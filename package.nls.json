@@ -1,0 +1,9 @@
+{
+    "qbs-tools.command.qbs.configure.title": "Configure",
+    "qbs-tools.command.qbs.build.title": "Build",
+    "qbs-tools.command.qbs.clean.title": "Clean",
+
+    "qbs-tools.configuration.qbs.qbsPath.description": "Name/path of the QBS executable to use.",
+    "qbs-tools.configuration.qbs.sourceDirectory.description": "The directory of the root *.qbs file.",
+    "qbs-tools.configuration.qbs.buildDirectory.description": "The directory where QBS build files will go."
+}

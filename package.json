@@ -28,6 +28,11 @@
     "contributes": {
         "commands": [
             {
+                "command": "qbs.configure",
+                "title": "%qbs-tools.command.qbs.configure.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.build",
                 "title": "%qbs-tools.command.qbs.build.title%",
                 "category": "QBS"

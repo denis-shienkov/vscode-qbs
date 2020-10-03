@@ -6,21 +6,27 @@ import * as vscode from 'vscode';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "qbs-tools" is now active!');
+    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    // This line of code will only be executed once when your extension is activated
+    console.log('Congratulations, your extension "qbs-tools" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('qbs.build', () => {
-		// The code you place here will be executed every time your command is executed
+    let configureCommand = vscode.commands.registerCommand('qbs.configure', () => {
+        // Display a message box to the user
+        vscode.window.showInformationMessage('QBS: configure');
+    });
+    context.subscriptions.push(configureCommand);
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from qbs!');
-	});
+    let buildCommand = vscode.commands.registerCommand('qbs.build', () => {
+        // Display a message box to the user
+        vscode.window.showInformationMessage('QBS: build');
+    });
+    context.subscriptions.push(buildCommand);
 
-	context.subscriptions.push(disposable);
+    let cleanCommand = vscode.commands.registerCommand('qbs.clean', () => {
+        // Display a message box to the user
+        vscode.window.showInformationMessage('QBS: clean');
+    });
+    context.subscriptions.push(cleanCommand);
 }
 
 // this method is called when your extension is deactivated
