@@ -21,6 +21,7 @@
     ],
     "icon": "res/logo.png",
     "activationEvents": [
+        "onCommand:qbs.configure",
         "onCommand:qbs.build",
         "onCommand:qbs.clean"
     ],
