@@ -2,14 +2,19 @@ import { create } from 'domain';
 import * as vscode from 'vscode';
 
 import {QbsSession} from './qbssession';
+import {StatusBar} from './statusbar';
 
 let qbsSession: QbsSession|null = null;
+let statusBar: StatusBar|null = null;
 
 export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "qbs-tools" is now active!');
 
     //  Create the Qbs session.
     qbsSession = QbsSession.create(extensionContext);
+
+    //  Create the status bar.
+    statusBar = StatusBar.create(qbsSession);
 
     const configureCmd = vscode.commands.registerCommand('qbs.configure', () => {
         vscode.window.showInformationMessage('QBS: configure');
@@ -28,7 +33,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
 
     // Subscribe on session events.
     qbsSession.onProjectUrisEnumerated(function(uris) {
-        console.log("Event happened: " + uris);
+        console.log(`Event happened: ${uris}`);
     });
 }
 
