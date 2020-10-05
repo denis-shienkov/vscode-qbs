@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
+
 import { basename } from 'path'; 
 
 import {QbsSession} from './qbssession';
@@ -13,11 +14,14 @@ export class StatusBar implements vscode.Disposable {
     // Constructors.
     constructor(private readonly _session: QbsSession) {
         this._projectFileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-        this._projectFileButton.tooltip = localize('qbs.active.project.select.tooltip', 'Active QBS Project File');
+        this._projectFileButton.tooltip = localize('qbs.active.project.select.tooltip', 'Click to select the active project');
+        this._projectFileButton.command = 'qbs.selectProject';
         this._projectFileButton.show();
 
-        // Subscribe on session events.
-        _session.onProjectUriChanged((uri) => this.updateProjectName);
+        // Subscribe on the session events.
+        _session.onProjectUriChanged(uri => {
+            this.updateProjectName(uri);
+        });
 
         this.initialize();
     }
@@ -38,7 +42,7 @@ export class StatusBar implements vscode.Disposable {
     }
 
     private async updateProjectName(uri?: vscode.Uri) {
-        const projectName = ((uri) ? basename(uri.fsPath) : '(empty)');
-        this._projectFileButton.text = localize('qbs.active.project.select', '$(project) Active project: ' + projectName);
+        const projectName = uri ? basename(uri.fsPath) : localize('qbs.active.project.empty', 'empty');
+        this._projectFileButton.text = localize('qbs.active.project.select', '$(project) Project (' + projectName + ')');
     }
 }

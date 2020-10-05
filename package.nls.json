@@ -1,4 +1,5 @@
 {
+    "qbs-tools.command.qbs.select.project.title": "SelectProject",
     "qbs-tools.command.qbs.configure.title": "Configure",
     "qbs-tools.command.qbs.build.title": "Build",
     "qbs-tools.command.qbs.clean.title": "Clean",

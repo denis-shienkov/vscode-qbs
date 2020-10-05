@@ -27,6 +27,7 @@
     ],
     "icon": "res/logo.png",
     "activationEvents": [
+        "onCommand:qbs.selectProject",
         "onCommand:qbs.configure",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
@@ -35,6 +36,11 @@
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
+            {
+                "command": "qbs.selectProject",
+                "title": "%qbs-tools.command.qbs.select.project.title%",
+                "category": "QBS"
+            },
             {
                 "command": "qbs.configure",
                 "title": "%qbs-tools.command.qbs.configure.title%",
