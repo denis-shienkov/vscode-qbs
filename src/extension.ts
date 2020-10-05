@@ -26,6 +26,15 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     });
     extensionContext.subscriptions.push(selectProjectCmd);
 
+    const selectProfileCmd = vscode.commands.registerCommand('qbs.selectProfile', () => {
+        selectProfile().then(profileName => {
+            console.debug('qbs: selectProfile: ' + profileName);
+            if (profileName && qbsSession)
+                qbsSession.profileName = profileName;
+        });
+    });
+    extensionContext.subscriptions.push(selectProfileCmd);
+
     const configureCmd = vscode.commands.registerCommand('qbs.configure', () => {
         vscode.window.showInformationMessage('QBS: configure');
     });
@@ -57,5 +66,20 @@ async function selectProject(): Promise<vscode.Uri | undefined> {
     });
     return await vscode.window.showQuickPick(items).then(item => {
         return item ? item.uri : undefined;
+    });
+}
+
+async function selectProfile(): Promise<string | undefined> {
+    interface ProfileQuickPickItem extends vscode.QuickPickItem {
+        //
+    }
+    const profileNames: string[] = ['msvc', 'gcc'];
+    const items: ProfileQuickPickItem[] = profileNames.map(profileName => {
+        return {
+            label: profileName
+        };
+    });
+    return await vscode.window.showQuickPick(items).then(item => {
+        return item ? item.label : undefined;
     });
 }

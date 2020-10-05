@@ -10,7 +10,8 @@ const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 export class StatusBar implements vscode.Disposable {
     // Private members.
     private _statusButton: vscode.StatusBarItem;
-    private _projectFileButton: vscode.StatusBarItem;
+    private _projectButton: vscode.StatusBarItem;
+    private _profileButton: vscode.StatusBarItem;
 
     // Constructors.
     constructor(private readonly _session: QbsSession) {
@@ -20,17 +21,26 @@ export class StatusBar implements vscode.Disposable {
         this._statusButton.show();
 
         // Create the QBS project file selection button.
-        this._projectFileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-        this._projectFileButton.tooltip = localize('qbs.active.project.select.tooltip', 'Click to select the active project');
-        this._projectFileButton.command = 'qbs.selectProject';
-        this._projectFileButton.show();
+        this._projectButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._projectButton.tooltip = localize('qbs.active.project.select.tooltip', 'Click to select the active project');
+        this._projectButton.command = 'qbs.selectProject';
+        this._projectButton.show();
+
+        // Create the QBS profile selection button.
+        this._profileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._profileButton.tooltip = localize('qbs.active.profile.select.tooltip', 'Click to select the profile');
+        this._profileButton.command = 'qbs.selectProfile';
+        this._profileButton.show();
 
         // Subscribe on the session events.
-        _session.onProjectUriChanged(uri => {
-            this.updateProjectName(uri);
-        });
         _session.onStatusChanged(status => {
             this.updateSessionStatus(StatusBar.sessionStatusName(this._session.status));
+        });
+        _session.onProjectUriChanged(uri => {
+            this.updateProjectFileName(uri);
+        });
+        _session.onProfileNameChanged(name => {
+            this.updateProfileName(name);
         });
 
         this.initialize();
@@ -65,15 +75,21 @@ export class StatusBar implements vscode.Disposable {
 
     private async initialize() {
         await this.updateSessionStatus(StatusBar.sessionStatusName(this._session.status));
-        await this.updateProjectName();
+        await this.updateProjectFileName();
+        await this.updateProfileName();
     }
 
     private async updateSessionStatus(status: string) {
         this._statusButton.text = localize('qbs.session.status', `QBS (${status})`);
     }
 
-    private async updateProjectName(uri?: vscode.Uri) {
+    private async updateProjectFileName(uri?: vscode.Uri) {
         const projectName = uri ? basename(uri.fsPath) : localize('qbs.active.project.empty', 'empty');
-        this._projectFileButton.text = localize('qbs.active.project.select', '$(project) Project (' + projectName + ')');
+        this._projectButton.text = localize('qbs.active.project.select', '$(project) Project (' + projectName + ')');
+    }
+
+    private async updateProfileName(profile?: string) {
+        const profileName = profile ? profile : localize('qbs.active.profile.empty', 'empty');
+        this._profileButton.text = localize('qbs.active.profile.select', `$(settings) Profile (${profileName})`);
     }
 }

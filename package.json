@@ -28,6 +28,7 @@
     "icon": "res/logo.png",
     "activationEvents": [
         "onCommand:qbs.selectProject",
+        "onCommand:qbs.selectProfile",
         "onCommand:qbs.configure",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
@@ -39,6 +40,11 @@
             {
                 "command": "qbs.selectProject",
                 "title": "%qbs-tools.command.qbs.select.project.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.selectProfile",
+                "title": "%qbs-tools.command.qbs.select.profile.title%",
                 "category": "QBS"
             },
             {
