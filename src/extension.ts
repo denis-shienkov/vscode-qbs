@@ -1,22 +1,35 @@
+import { create } from 'domain';
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+import {QbsSession} from './qbssession';
+
+let qbsSession: QbsSession|null = null;
+
+export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "qbs-tools" is now active!');
+
+    //  Create the Qbs session.
+    qbsSession = QbsSession.create(extensionContext);
 
     const configureCmd = vscode.commands.registerCommand('qbs.configure', () => {
         vscode.window.showInformationMessage('QBS: configure');
     });
-    context.subscriptions.push(configureCmd);
+    extensionContext.subscriptions.push(configureCmd);
 
     const buildCmd = vscode.commands.registerCommand('qbs.build', () => {
         vscode.window.showInformationMessage('QBS: build');
     });
-    context.subscriptions.push(buildCmd);
+    extensionContext.subscriptions.push(buildCmd);
 
     const cleanCmd = vscode.commands.registerCommand('qbs.clean', () => {
         vscode.window.showInformationMessage('QBS: clean');
     });
-    context.subscriptions.push(cleanCmd);
+    extensionContext.subscriptions.push(cleanCmd);
+
+    // Subscribe on session events.
+    qbsSession.onProjectUrisEnumerated(function(uris) {
+        console.log("Event happened: " + uris);
+    });
 }
 
 export function deactivate() {}
