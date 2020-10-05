@@ -4,7 +4,7 @@
     "description": "QBS support in Visual Studio Code",
     "version": "0.0.1",
     "publisher": "community",
-        "repository": {
+    "repository": {
         "type": "git",
         "url": "https://github.com/denis-shienkov/vscode-qbs"
     },
@@ -12,7 +12,13 @@
         "url": "https://github.com/denis-shienkov/vscode-qbs/issues"
     },
     "homepage": "https://github.com/denis-shienkov/vscode-qbs",
-    "keywords": ["qbs", "tools", "build", "c++", "native"],
+    "keywords": [
+        "qbs",
+        "tools",
+        "build",
+        "c++",
+        "native"
+    ],
     "engines": {
         "vscode": "^1.49.0"
     },
@@ -46,28 +52,28 @@
             }
         ],
         "configuration": {
-          "type": "object",
-          "title": "QBS configuration",
-          "properties": {
-            "qbs.qbsPath": {
-                "type": "string",
-                "default": "qbs",
-                "description": "%qbs-tools.configuration.qbs.qbsPath.description%",
-                "scope": "resource"
-            },
-            "qbs.sourceDirectory": {
-                "type": "string",
-                "default": "${workspaceFolder}",
-                "description": "%qbs-tools.configuration.qbs.sourceDirectory.description%",
-                "scope": "resource"
-            },
-            "qbs.buildDirectory": {
-                "type": "string",
-                "default": "${workspaceFolder}/build",
-                "description": "%qbs-tools.configuration.qbs.buildDirectory.description%",
-                "scope": "resource"
+            "type": "object",
+            "title": "QBS configuration",
+            "properties": {
+                "qbs.qbsPath": {
+                    "type": "string",
+                    "default": "qbs",
+                    "description": "%qbs-tools.configuration.qbs.qbsPath.description%",
+                    "scope": "resource"
+                },
+                "qbs.sourceDirectory": {
+                    "type": "string",
+                    "default": "${workspaceFolder}",
+                    "description": "%qbs-tools.configuration.qbs.sourceDirectory.description%",
+                    "scope": "resource"
+                },
+                "qbs.buildDirectory": {
+                    "type": "string",
+                    "default": "${workspaceFolder}/build",
+                    "description": "%qbs-tools.configuration.qbs.buildDirectory.description%",
+                    "scope": "resource"
+                }
             }
-          }
         }
     },
     "scripts": {
