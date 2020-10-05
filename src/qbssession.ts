@@ -12,14 +12,17 @@ export class QbsSession implements vscode.Disposable {
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri; // Current project *.qbs file.
     private _profileName!: string;
+    private _configurationName!: string;
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+    private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     
     // Public events.
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
+    readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
 
     // Constructors.
 
@@ -70,6 +73,17 @@ export class QbsSession implements vscode.Disposable {
 
     get profileName(): string {
         return this._profileName;
+    }
+
+    set configurationName(name: string) {
+        if (name === this._configurationName)
+            return;
+        this._configurationName = name;
+        this._onConfigurationNameChanged.fire(this._configurationName);
+    }
+
+    get configurationName(): string {
+        return this._configurationName;
     }
 
     // Private methods.

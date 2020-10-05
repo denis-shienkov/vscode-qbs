@@ -29,6 +29,7 @@
     "activationEvents": [
         "onCommand:qbs.selectProject",
         "onCommand:qbs.selectProfile",
+        "onCommand:qbs.selectConfiguration",
         "onCommand:qbs.configure",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
@@ -45,6 +46,11 @@
             {
                 "command": "qbs.selectProfile",
                 "title": "%qbs-tools.command.qbs.select.profile.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.selectConfiguration",
+                "title": "%qbs-tools.command.qbs.select.configuration.title%",
                 "category": "QBS"
             },
             {
