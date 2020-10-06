@@ -7,7 +7,7 @@ import {QbsSession, QbsSessionStatus} from './qbssession';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-export class StatusBar implements vscode.Disposable {
+export class QbsStatusBar implements vscode.Disposable {
     // Private members.
     private _statusButton: vscode.StatusBarItem;
     private _projectButton: vscode.StatusBarItem;
@@ -41,7 +41,7 @@ export class StatusBar implements vscode.Disposable {
 
         // Subscribe on the session events.
         _session.onStatusChanged(status => {
-            this.updateSessionStatus(StatusBar.sessionStatusName(this._session.status));
+            this.updateSessionStatus(QbsStatusBar.sessionStatusName(this._session.status));
         });
         _session.onProjectUriChanged(uri => {
             this.updateProjectFileName(uri);
@@ -59,7 +59,7 @@ export class StatusBar implements vscode.Disposable {
     // Public static methods.
 
     static create(session: QbsSession) {
-        const statusbar = new StatusBar(session);
+        const statusbar = new QbsStatusBar(session);
         return statusbar;
     }
 
@@ -84,7 +84,7 @@ export class StatusBar implements vscode.Disposable {
     // Private methods.
 
     private async initialize() {
-        await this.updateSessionStatus(StatusBar.sessionStatusName(this._session.status));
+        await this.updateSessionStatus(QbsStatusBar.sessionStatusName(this._session.status));
         await this.updateProjectFileName();
         await this.updateProfileName();
         await this.updateConfigurationName();

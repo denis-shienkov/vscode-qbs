@@ -2,20 +2,18 @@ import * as vscode from 'vscode';
 import { basename } from 'path';
 
 // From user code.
-import * as utils from './utils';
+import * as QbsUtils from './qbsutils';
 import {QbsSession} from './qbssession';
-import {StatusBar} from './statusbar';
+import {QbsStatusBar} from './qbsstatusbar';
 
 let qbsSession: QbsSession|null = null;
-let statusBar: StatusBar|null = null;
+let qbsStatusBar: QbsStatusBar|null = null;
 
 export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
-    // Create the QBS session.
     qbsSession = QbsSession.create(extensionContext);
-    // Create the status bar.
-    statusBar = StatusBar.create(qbsSession);
+    qbsStatusBar = QbsStatusBar.create(qbsSession);
 
     const selectProjectCmd = vscode.commands.registerCommand('qbs.selectProject', () => {
         selectProject().then(projectUri => {
@@ -66,7 +64,7 @@ async function selectProject(): Promise<vscode.Uri | undefined> {
     interface ProjectQuickPickItem extends vscode.QuickPickItem {
         uri: vscode.Uri;
     }
-    const projects = await utils.enumerateQbsProjects();
+    const projects = await QbsUtils.enumerateProjects();
     const items: ProjectQuickPickItem[] = projects.map(project => {
         return {
             label: basename(project.fsPath),
@@ -79,7 +77,7 @@ async function selectProject(): Promise<vscode.Uri | undefined> {
 }
 
 async function selectProfile(): Promise<string | undefined> {
-    const profiles = await utils.enumerateQbsBuildProfiles();
+    const profiles = await QbsUtils.enumerateBuildProfiles();
     const items: vscode.QuickPickItem[] = profiles.map(profile => {
         return { label: profile };
     });
@@ -89,7 +87,7 @@ async function selectProfile(): Promise<string | undefined> {
 }
 
 async function selectConfiguration(): Promise<string | undefined> {
-    const configurations = await utils.enumerateQbsBuildConfigurations();
+    const configurations = await QbsUtils.enumerateBuildConfigurations();
     const items: vscode.QuickPickItem[] = configurations.map(configuration => {
         return { label: configuration };
     });
