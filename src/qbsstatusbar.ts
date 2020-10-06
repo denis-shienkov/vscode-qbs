@@ -3,6 +3,7 @@ import * as nls from 'vscode-nls';
 
 import { basename } from 'path'; 
 
+// From user code.
 import {QbsSession, QbsSessionStatus} from './qbssession';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
