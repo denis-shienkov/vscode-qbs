@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-
-import { create } from 'domain';
 import { basename } from 'path';
 
+// From user code.
+import * as utils from './utils';
 import {QbsSession} from './qbssession';
 import {StatusBar} from './statusbar';
 
@@ -66,11 +66,11 @@ async function selectProject(): Promise<vscode.Uri | undefined> {
     interface ProjectQuickPickItem extends vscode.QuickPickItem {
         uri: vscode.Uri;
     }
-    const projectUris = await vscode.workspace.findFiles('*.qbs');
-    const items: ProjectQuickPickItem[] = projectUris.map(projectUri => {
+    const projects = await utils.enumerateQbsProjects();
+    const items: ProjectQuickPickItem[] = projects.map(project => {
         return {
-            label: basename(projectUri.fsPath),
-            uri: projectUri
+            label: basename(project.fsPath),
+            uri: project
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
@@ -79,14 +79,9 @@ async function selectProject(): Promise<vscode.Uri | undefined> {
 }
 
 async function selectProfile(): Promise<string | undefined> {
-    interface ProfileQuickPickItem extends vscode.QuickPickItem {
-        //
-    }
-    const profileNames: string[] = ['msvc', 'gcc'];
-    const items: ProfileQuickPickItem[] = profileNames.map(profileName => {
-        return {
-            label: profileName
-        };
+    const profiles = await utils.enumerateQbsBuildProfiles();
+    const items: vscode.QuickPickItem[] = profiles.map(profile => {
+        return { label: profile };
     });
     return await vscode.window.showQuickPick(items).then(item => {
         return item ? item.label : undefined;
@@ -94,14 +89,9 @@ async function selectProfile(): Promise<string | undefined> {
 }
 
 async function selectConfiguration(): Promise<string | undefined> {
-    interface ConfigurationQuickPickItem extends vscode.QuickPickItem {
-        //
-    }
-    const configurationNames: string[] = ['debug', 'release'];
-    const items: ConfigurationQuickPickItem[] = configurationNames.map(configurationName => {
-        return {
-            label: configurationName
-        };
+    const configurations = await utils.enumerateQbsBuildConfigurations();
+    const items: vscode.QuickPickItem[] = configurations.map(configuration => {
+        return { label: configuration };
     });
     return await vscode.window.showQuickPick(items).then(item => {
         return item ? item.label : undefined;
