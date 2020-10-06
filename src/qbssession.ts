@@ -31,6 +31,7 @@ export class QbsSession implements vscode.Disposable {
 
     constructor(readonly extensionContext: vscode.ExtensionContext) {
         this._process = new QbsProcess(extensionContext);
+
         this._process.onStatusChanged(status => {
             switch (status) {
             case QbsProcessStatus.Started:
@@ -46,6 +47,10 @@ export class QbsSession implements vscode.Disposable {
                 this.status = QbsSessionStatus.Stopping;
                 break;
             }
+        });
+
+        this._process.onObjectReceived(object => {
+            console.debug("O: " + object['type']);
         });
     }
 
