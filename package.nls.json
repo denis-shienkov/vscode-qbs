@@ -1,4 +1,6 @@
 {
+    "qbs-tools.command.qbs.start.session.title": "StartSession",
+    "qbs-tools.command.qbs.stop.session.title": "StopSession",
     "qbs-tools.command.qbs.select.project.title": "SelectProject",
     "qbs-tools.command.qbs.select.profile.title": "SelectProfile",
     "qbs-tools.command.qbs.select.configuration.title": "SelectConfiguration",

@@ -1,14 +1,17 @@
 import * as vscode from 'vscode';
 
+import {QbsProcess, QbsProcessStatus} from './qbsprocess';
+
 export enum QbsSessionStatus {
     Stopped,
     Started,
     Stopping,
     Starting
-  }
+}
 
 export class QbsSession implements vscode.Disposable {
     // Private members.
+    private _process: QbsProcess | undefined;
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri; // Current project *.qbs file.
     private _profileName!: string;
@@ -27,6 +30,23 @@ export class QbsSession implements vscode.Disposable {
     // Constructors.
 
     constructor(readonly extensionContext: vscode.ExtensionContext) {
+        this._process = new QbsProcess(extensionContext);
+        this._process.onStatusChanged(status => {
+            switch (status) {
+            case QbsProcessStatus.Started:
+                this.status = QbsSessionStatus.Started;
+                break;
+            case QbsProcessStatus.Starting:
+                this.status = QbsSessionStatus.Starting;
+                break;
+            case QbsProcessStatus.Stopped:
+                this.status = QbsSessionStatus.Stopped;
+                break;
+            case QbsProcessStatus.Stopping:
+                this.status = QbsSessionStatus.Stopping;
+                break;
+            }
+        });
     }
 
     // Public static methods.
@@ -41,6 +61,15 @@ export class QbsSession implements vscode.Disposable {
     dispose() {  }
 
     // Public methods.
+
+    async start() {
+        const qbsPath = <string>vscode.workspace.getConfiguration('qbs').get('qbsPath');
+        await this._process?.start(qbsPath);
+    }
+
+    async stop() {
+        await this._process?.stop();
+    }
 
     set status(st: QbsSessionStatus) {
         if (st === this._status)

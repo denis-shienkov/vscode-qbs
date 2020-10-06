@@ -8,11 +8,18 @@ import * as QbsSelectors from './qbsselectors';
 let qbsSession: QbsSession|null = null;
 let qbsStatusBar: QbsStatusBar|null = null;
 
-export function activate(extensionContext: vscode.ExtensionContext) {
-    console.log('Extension "qbs-tools" is now active!');
+function registerCommands(extensionContext: vscode.ExtensionContext) {
+    const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
+        console.debug('qbs: startSession');
+        qbsSession?.start();
+    });
+    extensionContext.subscriptions.push(startSessionCmd);
 
-    qbsSession = QbsSession.create(extensionContext);
-    qbsStatusBar = QbsStatusBar.create(qbsSession);
+    const stopSessionCmd = vscode.commands.registerCommand('qbs.stopSession', () => {
+        console.debug('qbs: stopSession');
+        qbsSession?.stop();
+    });
+    extensionContext.subscriptions.push(stopSessionCmd);
 
     const selectProjectCmd = vscode.commands.registerCommand('qbs.selectProject', () => {
         QbsSelectors.selectProject().then(projectUri => {
@@ -55,6 +62,15 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('QBS: clean');
     });
     extensionContext.subscriptions.push(cleanCmd);
+}
+
+export function activate(extensionContext: vscode.ExtensionContext) {
+    console.log('Extension "qbs-tools" is now active!');
+    // Create the QBS objects.
+    qbsSession = QbsSession.create(extensionContext);
+    qbsStatusBar = QbsStatusBar.create(qbsSession);
+    // Register the QBS commands.
+    registerCommands(extensionContext);
 }
 
 export function deactivate() {}
