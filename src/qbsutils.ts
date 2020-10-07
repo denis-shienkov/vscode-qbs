@@ -8,7 +8,7 @@ export async function enumerateProjects(): Promise<vscode.Uri[]> {
 export async function enumerateBuildProfiles(): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
         const qbsPath = vscode.workspace.getConfiguration('qbs').get('qbsPath');
-		cp.exec(qbsPath + ' config --list', (error, stdout, stderr) => {
+        cp.exec(qbsPath + ' config --list', (error, stdout, stderr) => {
             if (error) {
                 reject(undefined);
             } else {
@@ -28,7 +28,7 @@ export async function enumerateBuildProfiles(): Promise<string[]> {
                 });
                 resolve(profiles);
             }
-		});
+        });
     });
 }
 
