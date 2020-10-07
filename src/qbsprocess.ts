@@ -75,7 +75,7 @@ export class QbsProcess implements vscode.Disposable {
 
     // Private methods.
 
-    parseStdOutput() {
+    private parseStdOutput() {
         for (;;) {
             if (this._expectedLength === -1) {
                 // Lookup the protocol preamble and detect the expected payload length.
