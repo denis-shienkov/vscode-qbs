@@ -32,7 +32,7 @@
         "onCommand:qbs.selectProject",
         "onCommand:qbs.selectProfile",
         "onCommand:qbs.selectConfiguration",
-        "onCommand:qbs.configure",
+        "onCommand:qbs.resolve",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
         "workspaceContains:*.qbs"
@@ -73,8 +73,8 @@
                 "category": "QBS"
             },
             {
-                "command": "qbs.configure",
-                "title": "%qbs-tools.command.qbs.configure.title%",
+                "command": "qbs.resolve",
+                "title": "%qbs-tools.command.qbs.resolve.title%",
                 "category": "QBS"
             },
             {

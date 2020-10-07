@@ -48,10 +48,10 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     });
     extensionContext.subscriptions.push(selectConfigurationCmd);
 
-    const configureCmd = vscode.commands.registerCommand('qbs.configure', () => {
-        vscode.window.showInformationMessage('QBS: configure');
+    const resolveCmd = vscode.commands.registerCommand('qbs.resolve', () => {
+        vscode.window.showInformationMessage('QBS: resolve');
     });
-    extensionContext.subscriptions.push(configureCmd);
+    extensionContext.subscriptions.push(resolveCmd);
 
     const buildCmd = vscode.commands.registerCommand('qbs.build', () => {
         vscode.window.showInformationMessage('QBS: build');
