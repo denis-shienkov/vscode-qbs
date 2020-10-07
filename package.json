@@ -109,6 +109,12 @@
                     "default": "${workspaceFolder}/build",
                     "description": "%qbs-tools.configuration.qbs.buildDirectory.description%",
                     "scope": "resource"
+                },
+                "qbs.showCommandLines": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.showCommandLines.description%",
+                    "scope": "resource"
                 }
             }
         }

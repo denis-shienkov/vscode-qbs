@@ -122,11 +122,9 @@ export class QbsSession implements vscode.Disposable {
         if (this._profileName.length > 0)
             object['top-level-profile'] = this._profileName;
 
-        const buildDirectory = QbsUtils.expandPath(await vscode.workspace.getConfiguration('qbs').get('buildDirectory'));
-        if (buildDirectory) {
-            object['build-root'] = buildDirectory;
-            object['dry-run'] = fs.existsSync(buildDirectory) ? 'false' : 'true';
-        }
+        const buildDirectory = QbsUtils.expandPath(await vscode.workspace.getConfiguration('qbs').get('buildDirectory')) as string;
+        object['build-root'] = buildDirectory;
+        object['dry-run'] = fs.existsSync(buildDirectory) ? 'false' : 'true';
 
         await this._process?.sendObject(object);
     }
@@ -136,8 +134,10 @@ export class QbsSession implements vscode.Disposable {
         object['type'] = 'build-project';
         object['max-job-count'] = '2';
         object['keep-going'] = 'true';
-        object['command-echo-mode'] = false ? 'command-line' : 'summary';
         object['data-mode'] = 'only-if-changed';
+
+        const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
+        object['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
         await this._process?.sendObject(object);
     }

@@ -10,5 +10,6 @@
 
     "qbs-tools.configuration.qbs.qbsPath.description": "Name/path of the QBS executable to use.",
     "qbs-tools.configuration.qbs.sourceDirectory.description": "The directory of the root *.qbs file.",
-    "qbs-tools.configuration.qbs.buildDirectory.description": "The directory where QBS build files will go."
+    "qbs-tools.configuration.qbs.buildDirectory.description": "The directory where QBS build files will go.",
+    "qbs-tools.configuration.qbs.showCommandLines.description": "Show full command lines when building."
 }
