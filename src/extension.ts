@@ -49,7 +49,7 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(selectConfigurationCmd);
 
     const resolveCmd = vscode.commands.registerCommand('qbs.resolve', () => {
-        vscode.window.showInformationMessage('QBS: resolve');
+        qbsSession?.resolve();
     });
     extensionContext.subscriptions.push(resolveCmd);
 

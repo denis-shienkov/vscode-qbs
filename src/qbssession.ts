@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 
+// From user code.
+import * as QbsUtils from './qbsutils';
 import {QbsProcess, QbsProcessStatus} from './qbsprocess';
-
 import {QbsSessionProcessResult,
         QbsSessionTaskStartedResult,
         QbsSessionTaskProgressResult,
@@ -19,10 +21,10 @@ export class QbsSession implements vscode.Disposable {
     // Private members.
     private _process: QbsProcess | undefined;
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
-    private _projectUri!: vscode.Uri; // Current project *.qbs file.
-    private _profileName!: string;
-    private _configurationName!: string;
-    private _projectData!: any;
+    private _projectUri!: vscode.Uri;
+    private _profileName: string = '';
+    private _configurationName: string = '';
+    private _projectData: any = {};
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
@@ -105,6 +107,30 @@ export class QbsSession implements vscode.Disposable {
         await this._process?.stop();
     }
 
+    async resolve() {
+        let object: any = {};
+        object['type'] = 'resolve-project';
+        object['environment'] = process.env;
+        object['data-mode'] = 'only-if-changed';
+
+        if (this._projectUri)
+            object['project-file-path'] = QbsUtils.expandPath(this._projectUri.fsPath);
+
+        if (this._configurationName.length > 0)
+            object['configuration-name'] = this._configurationName;
+
+        if (this._profileName.length > 0)
+            object['top-level-profile'] = this._profileName;
+
+        const buildDirectory = QbsUtils.expandPath(await vscode.workspace.getConfiguration('qbs').get('buildDirectory'));
+        if (buildDirectory) {
+            object['build-root'] = buildDirectory;
+            object['dry-run'] = fs.existsSync(buildDirectory) ? 'false' : 'true';
+        }
+
+        // TODO: Write object to process.
+    }
+
     set status(st: QbsSessionStatus) {
         if (st === this._status)
             return;
@@ -150,6 +176,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     // Private static methods.
+
     static extractErrorDetails(object: any) : any {
         return object['error'];
     }

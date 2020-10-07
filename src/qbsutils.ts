@@ -35,3 +35,14 @@ export async function enumerateBuildProfiles(): Promise<string[]> {
 export async function enumerateBuildConfigurations(): Promise<string[]> {
     return ['debug', 'release'];
 }
+
+export function expandPath(path?: string): string | undefined {
+    if (path?.includes('${workspaceFolder}')) {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (workspaceFolders) {
+            const workspaceFolder = workspaceFolders[0].uri.fsPath;
+            path = path.replace('${workspaceFolder}', workspaceFolder);
+        }
+    }
+    return path?.replace(/\\/g, '/');
+}
