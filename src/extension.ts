@@ -54,7 +54,7 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(resolveCmd);
 
     const buildCmd = vscode.commands.registerCommand('qbs.build', () => {
-        vscode.window.showInformationMessage('QBS: build');
+        qbsSession?.build();
     });
     extensionContext.subscriptions.push(buildCmd);
 

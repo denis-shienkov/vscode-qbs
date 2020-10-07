@@ -131,6 +131,17 @@ export class QbsSession implements vscode.Disposable {
         await this._process?.sendObject(object);
     }
 
+    async build() {
+        let object: any = {};
+        object['type'] = 'build-project';
+        object['max-job-count'] = '2';
+        object['keep-going'] = 'true';
+        object['command-echo-mode'] = false ? 'command-line' : 'summary';
+        object['data-mode'] = 'only-if-changed';
+
+        await this._process?.sendObject(object);
+    }
+
     async clean() {
         let object: any = {};
         object['type'] = 'clean-project';
