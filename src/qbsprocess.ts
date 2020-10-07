@@ -73,6 +73,13 @@ export class QbsProcess implements vscode.Disposable {
         this._process?.kill();
     }
 
+    async sendObject(object: any) {
+        const json = JSON.stringify(object);
+        const data = Buffer.from(json, 'binary').toString('base64');
+        const output = PACKET_PREAMBLE + data.length + '\n' + data;
+        this._process?.stdin?.write(output);
+    }
+
     // Private methods.
 
     private parseStdOutput() {

@@ -128,7 +128,7 @@ export class QbsSession implements vscode.Disposable {
             object['dry-run'] = fs.existsSync(buildDirectory) ? 'false' : 'true';
         }
 
-        // TODO: Write object to process.
+        await this._process?.sendObject(object);
     }
 
     set status(st: QbsSessionStatus) {
