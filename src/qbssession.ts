@@ -2,6 +2,12 @@ import * as vscode from 'vscode';
 
 import {QbsProcess, QbsProcessStatus} from './qbsprocess';
 
+import {QbsSessionProcessResult,
+        QbsSessionTaskStartedResult,
+        QbsSessionTaskProgressResult,
+        QbsSessionTaskMaxProgressResult,
+        QbsSessionMessageResult} from './qbssessionresults';
+
 export enum QbsSessionStatus {
     Stopped,
     Started,
@@ -21,12 +27,34 @@ export class QbsSession implements vscode.Disposable {
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+    private _onHelloReceived: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
+    private _onProjectResolved: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onProjectBuilt: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onProjectCleaned: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onProjectInstalled: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onLogMessageReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onTaskStarted: vscode.EventEmitter<QbsSessionTaskStartedResult> = new vscode.EventEmitter<QbsSessionTaskStartedResult>();
+    private _onTaskProgressUpdated: vscode.EventEmitter<QbsSessionTaskProgressResult> = new vscode.EventEmitter<QbsSessionTaskProgressResult>();
+    private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsSessionTaskMaxProgressResult> = new vscode.EventEmitter<QbsSessionTaskMaxProgressResult>();
+    private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
     
     // Public events.
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
+    readonly onHelloReceived: vscode.Event<void> = this._onHelloReceived.event;
+    readonly onProjectResolved: vscode.Event<any> = this._onProjectResolved.event;
+    readonly onProjectBuilt: vscode.Event<any> = this._onProjectBuilt.event;
+    readonly onProjectCleaned: vscode.Event<any> = this._onProjectCleaned.event;
+    readonly onProjectInstalled: vscode.Event<any> = this._onProjectInstalled.event;
+    readonly onLogMessageReceived: vscode.Event<QbsSessionMessageResult> = this._onLogMessageReceived.event;
+    readonly onTaskStarted: vscode.Event<QbsSessionTaskStartedResult> = this._onTaskStarted.event;
+    readonly onTaskProgressUpdated: vscode.Event<QbsSessionTaskProgressResult> = this._onTaskProgressUpdated.event;
+    readonly onTaskMaxProgressChanged: vscode.Event<QbsSessionTaskMaxProgressResult> = this._onTaskMaxProgressChanged.event;
+    readonly onCommandDescriptionReceived: vscode.Event<QbsSessionMessageResult> = this._onCommandDescriptionReceived.event;
+    readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
 
     // Constructors.
 
@@ -121,65 +149,65 @@ export class QbsSession implements vscode.Disposable {
         return this._configurationName;
     }
 
+    // Private static methods.
+    static extractErrorDetails(object: any) : any {
+        return object['error'];
+    }
+
     // Private methods.
 
-    handleIncomingObject(object: any) {
+    private handleIncomingObject(object: any) {
         const type = object['type'];
         console.debug(`t: ${type}`);
 
         if (type === 'hello') {
-            // TODO: ??
+            this._onHelloReceived.fire();
         } else if (type === 'project-resolved') {
             this.setProjectData(object, true);
-            //const auto errors = extractErrorDetails(payload);
-            //emit projectResolved(errors);
+            const errors = QbsSession.extractErrorDetails(object);
+            this._onProjectResolved.fire(errors);
         } else if (type === 'project-built') {
             this.setProjectData(object, false);
-            //const auto errors = extractErrorDetails(payload);
-            //emit projectBuilt(errors);
+            const errors = QbsSession.extractErrorDetails(object);
+            this._onProjectBuilt.fire(errors);
         } else if (type === 'project-cleaned') {
-            //const auto errors = extractErrorDetails(payload);
-            //emit projectCleaned(errors);
+            const errors = QbsSession.extractErrorDetails(object);
+            this._onProjectCleaned.fire(errors);
         } else if (type === 'install-done') {
-            //const auto errors = extractErrorDetails(payload);
-            //emit projectInstalled(errors);
+            const errors = QbsSession.extractErrorDetails(object);
+            this._onProjectInstalled.fire(errors);
         } else if (type === 'log-data') {
-            //const auto message = payload.value("message").toString();
-            //qCInfo(SESSION) << "Qbs message: " + message;
+            const result = new QbsSessionMessageResult(object);
+            this._onLogMessageReceived.fire(result);
         } else if (type === 'warning') {
+            // TODO:
             //const SessionErrorDetails warning(payload.value("warning").toObject());
             //qCWarning(SESSION) << "Qbs warning: " + warning.toString();
         } else if (type === 'task-started') {
-            //const auto description = payload.value("description").toString();
-            //const auto maxProgress = payload.value("max-progress").toInt();
-            //emit taskStarted(description, maxProgress);
+            const result = new QbsSessionTaskStartedResult(object);
+            this._onTaskStarted.fire(result);
         } else if (type === 'task-progress') {
-            //const auto progress = payload.value("progress").toInt();
-            //emit taskProgress(progress);
+            const result = new QbsSessionTaskProgressResult(object);
+            this._onTaskProgressUpdated.fire(result);
         } else if (type === 'new-max-progress') {
-            //const auto maxProgress = payload.value("max-progress").toInt();
-            //emit taskMaxProgressChanged(maxProgress);
+            const result = new QbsSessionTaskMaxProgressResult(object);
+            this._onTaskMaxProgressChanged.fire(result);
         } else if (type === 'generated-files-for-source') {
             // TODO: Implement me.
         } else if (type === 'command-description') {
-            //const auto description = payload.value("message").toString();
-            //emit commandDescriptionReceived(description);
+            const result = new QbsSessionMessageResult(object);
+            this._onCommandDescriptionReceived.fire(result);
         } else if (type === 'files-added' || type === 'files-removed') {
             // TODO: Implement me.
         } else if (type === 'process-result') {
-            //const auto executable = payload.value("executable-file-path").toString();
-            //const auto args = arrayToStringList(payload.value("arguments"));
-            //const auto workingDir = payload.value("working-directory").toString();
-            //const auto stdOut = arrayToStringList(payload.value("stdout"));
-            //const auto stdErr = arrayToStringList(payload.value("stderr"));
-            //const auto success = payload.value("success").toBool();
-            //emit processResultReceived(executable, args, workingDir, stdOut, stdErr, success);
+            const result = new QbsSessionProcessResult(object);
+            this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
             // TODO: Implement me.
         }
     }
 
-    setProjectData(object: any, withBuildSystemFiles: boolean) {
+    private setProjectData(object: any, withBuildSystemFiles: boolean) {
         const data = object['project-data'];
         if (data) {
             const files = data['build-system-files'];
