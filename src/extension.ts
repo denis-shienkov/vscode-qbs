@@ -59,7 +59,7 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(buildCmd);
 
     const cleanCmd = vscode.commands.registerCommand('qbs.clean', () => {
-        vscode.window.showInformationMessage('QBS: clean');
+        qbsSession?.clean();
     });
     extensionContext.subscriptions.push(cleanCmd);
 }
