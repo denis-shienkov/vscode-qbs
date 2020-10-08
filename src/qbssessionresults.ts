@@ -54,15 +54,7 @@ export class QbsSessionTaskMaxProgressResult {
     }
 }
 
-export class QbsSessionMessageResult {
-    readonly _description: string;
-
-    constructor(readonly response: any) {
-        this._description = response['message'];
-    }
-}
-
-export class QbsSessionErrorInfoItemResult {
+export class QbsSessionMessageItemResult {
     readonly _description: string = '';
     readonly _filePath: string = '';
     readonly _line: number = -1;
@@ -90,29 +82,29 @@ export class QbsSessionErrorInfoItemResult {
     }
 }
 
-export class QbsSessionErrorInfoResult {
-    readonly _entries: QbsSessionErrorInfoItemResult[] = [];
+export class QbsSessionMesageResult {
+    readonly _messages: QbsSessionMessageItemResult[] = [];
 
-    constructor(readonly msg: any) {
-        if (typeof msg === 'string') {
-            const item = new QbsSessionErrorInfoItemResult(msg);
-            this._entries.push(item);
+    constructor(readonly obj: any) {
+        if (typeof obj === 'string') {
+            const message = new QbsSessionMessageItemResult(obj);
+            this._messages.push(message);
         } else {
-            const items = msg['items'] || [];
+            const items = obj['items'] || [];
             for (const item of items) {
-                const entry = new QbsSessionErrorInfoItemResult(item);
-                this._entries.push(item);
+                const message = new QbsSessionMessageItemResult(item);
+                this._messages.push(message);
             }
         }
     }
 
     hasError(): boolean {
-        return this._entries.length > 0;
+        return this._messages.length > 0;
     }
 
     toString(): string {
         let list: string[] = [];
-        for (const item of this._entries) {
+        for (const item of this._messages) {
             const s = item.toString();
             list.push(s);
         }
