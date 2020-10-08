@@ -74,8 +74,8 @@ export class QbsSessionErrorInfoItemResult {
         } else {
             this._description = object['description'];
             const location = object['location'];
-            this._filePath = object['file-path'];
-            this._line = parseInt(object['line']);
+            this._filePath = location['file-path'];
+            this._line = parseInt(location['line']);
         }
     }
 

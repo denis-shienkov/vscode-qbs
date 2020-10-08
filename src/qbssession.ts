@@ -21,7 +21,7 @@ export enum QbsSessionStatus {
 
 export class QbsSession implements vscode.Disposable {
     // Private members.
-    private _process: QbsProcess | undefined;
+    private _process?: QbsProcess;
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri;
     private _profileName: string = '';
@@ -106,11 +106,15 @@ export class QbsSession implements vscode.Disposable {
     // Public methods.
 
     async start() {
+        if (this._status !== QbsSessionStatus.Stopped)
+            return;
         const qbsPath = <string>vscode.workspace.getConfiguration('qbs').get('qbsPath');
         await this._process?.start(qbsPath);
     }
 
     async stop() {
+        if (this._status !== QbsSessionStatus.Started)
+            return;
         await this._process?.stop();
     }
 
@@ -214,17 +218,17 @@ export class QbsSession implements vscode.Disposable {
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             this.setProjectData(object, true);
-            const result = new QbsSessionErrorInfoResult(object);
+            const result = new QbsSessionErrorInfoResult(object['error']);
             this._onProjectResolved.fire(result);
-        } else if (type === 'project-built') {
+        } else if (type === 'project-built' || type === 'build-done') {
             this.setProjectData(object, false);
-            const result = new QbsSessionErrorInfoResult(object);
+            const result = new QbsSessionErrorInfoResult(object['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            const result = new QbsSessionErrorInfoResult(object);
+            const result = new QbsSessionErrorInfoResult(object['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
-            const result = new QbsSessionErrorInfoResult(object);
+            const result = new QbsSessionErrorInfoResult(object['error']);
             this._onProjectInstalled.fire(result);
         } else if (type === 'log-data') {
             const result = new QbsSessionMessageResult(object);
