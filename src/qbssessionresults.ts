@@ -21,9 +21,9 @@ export class QbsSessionProcessResult {
     constructor(readonly object: any) {
         this._executable = object['executable-file-path'];
         this._workingDirectory = object['working-directory'];
-        this._arguments = [];// [''];//object['arguments'];
-        this._stdOutput = [];//[''];//arrayToStringList(object.value("stdout"));
-        this._stdError = [];//[''];//arrayToStringList(object.value("stderr"));
+        this._arguments = object['arguments'];
+        this._stdOutput = object['stdout'];
+        this._stdError = object['stderr'];
         this._success = JSON.parse(object['success']);
     }
 }
