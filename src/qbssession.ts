@@ -133,9 +133,12 @@ export class QbsSession implements vscode.Disposable {
     async build() {
         let object: any = {};
         object['type'] = 'build-project';
-        object['max-job-count'] = '2';
         object['keep-going'] = 'true';
         object['data-mode'] = 'only-if-changed';
+
+        const maxJobs = await vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number;
+        if (maxJobs > 0)
+            object['max-job-count'] = maxJobs;
 
         const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
         object['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
