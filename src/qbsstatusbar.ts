@@ -15,6 +15,7 @@ export class QbsStatusBar implements vscode.Disposable {
     private _projectButton: vscode.StatusBarItem;
     private _profileButton: vscode.StatusBarItem;
     private _configurationButton: vscode.StatusBarItem;
+    private _buildRunButton: vscode.StatusBarItem;
 
     // Constructors.
     constructor(private readonly _session: QbsSession) {
@@ -40,6 +41,13 @@ export class QbsStatusBar implements vscode.Disposable {
         this._configurationButton.tooltip = localize('qbs.build.configuration.select.tooltip', 'Click to select the build configuration');
         this._configurationButton.command = 'qbs.selectConfiguration';
         this._configurationButton.show();
+
+        // Create the QBS build run button.
+        this._buildRunButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -5);
+        this._buildRunButton.text = localize('qbs.build.run', `$(gear) Build`);
+        this._buildRunButton.tooltip = localize('qbs.build.run.tooltip', 'Build the selected target');
+        this._buildRunButton.command = 'qbs.build';
+        this._buildRunButton.show();
 
         // Subscribe on the session events.
         _session.onStatusChanged(status => {
