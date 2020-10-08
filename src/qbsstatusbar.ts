@@ -66,13 +66,6 @@ export class QbsStatusBar implements vscode.Disposable {
         this.initialize();
     }
 
-    // Public static methods.
-
-    static create(session: QbsSession) {
-        const statusbar = new QbsStatusBar(session);
-        return statusbar;
-    }
-
     // Public overriden methods.
     dispose(): void { }
 

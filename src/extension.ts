@@ -151,8 +151,8 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
     // Create all required singletons.
-    qbsSession = QbsSession.create(extensionContext);
-    qbsStatusBar = QbsStatusBar.create(qbsSession);
+    qbsSession = new QbsSession(extensionContext);
+    qbsStatusBar = new QbsStatusBar(qbsSession);
 
     // Subscribe to all required events.
     subscribeCommands(extensionContext);

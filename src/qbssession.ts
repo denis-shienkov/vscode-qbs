@@ -91,13 +91,6 @@ export class QbsSession implements vscode.Disposable {
         });
     }
 
-    // Public static methods.
-
-    static create(extensionContext: vscode.ExtensionContext) {
-        const session = new QbsSession(extensionContext);
-        return session;
-    }
-
     // Public overriden methods.
 
     dispose() {  }
