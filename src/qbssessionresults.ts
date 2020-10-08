@@ -62,3 +62,60 @@ export class QbsSessionMessageResult {
     }
 }
 
+export class QbsSessionErrorInfoResult {
+    readonly _description: string = '';
+    readonly _filePath: string = '';
+    readonly _line: number = -1;
+
+    constructor(object: string)
+    constructor(readonly object: any) {
+        if (typeof object === 'string') {
+            this._description = object;
+        } else {
+            this._description = object['description'];
+            const location = object['location'];
+            this._filePath = object['file-path'];
+            this._line = parseInt(object['line']);
+        }
+    }
+
+    toString(): string {
+        let s: string = this._filePath;
+        if (s.length > 0 && this._line != -1)
+            s += ':' + this._line;
+        if (s.length > 0)
+            s += ':';
+        s += this._description;
+        return s;
+    }
+}
+
+export class QbsSessionErrorInfoDetailsResult {
+    readonly _messages: QbsSessionErrorInfoResult[] = [];
+
+    constructor(readonly object: any) {
+        if (typeof object === 'string') {
+            const message = new QbsSessionErrorInfoResult(object);
+            this._messages.push(message);
+        } else {
+            const items = object['items'];
+            for (const item of items) {
+                const message = new QbsSessionErrorInfoResult(item);
+                this._messages.push(message);
+            }
+        }
+    }
+
+    hasError(): boolean {
+        return this._messages.length > 0;
+    }
+
+    toString(): string {
+        let list: string[] = [];
+        for (const message of this._messages) {
+            const s = message.toString();
+            list.push(s);
+        }
+        return list.join('\n');
+    }
+}

@@ -9,7 +9,8 @@ import {QbsSessionHelloResult,
         QbsSessionTaskStartedResult,
         QbsSessionTaskProgressResult,
         QbsSessionTaskMaxProgressResult,
-        QbsSessionMessageResult} from './qbssessionresults';
+        QbsSessionMessageResult,
+        QbsSessionErrorInfoDetailsResult} from './qbssessionresults';
 
 export enum QbsSessionStatus {
     Stopped,
@@ -26,15 +27,17 @@ export class QbsSession implements vscode.Disposable {
     private _profileName: string = '';
     private _configurationName: string = '';
     private _projectData: any = {};
+
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
-    private _onProjectResolved: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-    private _onProjectBuilt: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-    private _onProjectCleaned: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
-    private _onProjectInstalled: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onProjectResolved: vscode.EventEmitter<QbsSessionErrorInfoDetailsResult> = new vscode.EventEmitter<QbsSessionErrorInfoDetailsResult>();
+    private _onProjectBuilt: vscode.EventEmitter<QbsSessionErrorInfoDetailsResult> = new vscode.EventEmitter<QbsSessionErrorInfoDetailsResult>();
+    private _onProjectCleaned: vscode.EventEmitter<QbsSessionErrorInfoDetailsResult> = new vscode.EventEmitter<QbsSessionErrorInfoDetailsResult>();
+    private _onProjectInstalled: vscode.EventEmitter<QbsSessionErrorInfoDetailsResult> = new vscode.EventEmitter<QbsSessionErrorInfoDetailsResult>();
     private _onLogMessageReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onTaskStarted: vscode.EventEmitter<QbsSessionTaskStartedResult> = new vscode.EventEmitter<QbsSessionTaskStartedResult>();
     private _onTaskProgressUpdated: vscode.EventEmitter<QbsSessionTaskProgressResult> = new vscode.EventEmitter<QbsSessionTaskProgressResult>();
@@ -47,11 +50,12 @@ export class QbsSession implements vscode.Disposable {
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
+
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
-    readonly onProjectResolved: vscode.Event<any> = this._onProjectResolved.event;
-    readonly onProjectBuilt: vscode.Event<any> = this._onProjectBuilt.event;
-    readonly onProjectCleaned: vscode.Event<any> = this._onProjectCleaned.event;
-    readonly onProjectInstalled: vscode.Event<any> = this._onProjectInstalled.event;
+    readonly onProjectResolved: vscode.Event<QbsSessionErrorInfoDetailsResult> = this._onProjectResolved.event;
+    readonly onProjectBuilt: vscode.Event<QbsSessionErrorInfoDetailsResult> = this._onProjectBuilt.event;
+    readonly onProjectCleaned: vscode.Event<QbsSessionErrorInfoDetailsResult> = this._onProjectCleaned.event;
+    readonly onProjectInstalled: vscode.Event<QbsSessionErrorInfoDetailsResult> = this._onProjectInstalled.event;
     readonly onLogMessageReceived: vscode.Event<QbsSessionMessageResult> = this._onLogMessageReceived.event;
     readonly onTaskStarted: vscode.Event<QbsSessionTaskStartedResult> = this._onTaskStarted.event;
     readonly onTaskProgressUpdated: vscode.Event<QbsSessionTaskProgressResult> = this._onTaskProgressUpdated.event;
@@ -197,12 +201,6 @@ export class QbsSession implements vscode.Disposable {
         return this._configurationName;
     }
 
-    // Private static methods.
-
-    static extractErrorDetails(object: any) : any {
-        return object['error'];
-    }
-
     // Private methods.
 
     private handleIncomingObject(object: any) {
@@ -214,18 +212,18 @@ export class QbsSession implements vscode.Disposable {
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             this.setProjectData(object, true);
-            const errors = QbsSession.extractErrorDetails(object);
-            this._onProjectResolved.fire(errors);
+            const result = new QbsSessionErrorInfoDetailsResult(object);
+            this._onProjectResolved.fire(result);
         } else if (type === 'project-built') {
             this.setProjectData(object, false);
-            const errors = QbsSession.extractErrorDetails(object);
-            this._onProjectBuilt.fire(errors);
+            const result = new QbsSessionErrorInfoDetailsResult(object);
+            this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            const errors = QbsSession.extractErrorDetails(object);
-            this._onProjectCleaned.fire(errors);
+            const result = new QbsSessionErrorInfoDetailsResult(object);
+            this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
-            const errors = QbsSession.extractErrorDetails(object);
-            this._onProjectInstalled.fire(errors);
+            const result = new QbsSessionErrorInfoDetailsResult(object);
+            this._onProjectInstalled.fire(result);
         } else if (type === 'log-data') {
             const result = new QbsSessionMessageResult(object);
             this._onLogMessageReceived.fire(result);
