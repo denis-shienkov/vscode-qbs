@@ -17,11 +17,11 @@ export class QbsProcess implements vscode.Disposable {
     private _status: QbsProcessStatus = QbsProcessStatus.Stopped;
     private _process: cp.ChildProcess | undefined;
     private _onStatusChanged: vscode.EventEmitter<QbsProcessStatus> = new vscode.EventEmitter<QbsProcessStatus>();
-    private _onObjectReceived: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
+    private _onResponseReceived: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
      // Public events.
     readonly onStatusChanged: vscode.Event<QbsProcessStatus> = this._onStatusChanged.event;
-    readonly onObjectReceived: vscode.Event<any> = this._onObjectReceived.event;
+    readonly onResponseReceived: vscode.Event<any> = this._onResponseReceived.event;
 
     // Constructors.
 
@@ -73,8 +73,8 @@ export class QbsProcess implements vscode.Disposable {
         this._process?.kill();
     }
 
-    async sendObject(object: any) {
-        const json = JSON.stringify(object);
+    async sendRequest(request: any) {
+        const json = JSON.stringify(request);
         const data = Buffer.from(json, 'binary').toString('base64');
         const output = PACKET_PREAMBLE + data.length + '\n' + data;
         this._process?.stdin?.write(output);
@@ -110,8 +110,8 @@ export class QbsProcess implements vscode.Disposable {
                 this._input = this._input.slice(this._expectedLength);
                 this._expectedLength = -1;
                 const json = Buffer.from(data, 'base64').toString('binary');
-                const obj = JSON.parse(json);
-                this._onObjectReceived.fire(obj);
+                const response = JSON.parse(json);
+                this._onResponseReceived.fire(response);
             }
         }
     }

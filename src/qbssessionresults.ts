@@ -4,9 +4,9 @@ export class QbsSessionHelloResult {
     readonly _apiLevel: number = 0;
     readonly _apiCompatibilityLevel: number = 0;
 
-    constructor(readonly object: any) {
-        this._apiLevel = parseInt(object['api-level']);
-        this._apiCompatibilityLevel = parseInt(object['api-compat-level']);
+    constructor(readonly response: any) {
+        this._apiLevel = parseInt(response['api-level']);
+        this._apiCompatibilityLevel = parseInt(response['api-compat-level']);
     }
 }
 
@@ -18,13 +18,13 @@ export class QbsSessionProcessResult {
     readonly _stdError: string[];
     readonly _success: boolean;
 
-    constructor(readonly object: any) {
-        this._executable = object['executable-file-path'];
-        this._workingDirectory = object['working-directory'];
-        this._arguments = object['arguments'];
-        this._stdOutput = object['stdout'];
-        this._stdError = object['stderr'];
-        this._success = JSON.parse(object['success']);
+    constructor(readonly response: any) {
+        this._executable = response['executable-file-path'];
+        this._workingDirectory = response['working-directory'];
+        this._arguments = response['arguments'];
+        this._stdOutput = response['stdout'];
+        this._stdError = response['stderr'];
+        this._success = JSON.parse(response['success']);
     }
 }
 
@@ -32,33 +32,33 @@ export class QbsSessionTaskStartedResult {
     readonly _description: string;
     readonly _maxProgress: number;
 
-    constructor(readonly object: any) {
-        this._description = object['description'];
-        this._maxProgress = parseInt(object['max-progress']);
+    constructor(readonly response: any) {
+        this._description = response['description'];
+        this._maxProgress = parseInt(response['max-progress']);
     }
 }
 
 export class QbsSessionTaskProgressResult {
     readonly _progress: number;
 
-    constructor(readonly object: any) {
-        this._progress = parseInt(object['progress']);
+    constructor(readonly response: any) {
+        this._progress = parseInt(response['progress']);
     }
 }
 
 export class QbsSessionTaskMaxProgressResult {
     readonly _maxProgress: number;
 
-    constructor(readonly object: any) {
-        this._maxProgress = parseInt(object['max-progress']);
+    constructor(readonly response: any) {
+        this._maxProgress = parseInt(response['max-progress']);
     }
 }
 
 export class QbsSessionMessageResult {
     readonly _description: string;
 
-    constructor(readonly object: any) {
-        this._description = object['message'];
+    constructor(readonly response: any) {
+        this._description = response['message'];
     }
 }
 
@@ -67,13 +67,13 @@ export class QbsSessionErrorInfoItemResult {
     readonly _filePath: string = '';
     readonly _line: number = -1;
 
-    constructor(object: string)
-    constructor(readonly object: any) {
-        if (typeof object === 'string') {
-            this._description = object;
+    constructor(msg: string)
+    constructor(readonly msg: any) {
+        if (typeof msg === 'string') {
+            this._description = msg;
         } else {
-            this._description = object['description'];
-            const location = object['location'];
+            this._description = msg['description'];
+            const location = msg['location'];
             this._filePath = location['file-path'];
             this._line = parseInt(location['line']);
         }
@@ -93,12 +93,12 @@ export class QbsSessionErrorInfoItemResult {
 export class QbsSessionErrorInfoResult {
     readonly _entries: QbsSessionErrorInfoItemResult[] = [];
 
-    constructor(readonly object: any) {
-        if (typeof object === 'string') {
-            const item = new QbsSessionErrorInfoItemResult(object);
+    constructor(readonly msg: any) {
+        if (typeof msg === 'string') {
+            const item = new QbsSessionErrorInfoItemResult(msg);
             this._entries.push(item);
         } else {
-            const items = object['items'] || [];
+            const items = msg['items'] || [];
             for (const item of items) {
                 const entry = new QbsSessionErrorInfoItemResult(item);
                 this._entries.push(item);

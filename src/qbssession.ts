@@ -87,8 +87,8 @@ export class QbsSession implements vscode.Disposable {
             }
         });
 
-        this._process.onObjectReceived(object => {
-            this.handleIncomingObject(object);
+        this._process.onResponseReceived(response => {
+            this.parseResponse(response);
         });
     }
 
@@ -119,48 +119,51 @@ export class QbsSession implements vscode.Disposable {
     }
 
     async resolve() {
-        let object: any = {};
-        object['type'] = 'resolve-project';
-        object['environment'] = process.env;
-        object['data-mode'] = 'only-if-changed';
+        let request: any = {};
+        request['type'] = 'resolve-project';
+        request['environment'] = process.env;
+        request['data-mode'] = 'only-if-changed';
 
-        if (this._projectUri)
-            object['project-file-path'] = QbsUtils.expandPath(this._projectUri.fsPath);
+        if (this._projectUri) {
+            request['project-file-path'] = QbsUtils.expandPath(this._projectUri.fsPath);
+        }
 
-        if (this._configurationName.length > 0)
-            object['configuration-name'] = this._configurationName;
+        if (this._configurationName.length > 0) {
+            request['configuration-name'] = this._configurationName;
+        }
 
-        if (this._profileName.length > 0)
-            object['top-level-profile'] = this._profileName;
+        if (this._profileName.length > 0) {
+            request['top-level-profile'] = this._profileName;
+        }
 
         const buildDirectory = QbsUtils.expandPath(await vscode.workspace.getConfiguration('qbs').get('buildDirectory')) as string;
-        object['build-root'] = buildDirectory;
-        object['dry-run'] = fs.existsSync(buildDirectory) ? 'false' : 'true';
+        request['build-root'] = buildDirectory;
+        request['dry-run'] = !fs.existsSync(buildDirectory);
 
-        await this._process?.sendObject(object);
+        await this._process?.sendRequest(request);
     }
 
     async build() {
-        let object: any = {};
-        object['type'] = 'build-project';
-        object['keep-going'] = 'true';
-        object['data-mode'] = 'only-if-changed';
+        let request: any = {};
+        request['type'] = 'build-project';
+        request['keep-going'] = 'true';
+        request['data-mode'] = 'only-if-changed';
 
         const maxJobs = await vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number;
         if (maxJobs > 0)
-            object['max-job-count'] = maxJobs;
+        request['max-job-count'] = maxJobs;
 
         const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
-        object['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
+        request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
-        await this._process?.sendObject(object);
+        await this._process?.sendRequest(request);
     }
 
     async clean() {
-        let object: any = {};
-        object['type'] = 'clean-project';
+        let request: any = {};
+        request['type'] = 'clean-project';
 
-        await this._process?.sendObject(object);
+        await this._process?.sendRequest(request);
     }
 
     set status(st: QbsSessionStatus) {
@@ -209,59 +212,59 @@ export class QbsSession implements vscode.Disposable {
 
     // Private methods.
 
-    private handleIncomingObject(object: any) {
-        const type = object['type'];
+    private parseResponse(response: any) {
+        const type = response['type'];
         console.debug(`t: ${type}`);
 
         if (type === 'hello') {
-            const result = new QbsSessionHelloResult(object)
+            const result = new QbsSessionHelloResult(response)
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
-            this.setProjectData(object, true);
-            const result = new QbsSessionErrorInfoResult(object['error']);
+            this.setProjectData(response, true);
+            const result = new QbsSessionErrorInfoResult(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
-            this.setProjectData(object, false);
-            const result = new QbsSessionErrorInfoResult(object['error']);
+            this.setProjectData(response, false);
+            const result = new QbsSessionErrorInfoResult(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            const result = new QbsSessionErrorInfoResult(object['error']);
+            const result = new QbsSessionErrorInfoResult(response['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
-            const result = new QbsSessionErrorInfoResult(object['error']);
+            const result = new QbsSessionErrorInfoResult(response['error']);
             this._onProjectInstalled.fire(result);
         } else if (type === 'log-data') {
-            const result = new QbsSessionMessageResult(object);
+            const result = new QbsSessionMessageResult(response);
             this._onLogMessageReceived.fire(result);
         } else if (type === 'warning') {
-            const result = new QbsSessionErrorInfoResult(object['warning']);
+            const result = new QbsSessionErrorInfoResult(response['warning']);
             this._onWarningMessageReceived.fire(result);
         } else if (type === 'task-started') {
-            const result = new QbsSessionTaskStartedResult(object);
+            const result = new QbsSessionTaskStartedResult(response);
             this._onTaskStarted.fire(result);
         } else if (type === 'task-progress') {
-            const result = new QbsSessionTaskProgressResult(object);
+            const result = new QbsSessionTaskProgressResult(response);
             this._onTaskProgressUpdated.fire(result);
         } else if (type === 'new-max-progress') {
-            const result = new QbsSessionTaskMaxProgressResult(object);
+            const result = new QbsSessionTaskMaxProgressResult(response);
             this._onTaskMaxProgressChanged.fire(result);
         } else if (type === 'generated-files-for-source') {
             // TODO: Implement me.
         } else if (type === 'command-description') {
-            const result = new QbsSessionMessageResult(object);
+            const result = new QbsSessionMessageResult(response);
             this._onCommandDescriptionReceived.fire(result);
         } else if (type === 'files-added' || type === 'files-removed') {
             // TODO: Implement me.
         } else if (type === 'process-result') {
-            const result = new QbsSessionProcessResult(object);
+            const result = new QbsSessionProcessResult(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
             // TODO: Implement me.
         }
     }
 
-    private setProjectData(object: any, withBuildSystemFiles: boolean) {
-        const data = object['project-data'];
+    private setProjectData(response: any, withBuildSystemFiles: boolean) {
+        const data = response['project-data'];
         if (data) {
             const files = data['build-system-files'];
             this._projectData = data;
