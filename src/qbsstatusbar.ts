@@ -78,21 +78,21 @@ export class QbsStatusBar implements vscode.Disposable {
     }
 
     private async updateSessionStatus(status: string) {
-        this._statusButton.text = localize('qbs.session.status', `QBS (${status})`);
+        this._statusButton.text = localize('qbs.session.status', `$(info) QBS: ${status}`);
     }
 
     private async updateProjectFileName(uri?: vscode.Uri) {
         const projectName = uri ? basename(uri.fsPath) : localize('qbs.active.project.empty', 'empty');
-        this._projectButton.text = localize('qbs.active.project.select', '$(project) Project (' + projectName + ')');
+        this._projectButton.text = localize('qbs.active.project.select', `$(project) [${projectName}]`);
     }
 
     private async updateProfileName(profile?: string) {
-        const profileName = profile ? profile : localize('qbs.active.profile.empty', 'empty');
-        this._profileButton.text = localize('qbs.build.profile.select', `$(settings) Profile (${profileName})`);
+        const profileName = profile ? profile : localize('qbs.active.profile.empty', 'none');
+        this._profileButton.text = localize('qbs.build.profile.select', `$(tools) [${profileName}]`);
     }
 
     private async updateConfigurationName(configuration?: string) {
         const configurationName = configuration ? configuration : 'default';
-        this._configurationButton.text = localize('qbs.build.configuration.select', `$(settings-gear) Configuration (${configurationName})`);
+        this._configurationButton.text = localize('qbs.build.configuration.select', `$(settings) [${configurationName}]`);
     }
 }
