@@ -106,8 +106,10 @@ export class QbsSession implements vscode.Disposable {
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
-            const qbsPath = vscode.workspace.getConfiguration('qbs').get('qbsPath') as string;
-            await this._process?.start(qbsPath);
+            const qbsPath = await QbsUtils.fetchQbsPath();
+            if (qbsPath) {
+                await this._process?.start(qbsPath);
+            }
         }
     }
 

@@ -1,15 +1,21 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
+import * as fs from 'fs';
 
 // From user code.
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import * as QbsSelectors from './qbsselectors';
+import * as QbsUtils from './qbsutils';
+
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 let qbsSession: QbsSession|null = null;
 let qbsStatusBar: QbsStatusBar|null = null;
 let qbsAutoResolveRequired: boolean = false;
+let qbsAutoRestartRequired: boolean = false;
 
-function registerCommands(extensionContext: vscode.ExtensionContext) {
+function subscribeCommands(extensionContext: vscode.ExtensionContext) {
     const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
          qbsSession!.start();
     });
@@ -60,38 +66,100 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(cleanCmd);
 }
 
-function autoResolveProject() {
+function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.ExtensionContext) {
+    extensionContext.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('qbs.qbsPath')) {
+            autoRestartSession();
+        }
+    }));
+}
+
+function subscribeSessionEvents(extensionContext: vscode.ExtensionContext, session: QbsSession) {
+    extensionContext.subscriptions.push(session.onStatusChanged(status => {
+        showSessionStatusMessage(status);
+
+        if (status === QbsSessionStatus.Started) {
+            autoResolveProject();
+        } else if (status === QbsSessionStatus.Stopped) {
+            if (qbsAutoRestartRequired) {
+                qbsAutoRestartRequired = false;
+                session.start();
+            }
+        }
+    }));
+    extensionContext.subscriptions.push(session.onProjectUriChanged(uri => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    }));
+    extensionContext.subscriptions.push(session.onProfileNameChanged(name => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    }));
+    extensionContext.subscriptions.push(session.onConfigurationNameChanged(name => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    }));
+}
+
+async function showSessionStatusMessage(status: QbsSessionStatus) {
+    const statusName = QbsUtils.sessionStatusName(status);
+    await vscode.window.showInformationMessage(localize('qbs.status.info.message',
+                                                        `QBS status: ${statusName}`));
+}
+
+async function ensureQbsExecutableConfigured(): Promise<boolean> {
+    const qbsPath = await QbsUtils.fetchQbsPath();
+    if (!qbsPath) {
+        vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
+                                                'QBS executable not set in configuration.'));
+        return false;
+    } else if (!fs.existsSync(qbsPath)) {
+        vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
+                                                `QBS executable ${qbsPath} not found.`));
+        return false;
+    }
+    vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
+                                                  `QBS executable found in ${qbsPath}.`));
+    return true;
+}
+
+async function autoResolveProject() {
     if (qbsAutoResolveRequired && qbsSession?.status === QbsSessionStatus.Started && qbsSession?.projectUri) {
         qbsAutoResolveRequired = false;
-        qbsSession.resolve();
+        await qbsSession.resolve();
+    }
+}
+
+async function autoRestartSession() {
+    if (!await ensureQbsExecutableConfigured()) {
+        await qbsSession?.stop();
+        return;
+    }
+
+    if (qbsSession?.status === QbsSessionStatus.Started
+        || qbsSession?.status === QbsSessionStatus.Starting) {
+            qbsAutoRestartRequired = true;
+            await qbsSession.stop();
+    } else if (qbsSession?.status === QbsSessionStatus.Stopping) {
+        qbsAutoRestartRequired = true;
+    } else if (qbsSession?.status === QbsSessionStatus.Stopped) {
+        await qbsSession.start();
     }
 }
 
 export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
-    // Create the QBS objects.
+
+    // Create all required singletons.
     qbsSession = QbsSession.create(extensionContext);
     qbsStatusBar = QbsStatusBar.create(qbsSession);
-    // Register the QBS commands.
-    registerCommands(extensionContext);
 
-    qbsSession.onStatusChanged(status => {
-        if (status === QbsSessionStatus.Started) {
-            autoResolveProject();
-        }
-    });
-    qbsSession.onProjectUriChanged(uri => {
-        qbsAutoResolveRequired = true;
-        autoResolveProject();
-    });
-    qbsSession.onProfileNameChanged(name => {
-        qbsAutoResolveRequired = true;
-        autoResolveProject();
-    });
-    qbsSession.onConfigurationNameChanged(name => {
-        qbsAutoResolveRequired = true;
-        autoResolveProject();
-    });
+    // Subscribe to all required events.
+    subscribeCommands(extensionContext);
+    subscribeWorkspaceConfigurationEvents(extensionContext);
+    subscribeSessionEvents(extensionContext, qbsSession);
+
+    autoRestartSession();
 }
 
 export function deactivate() {}

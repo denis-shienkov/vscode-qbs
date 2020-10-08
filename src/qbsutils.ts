@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import * as cp from 'child_process';
+
+// From user code.
+import { QbsSessionStatus } from './qbssession';
+
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export async function enumerateProjects(): Promise<vscode.Uri[]> {
     return await vscode.workspace.findFiles('*.qbs');
@@ -7,7 +13,7 @@ export async function enumerateProjects(): Promise<vscode.Uri[]> {
 
 export async function enumerateBuildProfiles(): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
-        const qbsPath = expandPath(vscode.workspace.getConfiguration('qbs').get('qbsPath') as string);
+        const qbsPath = fetchQbsPath();
         cp.exec(qbsPath + ' config --list', (error, stdout, stderr) => {
             if (error) {
                 reject(undefined);
@@ -36,6 +42,11 @@ export async function enumerateBuildConfigurations(): Promise<string[]> {
     return ['debug', 'release'];
 }
 
+export function fetchQbsPath(): string | undefined  {
+    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('qbsPath') as string);
+    return path;
+}
+
 export function expandPath(path?: string): string | undefined {
     if (path?.includes('${workspaceFolder}')) {
         const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -45,4 +56,17 @@ export function expandPath(path?: string): string | undefined {
         }
     }
     return path?.replace(/\\/g, '/');
+}
+
+export function sessionStatusName(status: QbsSessionStatus): string {
+    switch (status) {
+    case QbsSessionStatus.Started:
+        return localize('qbs.session.status.started', "Started");
+    case QbsSessionStatus.Starting:
+        return localize('qbs.session.status.started', "Starting");
+    case QbsSessionStatus.Stopped:
+        return localize('qbs.session.status.started', "Stopped");
+    case QbsSessionStatus.Stopping:
+        return localize('qbs.session.status.started', "Stopping");
+    }
 }
