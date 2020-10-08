@@ -10,56 +10,51 @@ let qbsStatusBar: QbsStatusBar|null = null;
 
 function registerCommands(extensionContext: vscode.ExtensionContext) {
     const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
-        console.debug('qbs: startSession');
-        qbsSession?.start();
+         qbsSession!.start();
     });
     extensionContext.subscriptions.push(startSessionCmd);
 
     const stopSessionCmd = vscode.commands.registerCommand('qbs.stopSession', () => {
-        console.debug('qbs: stopSession');
-        qbsSession?.stop();
+        qbsSession!.stop();
     });
     extensionContext.subscriptions.push(stopSessionCmd);
 
     const selectProjectCmd = vscode.commands.registerCommand('qbs.selectProject', () => {
         QbsSelectors.selectProject().then(projectUri => {
-            console.debug('qbs: selectProject: ' + projectUri);
-            if (projectUri && qbsSession)
-                qbsSession.projectUri = projectUri;
+            if (projectUri)
+                qbsSession!.projectUri = projectUri;
         });
     });
     extensionContext.subscriptions.push(selectProjectCmd);
 
     const selectProfileCmd = vscode.commands.registerCommand('qbs.selectProfile', () => {
         QbsSelectors.selectProfile().then(profileName => {
-            console.debug('qbs: selectProfile: ' + profileName);
-            if (profileName && qbsSession)
-                qbsSession.profileName = profileName;
+            if (profileName)
+                qbsSession!.profileName = profileName;
         });
     });
     extensionContext.subscriptions.push(selectProfileCmd);
 
     const selectConfigurationCmd = vscode.commands.registerCommand('qbs.selectConfiguration', () => {
         QbsSelectors.selectConfiguration().then(configurationName => {
-            console.debug('qbs: selectConfiguration: ' + configurationName);
-            if (configurationName && qbsSession)
-                qbsSession.configurationName = configurationName;
+             if (configurationName)
+                qbsSession!.configurationName = configurationName;
         });
     });
     extensionContext.subscriptions.push(selectConfigurationCmd);
 
     const resolveCmd = vscode.commands.registerCommand('qbs.resolve', () => {
-        qbsSession?.resolve();
+        qbsSession!.resolve();
     });
     extensionContext.subscriptions.push(resolveCmd);
 
     const buildCmd = vscode.commands.registerCommand('qbs.build', () => {
-        qbsSession?.build();
+        qbsSession!.build();
     });
     extensionContext.subscriptions.push(buildCmd);
 
     const cleanCmd = vscode.commands.registerCommand('qbs.clean', () => {
-        qbsSession?.clean();
+        qbsSession!.clean();
     });
     extensionContext.subscriptions.push(cleanCmd);
 }
