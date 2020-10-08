@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 
 // From user code.
-import {QbsSession} from './qbssession';
+import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import * as QbsSelectors from './qbsselectors';
 
 let qbsSession: QbsSession|null = null;
 let qbsStatusBar: QbsStatusBar|null = null;
+let qbsAutoResolveRequired: boolean = false;
 
 function registerCommands(extensionContext: vscode.ExtensionContext) {
     const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
@@ -59,6 +60,13 @@ function registerCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(cleanCmd);
 }
 
+function autoResolveProject() {
+    if (qbsAutoResolveRequired && qbsSession?.status === QbsSessionStatus.Started && qbsSession?.projectUri) {
+        qbsAutoResolveRequired = false;
+        qbsSession.resolve();
+    }
+}
+
 export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
     // Create the QBS objects.
@@ -66,6 +74,24 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     qbsStatusBar = QbsStatusBar.create(qbsSession);
     // Register the QBS commands.
     registerCommands(extensionContext);
+
+    qbsSession.onStatusChanged(status => {
+        if (status === QbsSessionStatus.Started) {
+            autoResolveProject();
+        }
+    });
+    qbsSession.onProjectUriChanged(uri => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    });
+    qbsSession.onProfileNameChanged(name => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    });
+    qbsSession.onConfigurationNameChanged(name => {
+        qbsAutoResolveRequired = true;
+        autoResolveProject();
+    });
 }
 
 export function deactivate() {}
