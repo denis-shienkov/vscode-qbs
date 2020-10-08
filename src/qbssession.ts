@@ -93,7 +93,9 @@ export class QbsSession implements vscode.Disposable {
 
     // Public overriden methods.
 
-    dispose() {  }
+    dispose() {
+        this._process?.dispose();
+    }
 
     // Public methods.
 

@@ -162,4 +162,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     autoRestartSession();
 }
 
-export function deactivate() {}
+export function deactivate() {
+    qbsStatusBar?.dispose();
+    qbsSession?.dispose();
+}

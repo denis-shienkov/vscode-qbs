@@ -67,7 +67,14 @@ export class QbsStatusBar implements vscode.Disposable {
     }
 
     // Public overriden methods.
-    dispose(): void { }
+
+    dispose() {
+        this._buildRunButton.dispose();
+        this._configurationButton.dispose();
+        this._profileButton.dispose();
+        this._projectButton.dispose();
+        this._statusButton.dispose();
+    }
 
     // Private methods.
 
