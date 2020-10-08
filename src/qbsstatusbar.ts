@@ -5,6 +5,7 @@ import { basename } from 'path';
 
 // From user code.
 import {QbsSession, QbsSessionStatus} from './qbssession';
+import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -18,31 +19,31 @@ export class QbsStatusBar implements vscode.Disposable {
     // Constructors.
     constructor(private readonly _session: QbsSession) {
         // Create the QBS session status button.
-        this._statusButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._statusButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -1);
         this._statusButton.tooltip = localize('qbs.status.tooltip', 'QBS session status');
         this._statusButton.show();
 
         // Create the QBS project file selection button.
-        this._projectButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._projectButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -2);
         this._projectButton.tooltip = localize('qbs.active.project.select.tooltip', 'Click to select the active project');
         this._projectButton.command = 'qbs.selectProject';
         this._projectButton.show();
 
         // Create the QBS build profile selection button.
-        this._profileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._profileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -3);
         this._profileButton.tooltip = localize('qbs.build.profile.select.tooltip', 'Click to select the build profile');
         this._profileButton.command = 'qbs.selectProfile';
         this._profileButton.show();
 
         // Create the QBS build configuration selection button.
-        this._configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -4);
         this._configurationButton.tooltip = localize('qbs.build.configuration.select.tooltip', 'Click to select the build configuration');
         this._configurationButton.command = 'qbs.selectConfiguration';
         this._configurationButton.show();
 
         // Subscribe on the session events.
         _session.onStatusChanged(status => {
-            this.updateSessionStatus(QbsStatusBar.sessionStatusName(this._session.status));
+            this.updateSessionStatus(QbsUtils.sessionStatusName(this._session.status));
         });
         _session.onProjectUriChanged(uri => {
             this.updateProjectFileName(uri);
@@ -67,25 +68,10 @@ export class QbsStatusBar implements vscode.Disposable {
     // Public overriden methods.
     dispose(): void { }
 
-    // Private static methods.
-
-    private static sessionStatusName(status: QbsSessionStatus) {
-        switch (status) {
-        case QbsSessionStatus.Started:
-            return localize('qbs.session.status.started', `started`);
-        case QbsSessionStatus.Starting:
-            return localize('qbs.session.status.starting', `starting`);
-        case QbsSessionStatus.Stopped:
-            return localize('qbs.session.status.stopped', `stopped`);
-        case QbsSessionStatus.Stopping:
-            return localize('qbs.session.status.stopping', `stopping`);
-        }
-    }
-
     // Private methods.
 
     private async initialize() {
-        await this.updateSessionStatus(QbsStatusBar.sessionStatusName(this._session.status));
+        await this.updateSessionStatus(QbsUtils.sessionStatusName(this._session.status));
         await this.updateProjectFileName();
         await this.updateProfileName();
         await this.updateConfigurationName();

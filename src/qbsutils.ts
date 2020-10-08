@@ -61,12 +61,12 @@ export function expandPath(path?: string): string | undefined {
 export function sessionStatusName(status: QbsSessionStatus): string {
     switch (status) {
     case QbsSessionStatus.Started:
-        return localize('qbs.session.status.started', "Started");
+        return localize('qbs.session.status.started', "started");
     case QbsSessionStatus.Starting:
-        return localize('qbs.session.status.started', "Starting");
+        return localize('qbs.session.status.started', "starting");
     case QbsSessionStatus.Stopped:
-        return localize('qbs.session.status.started', "Stopped");
+        return localize('qbs.session.status.started', "stopped");
     case QbsSessionStatus.Stopping:
-        return localize('qbs.session.status.started', "Stopping");
+        return localize('qbs.session.status.started', "stopping");
     }
 }
