@@ -105,16 +105,16 @@ export class QbsSession implements vscode.Disposable {
     // Public methods.
 
     async start() {
-        if (this._status !== QbsSessionStatus.Stopped)
-            return;
-        const qbsPath = <string>vscode.workspace.getConfiguration('qbs').get('qbsPath');
-        await this._process?.start(qbsPath);
+        if (this._status === QbsSessionStatus.Stopped) {
+            const qbsPath = vscode.workspace.getConfiguration('qbs').get('qbsPath') as string;
+            await this._process?.start(qbsPath);
+        }
     }
 
     async stop() {
-        if (this._status !== QbsSessionStatus.Started)
-            return;
-        await this._process?.stop();
+        if (this._status === QbsSessionStatus.Started) {
+            await this._process?.stop();
+        }
     }
 
     async resolve() {
@@ -145,12 +145,13 @@ export class QbsSession implements vscode.Disposable {
     async build() {
         let request: any = {};
         request['type'] = 'build-project';
-        request['keep-going'] = 'true';
+        request['keep-going'] = true;
         request['data-mode'] = 'only-if-changed';
 
         const maxJobs = await vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number;
-        if (maxJobs > 0)
-        request['max-job-count'] = maxJobs;
+        if (maxJobs > 0) {
+            request['max-job-count'] = maxJobs;
+        }
 
         const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
@@ -166,10 +167,10 @@ export class QbsSession implements vscode.Disposable {
     }
 
     set status(st: QbsSessionStatus) {
-        if (st === this._status)
-            return;
-        this._status = st;
-        this._onStatusChanged.fire(this._status);
+        if (st !== this._status) {
+            this._status = st;
+            this._onStatusChanged.fire(this._status);
+        }
     }
 
     get status(): QbsSessionStatus {
@@ -177,10 +178,10 @@ export class QbsSession implements vscode.Disposable {
     }
 
     set projectUri(uri: vscode.Uri) {
-        if (uri === this._projectUri)
-            return;
-        this._projectUri = uri;
-        this._onProjectUriChanged.fire(this._projectUri);
+        if (uri !== this._projectUri) {
+            this._projectUri = uri;
+            this._onProjectUriChanged.fire(this._projectUri);
+        }
     }
 
     get projectUri(): vscode.Uri {
@@ -188,10 +189,10 @@ export class QbsSession implements vscode.Disposable {
     }
 
     set profileName(name: string) {
-        if (name === this._profileName)
-            return;
-        this._profileName = name;
-        this._onProfileNameChanged.fire(this._profileName);
+        if (name !== this._profileName) {
+            this._profileName = name;
+            this._onProfileNameChanged.fire(this._profileName);
+        }
     }
 
     get profileName(): string {
@@ -199,10 +200,10 @@ export class QbsSession implements vscode.Disposable {
     }
 
     set configurationName(name: string) {
-        if (name === this._configurationName)
-            return;
-        this._configurationName = name;
-        this._onConfigurationNameChanged.fire(this._configurationName);
+        if (name !== this._configurationName) {
+            this._configurationName = name;
+            this._onConfigurationNameChanged.fire(this._configurationName);
+        }
     }
 
     get configurationName(): string {
