@@ -62,7 +62,7 @@ export class QbsSessionMessageResult {
     }
 }
 
-export class QbsSessionErrorInfoResult {
+export class QbsSessionErrorInfoItemResult {
     readonly _description: string = '';
     readonly _filePath: string = '';
     readonly _line: number = -1;
@@ -90,30 +90,30 @@ export class QbsSessionErrorInfoResult {
     }
 }
 
-export class QbsSessionErrorInfoDetailsResult {
-    readonly _messages: QbsSessionErrorInfoResult[] = [];
+export class QbsSessionErrorInfoResult {
+    readonly _entries: QbsSessionErrorInfoItemResult[] = [];
 
     constructor(readonly object: any) {
         if (typeof object === 'string') {
-            const message = new QbsSessionErrorInfoResult(object);
-            this._messages.push(message);
+            const item = new QbsSessionErrorInfoItemResult(object);
+            this._entries.push(item);
         } else {
-            const items = object['items'];
+            const items = object['items'] || [];
             for (const item of items) {
-                const message = new QbsSessionErrorInfoResult(item);
-                this._messages.push(message);
+                const entry = new QbsSessionErrorInfoItemResult(item);
+                this._entries.push(item);
             }
         }
     }
 
     hasError(): boolean {
-        return this._messages.length > 0;
+        return this._entries.length > 0;
     }
 
     toString(): string {
         let list: string[] = [];
-        for (const message of this._messages) {
-            const s = message.toString();
+        for (const item of this._entries) {
+            const s = item.toString();
             list.push(s);
         }
         return list.join('\n');
