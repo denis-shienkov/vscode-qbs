@@ -4,7 +4,8 @@ import * as fs from 'fs';
 // From user code.
 import * as QbsUtils from './qbsutils';
 import {QbsProcess, QbsProcessStatus} from './qbsprocess';
-import {QbsSessionProcessResult,
+import {QbsSessionHelloResult,
+        QbsSessionProcessResult,
         QbsSessionTaskStartedResult,
         QbsSessionTaskProgressResult,
         QbsSessionTaskMaxProgressResult,
@@ -29,7 +30,7 @@ export class QbsSession implements vscode.Disposable {
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onHelloReceived: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
+    private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
     private _onProjectResolved: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
     private _onProjectBuilt: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
     private _onProjectCleaned: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
@@ -46,7 +47,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
-    readonly onHelloReceived: vscode.Event<void> = this._onHelloReceived.event;
+    readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
     readonly onProjectResolved: vscode.Event<any> = this._onProjectResolved.event;
     readonly onProjectBuilt: vscode.Event<any> = this._onProjectBuilt.event;
     readonly onProjectCleaned: vscode.Event<any> = this._onProjectCleaned.event;
@@ -206,7 +207,8 @@ export class QbsSession implements vscode.Disposable {
         console.debug(`t: ${type}`);
 
         if (type === 'hello') {
-            this._onHelloReceived.fire();
+            const result = new QbsSessionHelloResult(object)
+            this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             this.setProjectData(object, true);
             const errors = QbsSession.extractErrorDetails(object);

@@ -1,5 +1,15 @@
 import * as vscode from 'vscode';
 
+export class QbsSessionHelloResult {
+    readonly _apiLevel: number = 0;
+    readonly _apiCompatibilityLevel: number = 0;
+
+    constructor(readonly object: any) {
+        this._apiLevel = parseInt(object['api-level']);
+        this._apiCompatibilityLevel = parseInt(object['api-compat-level']);
+    }
+}
+
 export class QbsSessionProcessResult {
     readonly _executable: string;
     readonly _arguments: string[];
