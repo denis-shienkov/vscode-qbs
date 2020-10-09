@@ -98,8 +98,8 @@ export class QbsSessionMessageResult {
         }
     }
 
-    hasError(): boolean {
-        return this._messages.length > 0;
+    isEmpty(): boolean {
+        return this._messages.length === 0;
     }
 
     toString(): string {

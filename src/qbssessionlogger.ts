@@ -28,31 +28,31 @@ export class QbsSessionLogger implements vscode.Disposable {
     }
 
     handleProjectResolved(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             this._compileOutput.appendLine(result.toString());
         }
     }
 
     handleProjectBuilt(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             this._compileOutput.appendLine(result.toString());
         }
     }
 
     handleProjectCleaned(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             this._compileOutput.appendLine(result.toString());
         }
     }
 
     handleProjectInstalled(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             this._compileOutput.appendLine(result.toString());
         }
     }
 
     handleCommandDesctiptionReceived(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             this._compileOutput.appendLine(result.toString());
         }
     }
@@ -77,7 +77,7 @@ export class QbsSessionLogger implements vscode.Disposable {
     }
 
     handleMessageReceived(result: QbsSessionMessageResult) {
-        if (result.hasError()) {
+        if (!result.isEmpty()) {
             const msg = `[qbs] ${result.toString()}`;
             this._messageOutput.appendLine(msg);
         }
