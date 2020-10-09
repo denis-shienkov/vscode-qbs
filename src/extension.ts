@@ -3,6 +3,7 @@ import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 
 // From user code.
+import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import * as QbsSelectors from './qbsselectors';
@@ -10,8 +11,9 @@ import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-let qbsSession: QbsSession|null = null;
-let qbsStatusBar: QbsStatusBar|null = null;
+let qbsSessionLogger!: QbsSessionLogger;
+let qbsSession!: QbsSession;
+let qbsStatusBar!: QbsStatusBar;
 let qbsAutoResolveRequired: boolean = false;
 let qbsAutoRestartRequired: boolean = false;
 
@@ -151,6 +153,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
     // Create all required singletons.
+    qbsSessionLogger = new QbsSessionLogger(extensionContext);
     qbsSession = new QbsSession(extensionContext);
     qbsStatusBar = new QbsStatusBar(qbsSession);
 
