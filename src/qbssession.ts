@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 // From user code.
 import * as QbsUtils from './qbsutils';
-import {QbsProcess, QbsProcessStatus} from './qbsprocess';
+import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {QbsSessionHelloResult,
         QbsSessionProcessResult,
         QbsSessionTaskStartedResult,
@@ -20,7 +20,7 @@ export enum QbsSessionStatus {
 
 export class QbsSession implements vscode.Disposable {
     // Private members.
-    private _process?: QbsProcess;
+    private _protocol?: QbsSessionProtocol;
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri;
     private _profileName: string = '';
@@ -67,26 +67,26 @@ export class QbsSession implements vscode.Disposable {
     // Constructors.
 
     constructor(readonly extensionContext: vscode.ExtensionContext) {
-        this._process = new QbsProcess(extensionContext);
+        this._protocol = new QbsSessionProtocol(extensionContext);
 
-        this._process.onStatusChanged(status => {
+        this._protocol.onStatusChanged(status => {
             switch (status) {
-            case QbsProcessStatus.Started:
+            case QbsSessionProtocolStatus.Started:
                 this.status = QbsSessionStatus.Started;
                 break;
-            case QbsProcessStatus.Starting:
+            case QbsSessionProtocolStatus.Starting:
                 this.status = QbsSessionStatus.Starting;
                 break;
-            case QbsProcessStatus.Stopped:
+            case QbsSessionProtocolStatus.Stopped:
                 this.status = QbsSessionStatus.Stopped;
                 break;
-            case QbsProcessStatus.Stopping:
+            case QbsSessionProtocolStatus.Stopping:
                 this.status = QbsSessionStatus.Stopping;
                 break;
             }
         });
 
-        this._process.onResponseReceived(response => {
+        this._protocol.onResponseReceived(response => {
             this.parseResponse(response);
         });
     }
@@ -94,23 +94,23 @@ export class QbsSession implements vscode.Disposable {
     // Public overriden methods.
 
     dispose() {
-        this._process?.dispose();
+        this._protocol?.dispose();
     }
 
     // Public methods.
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
-            const qbsPath = await QbsUtils.fetchQbsPath();
+            const qbsPath = QbsUtils.fetchQbsPath();
             if (qbsPath) {
-                await this._process?.start(qbsPath);
+                await this._protocol?.start(qbsPath);
             }
         }
     }
 
     async stop() {
         if (this._status === QbsSessionStatus.Started) {
-            await this._process?.stop();
+            await this._protocol?.stop();
         }
     }
 
@@ -136,7 +136,7 @@ export class QbsSession implements vscode.Disposable {
         request['build-root'] = buildDirectory;
         request['dry-run'] = !fs.existsSync(buildDirectory);
 
-        await this._process?.sendRequest(request);
+        await this._protocol?.sendRequest(request);
     }
 
     async build() {
@@ -153,14 +153,14 @@ export class QbsSession implements vscode.Disposable {
         const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
-        await this._process?.sendRequest(request);
+        await this._protocol?.sendRequest(request);
     }
 
     async clean() {
         let request: any = {};
         request['type'] = 'clean-project';
 
-        await this._process?.sendRequest(request);
+        await this._protocol?.sendRequest(request);
     }
 
     set status(st: QbsSessionStatus) {

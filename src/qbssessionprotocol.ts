@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 
-export enum QbsProcessStatus {
+export enum QbsSessionProtocolStatus {
     Stopped,
     Started,
     Stopping,
@@ -10,17 +10,17 @@ export enum QbsProcessStatus {
 
 const PACKET_PREAMBLE = "qbsmsg:";
 
-export class QbsProcess implements vscode.Disposable {
+export class QbsSessionProtocol implements vscode.Disposable {
     // Private members.
     private _input: string = '';
     private _expectedLength: number = -1;
-    private _status: QbsProcessStatus = QbsProcessStatus.Stopped;
+    private _status: QbsSessionProtocolStatus = QbsSessionProtocolStatus.Stopped;
     private _process: cp.ChildProcess | undefined;
-    private _onStatusChanged: vscode.EventEmitter<QbsProcessStatus> = new vscode.EventEmitter<QbsProcessStatus>();
+    private _onStatusChanged: vscode.EventEmitter<QbsSessionProtocolStatus> = new vscode.EventEmitter<QbsSessionProtocolStatus>();
     private _onResponseReceived: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
      // Public events.
-    readonly onStatusChanged: vscode.Event<QbsProcessStatus> = this._onStatusChanged.event;
+    readonly onStatusChanged: vscode.Event<QbsSessionProtocolStatus> = this._onStatusChanged.event;
     readonly onResponseReceived: vscode.Event<any> = this._onResponseReceived.event;
 
     // Constructors.
@@ -34,25 +34,25 @@ export class QbsProcess implements vscode.Disposable {
 
     // Public methods.
 
-    set status(st: QbsProcessStatus) {
+    set status(st: QbsSessionProtocolStatus) {
         if (st === this._status)
             return;
         this._status = st;
         this._onStatusChanged.fire(this._status);
     }
 
-    get status(): QbsProcessStatus {
+    get status(): QbsSessionProtocolStatus {
         return this._status;
     }
 
     async start(qbsPath: string) {
         this._input = '';
         this._expectedLength = -1;
-        this.status = QbsProcessStatus.Starting;
+        this.status = QbsSessionProtocolStatus.Starting;
         this._process = cp.spawn(qbsPath, ['session']);
 
         this._process.stdout?.on('data', (data) => {
-            this.status = QbsProcessStatus.Started;
+            this.status = QbsSessionProtocolStatus.Started;
             console.log(`stdout: ${data}`);
             this._input += data;
             this.parseStdOutput();
@@ -64,12 +64,12 @@ export class QbsProcess implements vscode.Disposable {
           
         this._process.on('close', (code) => {
             console.log(`child process exited with code ${code}`);
-            this.status = QbsProcessStatus.Stopped;
+            this.status = QbsSessionProtocolStatus.Stopped;
         });
     }
 
     async stop() {
-        this.status = QbsProcessStatus.Stopping;
+        this.status = QbsSessionProtocolStatus.Stopping;
         this._process?.kill();
     }
 
