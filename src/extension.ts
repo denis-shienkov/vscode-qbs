@@ -8,6 +8,7 @@ import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
+import * as QbsConfig from './qbsconfig';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -137,7 +138,7 @@ async function showSessionStatusMessage(status: QbsSessionStatus) {
 }
 
 async function ensureQbsExecutableConfigured(): Promise<boolean> {
-    const qbsPath = QbsUtils.fetchQbsPath();
+    const qbsPath = QbsConfig.fetchQbsPath();
     if (qbsPath.length === 0) {
         vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
                                                 'QBS executable not set in configuration.'));

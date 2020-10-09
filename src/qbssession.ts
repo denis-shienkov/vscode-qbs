@@ -3,6 +3,7 @@ import * as fs from 'fs';
 
 // From user code.
 import * as QbsUtils from './qbsutils';
+import * as QbsConfig from './qbsconfig';
 import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {QbsSessionHelloResult,
         QbsSessionProcessResult,
@@ -101,7 +102,7 @@ export class QbsSession implements vscode.Disposable {
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
-            const qbsPath = QbsUtils.fetchQbsPath();
+            const qbsPath = QbsConfig.fetchQbsPath();
             if (qbsPath.length > 0) {
                 await this._protocol?.start(qbsPath);
             }
@@ -132,11 +133,11 @@ export class QbsSession implements vscode.Disposable {
             request['top-level-profile'] = this._profileName;
         }
 
-        const buildDirectory = QbsUtils.fetchQbsBuildDirectory();
+        const buildDirectory = QbsConfig.fetchQbsBuildDirectory();
         request['build-root'] = buildDirectory;
         request['dry-run'] = !fs.existsSync(buildDirectory);
 
-        const settingsDirectory = QbsUtils.fetchQbsSettingsDirectory();
+        const settingsDirectory = QbsConfig.fetchQbsSettingsDirectory();
         if (settingsDirectory.length > 0) {
             request['settings-directory'] = settingsDirectory;
         }
@@ -150,15 +151,15 @@ export class QbsSession implements vscode.Disposable {
         request['keep-going'] = true;
         request['data-mode'] = 'only-if-changed';
 
-        const maxJobs = QbsUtils.fetchQbsMaxJobs();
+        const maxJobs = QbsConfig.fetchQbsMaxJobs();
         if (maxJobs > 0) {
             request['max-job-count'] = maxJobs;
         }
 
-        const keepGoing = QbsUtils.fetchQbsKeepGoing();
+        const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
 
-        const showCommandLines = QbsUtils.fetchQbsShowCommandLines();
+        const showCommandLines = QbsConfig.fetchQbsShowCommandLines();
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
         await this._protocol?.sendRequest(request);
@@ -168,7 +169,7 @@ export class QbsSession implements vscode.Disposable {
         let request: any = {};
         request['type'] = 'clean-project';
 
-        const keepGoing = QbsUtils.fetchQbsKeepGoing();
+        const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
 
         await this._protocol?.sendRequest(request);
