@@ -9,7 +9,7 @@ import {QbsSessionHelloResult,
         QbsSessionTaskStartedResult,
         QbsSessionTaskProgressResult,
         QbsSessionTaskMaxProgressResult,
-        QbsSessionMesageResult} from './qbssessionresults';
+        QbsSessionMessageResult} from './qbssessionresults';
 
 export enum QbsSessionStatus {
     Stopped,
@@ -33,16 +33,16 @@ export class QbsSession implements vscode.Disposable {
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
-    private _onProjectResolved: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
-    private _onProjectBuilt: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
-    private _onProjectCleaned: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
-    private _onProjectInstalled: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
-    private _onWarningMessageReceived: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
-    private _onLogMessageReceived: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
+    private _onProjectResolved: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onProjectBuilt: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onProjectCleaned: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onProjectInstalled: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onWarningMessageReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
+    private _onLogMessageReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onTaskStarted: vscode.EventEmitter<QbsSessionTaskStartedResult> = new vscode.EventEmitter<QbsSessionTaskStartedResult>();
     private _onTaskProgressUpdated: vscode.EventEmitter<QbsSessionTaskProgressResult> = new vscode.EventEmitter<QbsSessionTaskProgressResult>();
     private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsSessionTaskMaxProgressResult> = new vscode.EventEmitter<QbsSessionTaskMaxProgressResult>();
-    private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMesageResult> = new vscode.EventEmitter<QbsSessionMesageResult>();
+    private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
     
     // Public events.
@@ -52,16 +52,16 @@ export class QbsSession implements vscode.Disposable {
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
-    readonly onProjectResolved: vscode.Event<QbsSessionMesageResult> = this._onProjectResolved.event;
-    readonly onProjectBuilt: vscode.Event<QbsSessionMesageResult> = this._onProjectBuilt.event;
-    readonly onProjectCleaned: vscode.Event<QbsSessionMesageResult> = this._onProjectCleaned.event;
-    readonly onProjectInstalled: vscode.Event<QbsSessionMesageResult> = this._onProjectInstalled.event;
-    readonly onWarningMessageReceived: vscode.Event<QbsSessionMesageResult> = this._onWarningMessageReceived.event;
-    readonly onLogMessageReceived: vscode.Event<QbsSessionMesageResult> = this._onLogMessageReceived.event;
+    readonly onProjectResolved: vscode.Event<QbsSessionMessageResult> = this._onProjectResolved.event;
+    readonly onProjectBuilt: vscode.Event<QbsSessionMessageResult> = this._onProjectBuilt.event;
+    readonly onProjectCleaned: vscode.Event<QbsSessionMessageResult> = this._onProjectCleaned.event;
+    readonly onProjectInstalled: vscode.Event<QbsSessionMessageResult> = this._onProjectInstalled.event;
+    readonly onWarningMessageReceived: vscode.Event<QbsSessionMessageResult> = this._onWarningMessageReceived.event;
+    readonly onLogMessageReceived: vscode.Event<QbsSessionMessageResult> = this._onLogMessageReceived.event;
     readonly onTaskStarted: vscode.Event<QbsSessionTaskStartedResult> = this._onTaskStarted.event;
     readonly onTaskProgressUpdated: vscode.Event<QbsSessionTaskProgressResult> = this._onTaskProgressUpdated.event;
     readonly onTaskMaxProgressChanged: vscode.Event<QbsSessionTaskMaxProgressResult> = this._onTaskMaxProgressChanged.event;
-    readonly onCommandDescriptionReceived: vscode.Event<QbsSessionMesageResult> = this._onCommandDescriptionReceived.event;
+    readonly onCommandDescriptionReceived: vscode.Event<QbsSessionMessageResult> = this._onCommandDescriptionReceived.event;
     readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
 
     // Constructors.
@@ -218,23 +218,23 @@ export class QbsSession implements vscode.Disposable {
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             this.setProjectData(response, true);
-            const result = new QbsSessionMesageResult(response['error']);
+            const result = new QbsSessionMessageResult(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
             this.setProjectData(response, false);
-            const result = new QbsSessionMesageResult(response['error']);
+            const result = new QbsSessionMessageResult(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            const result = new QbsSessionMesageResult(response['error']);
+            const result = new QbsSessionMessageResult(response['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
-            const result = new QbsSessionMesageResult(response['error']);
+            const result = new QbsSessionMessageResult(response['error']);
             this._onProjectInstalled.fire(result);
         } else if (type === 'log-data') {
-            const result = new QbsSessionMesageResult(response['message']);
+            const result = new QbsSessionMessageResult(response['message']);
             this._onLogMessageReceived.fire(result);
         } else if (type === 'warning') {
-            const result = new QbsSessionMesageResult(response['warning']);
+            const result = new QbsSessionMessageResult(response['warning']);
             this._onWarningMessageReceived.fire(result);
         } else if (type === 'task-started') {
             const result = new QbsSessionTaskStartedResult(response);
@@ -248,7 +248,7 @@ export class QbsSession implements vscode.Disposable {
         } else if (type === 'generated-files-for-source') {
             // TODO: Implement me.
         } else if (type === 'command-description') {
-            const result = new QbsSessionMesageResult(response['message']);
+            const result = new QbsSessionMessageResult(response['message']);
             this._onCommandDescriptionReceived.fire(result);
         } else if (type === 'files-added' || type === 'files-removed') {
             // TODO: Implement me.

@@ -82,7 +82,7 @@ export class QbsSessionMessageItemResult {
     }
 }
 
-export class QbsSessionMesageResult {
+export class QbsSessionMessageResult {
     readonly _messages: QbsSessionMessageItemResult[] = [];
 
     constructor(readonly obj: any) {
