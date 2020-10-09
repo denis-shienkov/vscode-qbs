@@ -62,6 +62,10 @@ export function fetchQbsBuildDirectory(): string | undefined  {
     return path;
 }
 
+export function fetchQbsKeepGoing(): boolean  {
+    return vscode.workspace.getConfiguration('qbs').get('keepGoing') as boolean || false;
+}
+
 export function expandPath(path?: string): string | undefined {
     if (path?.includes('${workspaceFolder}')) {
         const workspaceFolders = vscode.workspace.workspaceFolders;

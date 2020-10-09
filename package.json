@@ -121,6 +121,12 @@
                     "default": 0,
                     "description": "%qbs-tools.configuration.qbs.maxBuildJobs.description%",
                     "scope": "resource"
+                },
+                "qbs.keepGoing": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.keepGoing.description%",
+                    "scope": "resource"
                 }
             }
         }
