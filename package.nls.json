@@ -9,7 +9,7 @@
     "qbs-tools.command.qbs.clean.title": "Clean",
 
     "qbs-tools.configuration.qbs.qbsPath.description": "Name/path of the QBS executable to use.",
-    "qbs-tools.configuration.qbs.sourceDirectory.description": "The directory of the root *.qbs file.",
+    "qbs-tools.configuration.qbs.settingsDirectory.description": "The settings directory. An empty value means the default directory.",
     "qbs-tools.configuration.qbs.buildDirectory.description": "The directory where QBS build files will go.",
     "qbs-tools.configuration.qbs.showCommandLines.description": "Show full command lines when building.",
     "qbs-tools.configuration.qbs.maxBuildJobs.description": "The number of concurrent build jobs. Use zero to automatically detect the number of CPUs."

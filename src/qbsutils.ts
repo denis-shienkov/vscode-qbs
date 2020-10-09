@@ -14,7 +14,12 @@ export async function enumerateProjects(): Promise<vscode.Uri[]> {
 export async function enumerateBuildProfiles(): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
         const qbsPath = fetchQbsPath();
-        cp.exec(qbsPath + ' config --list', (error, stdout, stderr) => {
+        let qbsShell = `${qbsPath} config --list`;
+        const qbsSettingsDirectory = fetchQbsSettingsDirectory() || '';
+        if (qbsSettingsDirectory.length > 0) {
+            qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
+        }
+        cp.exec(qbsShell, (error, stdout, stderr) => {
             if (error) {
                 reject(undefined);
             } else {
@@ -44,6 +49,11 @@ export async function enumerateBuildConfigurations(): Promise<string[]> {
 
 export function fetchQbsPath(): string | undefined  {
     const path = expandPath(vscode.workspace.getConfiguration('qbs').get('qbsPath') as string);
+    return path;
+}
+
+export function fetchQbsSettingsDirectory(): string | undefined  {
+    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('settingsDirectory') as string);
     return path;
 }
 

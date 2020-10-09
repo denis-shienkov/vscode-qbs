@@ -136,6 +136,11 @@ export class QbsSession implements vscode.Disposable {
         request['build-root'] = buildDirectory;
         request['dry-run'] = !fs.existsSync(buildDirectory);
 
+        const settingsDirectory = QbsUtils.fetchQbsSettingsDirectory() || '';
+        if (settingsDirectory.length > 0) {
+            request['settings-directory'] = settingsDirectory;
+        }
+
         await this._protocol?.sendRequest(request);
     }
 

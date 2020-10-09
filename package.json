@@ -98,10 +98,10 @@
                     "description": "%qbs-tools.configuration.qbs.qbsPath.description%",
                     "scope": "resource"
                 },
-                "qbs.sourceDirectory": {
+                "qbs.settingsDirectory": {
                     "type": "string",
-                    "default": "${workspaceFolder}",
-                    "description": "%qbs-tools.configuration.qbs.sourceDirectory.description%",
+                    "default": "",
+                    "description": "%qbs-tools.configuration.qbs.settingsDirectory.description%",
                     "scope": "resource"
                 },
                 "qbs.buildDirectory": {
