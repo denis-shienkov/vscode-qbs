@@ -176,7 +176,7 @@ async function autoRestartSession() {
     }
 }
 
-export function activate(extensionContext: vscode.ExtensionContext) {
+export async function activate(extensionContext: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
     // Create all required singletons.
@@ -192,7 +192,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
     autoRestartSession();
 }
 
-export function deactivate() {
+export async function deactivate() {
     qbsStatusBar?.dispose();
     qbsSession?.dispose();
 }
