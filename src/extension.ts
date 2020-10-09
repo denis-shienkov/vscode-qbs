@@ -137,8 +137,8 @@ async function showSessionStatusMessage(status: QbsSessionStatus) {
 }
 
 async function ensureQbsExecutableConfigured(): Promise<boolean> {
-    const qbsPath = await QbsUtils.fetchQbsPath();
-    if (!qbsPath) {
+    const qbsPath = QbsUtils.fetchQbsPath();
+    if (qbsPath.length === 0) {
         vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
                                                 'QBS executable not set in configuration.'));
         return false;
