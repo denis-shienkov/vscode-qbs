@@ -70,6 +70,14 @@ export function fetchQbsKeepGoing(): boolean  {
     return vscode.workspace.getConfiguration('qbs').get('keepGoing') as boolean || false;
 }
 
+export function fetchQbsMaxJobs(): number  {
+    return vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number || 0;
+}
+
+export function fetchQbsShowCommandLines(): boolean  {
+    return vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean || false;
+}
+
 export function expandPath(path?: string): string | undefined {
     if (path?.includes('${workspaceFolder}')) {
         const workspaceFolders = vscode.workspace.workspaceFolders;

@@ -150,7 +150,7 @@ export class QbsSession implements vscode.Disposable {
         request['keep-going'] = true;
         request['data-mode'] = 'only-if-changed';
 
-        const maxJobs = await vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number;
+        const maxJobs = QbsUtils.fetchQbsMaxJobs();
         if (maxJobs > 0) {
             request['max-job-count'] = maxJobs;
         }
@@ -158,7 +158,7 @@ export class QbsSession implements vscode.Disposable {
         const keepGoing = QbsUtils.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
 
-        const showCommandLines = await vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
+        const showCommandLines = QbsUtils.fetchQbsShowCommandLines();
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
         await this._protocol?.sendRequest(request);
