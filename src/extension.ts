@@ -125,6 +125,9 @@ function subscribeSessionEvents(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(qbsSession.onProcessResultReceived(result => {
         qbsSessionLogger.handleProcessResultReceived(result);
     }));
+    extensionContext.subscriptions.push(qbsSession.onLogMessageReceived(result => {
+        qbsSessionLogger.handleMessageReceived(result);
+    }));
 }
 
 async function showSessionStatusMessage(status: QbsSessionStatus) {

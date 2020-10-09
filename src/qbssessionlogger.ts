@@ -8,11 +8,13 @@ import {QbsSessionTaskStartedResult,
 export class QbsSessionLogger implements vscode.Disposable {
     // Private members.
     private _compileOutput: vscode.OutputChannel;
+    private _messageOutput: vscode.OutputChannel;
 
     // Constructors.
 
     constructor(readonly extensionContext: vscode.ExtensionContext) {
-        this._compileOutput = vscode.window.createOutputChannel('QBS');
+        this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
+        this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
     }
 
     // Public overriden methods.
@@ -61,14 +63,23 @@ export class QbsSessionLogger implements vscode.Disposable {
             return;
         }
 
-        const shellExe = result._executable + ' ' + result._arguments.join(' ');
-        this._compileOutput.appendLine(shellExe);
+        const exe = `${result._executable} ${result._arguments.join(' ')}`;
+        this._compileOutput.appendLine(exe);
 
         if (result._stdError.length > 0) {
-            this._compileOutput.appendLine(result._stdError.join('\n'));
+            const msg = result._stdError.join('\n');
+            this._compileOutput.appendLine(msg);
         }
         if (result._stdOutput.length > 0) {
-            this._compileOutput.appendLine(result._stdOutput.join('\n'));
+            const msg = result._stdOutput.join('\n');
+            this._compileOutput.appendLine(msg);
+        }
+    }
+
+    handleMessageReceived(result: QbsSessionMessageResult) {
+        if (result.hasError()) {
+            const msg = `[qbs] ${result.toString()}`;
+            this._messageOutput.appendLine(msg);
         }
     }
 }
