@@ -132,11 +132,11 @@ export class QbsSession implements vscode.Disposable {
             request['top-level-profile'] = this._profileName;
         }
 
-        const buildDirectory = QbsUtils.fetchQbsBuildDirectory() || '';
+        const buildDirectory = QbsUtils.fetchQbsBuildDirectory();
         request['build-root'] = buildDirectory;
         request['dry-run'] = !fs.existsSync(buildDirectory);
 
-        const settingsDirectory = QbsUtils.fetchQbsSettingsDirectory() || '';
+        const settingsDirectory = QbsUtils.fetchQbsSettingsDirectory();
         if (settingsDirectory.length > 0) {
             request['settings-directory'] = settingsDirectory;
         }

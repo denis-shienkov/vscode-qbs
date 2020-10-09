@@ -18,7 +18,7 @@ export async function enumerateBuildProfiles(): Promise<string[]> {
             reject(undefined);
         } else {
             let qbsShell = `${qbsPath} config --list`;
-            const qbsSettingsDirectory = fetchQbsSettingsDirectory() || '';
+            const qbsSettingsDirectory = fetchQbsSettingsDirectory();
             if (qbsSettingsDirectory.length > 0) {
                 qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
             }
@@ -51,18 +51,18 @@ export async function enumerateBuildConfigurations(): Promise<string[]> {
     return ['debug', 'release'];
 }
 
-export function fetchQbsPath(): string  {
+export function fetchQbsPath(): string {
     const path = expandPath(vscode.workspace.getConfiguration('qbs').get('qbsPath') as string) || '';
     return path;
 }
 
-export function fetchQbsSettingsDirectory(): string | undefined  {
-    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('settingsDirectory') as string);
+export function fetchQbsSettingsDirectory(): string {
+    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('settingsDirectory') as string) || '';
     return path;
 }
 
-export function fetchQbsBuildDirectory(): string | undefined  {
-    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('buildDirectory') as string);
+export function fetchQbsBuildDirectory(): string {
+    const path = expandPath(vscode.workspace.getConfiguration('qbs').get('buildDirectory') as string) || '';
     return path;
 }
 
