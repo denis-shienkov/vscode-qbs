@@ -29,3 +29,7 @@ export function fetchQbsMaxJobs(): number  {
 export function fetchQbsShowCommandLines(): boolean  {
     return vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean || false;
 }
+
+export function fetchQbsForceProbes(): boolean  {
+    return vscode.workspace.getConfiguration('qbs').get('forceProbes') as boolean || false;
+}

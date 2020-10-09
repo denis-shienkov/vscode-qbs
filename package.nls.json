@@ -13,5 +13,6 @@
     "qbs-tools.configuration.qbs.buildDirectory.description": "The directory where QBS build files will go.",
     "qbs-tools.configuration.qbs.showCommandLines.description": "Show full command lines when building.",
     "qbs-tools.configuration.qbs.maxBuildJobs.description": "The number of concurrent build jobs. Use zero to automatically detect the number of CPUs.",
-    "qbs-tools.configuration.qbs.keepGoing.description": "Keep going when errors occur (if at all possible)."
+    "qbs-tools.configuration.qbs.keepGoing.description": "Keep going when errors occur (if at all possible).",
+    "qbs-tools.configuration.qbs.forceProbes.description": "Force probes execution."
 }

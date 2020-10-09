@@ -127,6 +127,12 @@
                     "default": false,
                     "description": "%qbs-tools.configuration.qbs.keepGoing.description%",
                     "scope": "resource"
+                },
+                "qbs.forceProbes": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
+                    "scope": "resource"
                 }
             }
         }
