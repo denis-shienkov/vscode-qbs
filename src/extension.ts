@@ -17,7 +17,7 @@ let qbsStatusBar!: QbsStatusBar;
 let qbsAutoResolveRequired: boolean = false;
 let qbsAutoRestartRequired: boolean = false;
 
-function subscribeCommands(extensionContext: vscode.ExtensionContext) {
+async function subscribeCommands(extensionContext: vscode.ExtensionContext) {
     const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
          qbsSession!.start();
     });
@@ -68,7 +68,7 @@ function subscribeCommands(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(cleanCmd);
 }
 
-function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.ExtensionContext) {
+async function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('qbs.qbsPath')) {
             autoRestartSession();
@@ -76,7 +76,7 @@ function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.Extensio
     }));
 }
 
-function subscribeSessionEvents(extensionContext: vscode.ExtensionContext) {
+async function subscribeSessionEvents(extensionContext: vscode.ExtensionContext) {
     // QBS session status.
     extensionContext.subscriptions.push(qbsSession.onStatusChanged(status => {
         showSessionStatusMessage(status);
@@ -159,6 +159,13 @@ async function autoResolveProject() {
     }
 }
 
+async function setupDefaultProject() {
+    const projects = await QbsUtils.enumerateProjects();
+    if (projects.length) {
+        qbsSession.projectUri = projects[0];
+    }
+}
+
 async function autoRestartSession() {
     if (!await ensureQbsExecutableConfigured()) {
         await qbsSession?.stop();
@@ -185,11 +192,12 @@ export async function activate(extensionContext: vscode.ExtensionContext) {
     qbsStatusBar = new QbsStatusBar(qbsSession);
 
     // Subscribe to all required events.
-    subscribeCommands(extensionContext);
-    subscribeWorkspaceConfigurationEvents(extensionContext);
-    subscribeSessionEvents(extensionContext);
+    await subscribeCommands(extensionContext);
+    await subscribeWorkspaceConfigurationEvents(extensionContext);
+    await subscribeSessionEvents(extensionContext);
 
-    autoRestartSession();
+    await setupDefaultProject();
+    await autoRestartSession();
 }
 
 export async function deactivate() {
