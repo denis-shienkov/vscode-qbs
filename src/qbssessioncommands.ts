@@ -7,6 +7,7 @@ import {QbsSession, QbsSessionStatus} from './qbssession';
 
 import * as QbsSelectors from './qbsselectors';
 import * as QbsConfig from './qbsconfig';
+import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -26,6 +27,13 @@ async function ensureQbsExecutableConfigured(): Promise<boolean> {
     vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
                                                   `QBS executable found in ${qbsPath}.`));
     return true;
+}
+
+async function setupDefaultProject(session: QbsSession) {
+    const projects = await QbsUtils.enumerateProjects();
+    if (projects.length) {
+        session.projectUri = projects[0];
+    }
 }
 
 async function autoRestartSession(session: QbsSession) {
@@ -152,6 +160,10 @@ async function clean(session: QbsSession) {
 // Public function.
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
+    // Start/stop session commands.
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
+        setupDefaultProject(session);
+    }));
     // Start/stop session commands.
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
         autoRestartSession(session);

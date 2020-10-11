@@ -5,67 +5,64 @@ import * as nls from 'vscode-nls';
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
-import * as QbsUtils from './qbsutils';
 import * as QbsCommands from './qbssessioncommands';
-
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 let qbsSessionLogger!: QbsSessionLogger;
 let qbsSession!: QbsSession;
 let qbsStatusBar!: QbsStatusBar;
 let qbsAutoResolveRequired: boolean = false;
 
-async function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.ExtensionContext) {
-    extensionContext.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
+async function subscribeWorkspaceConfigurationEvents(ctx: vscode.ExtensionContext) {
+    ctx.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('qbs.qbsPath')) {
             vscode.commands.executeCommand('qbs.autoRestartSession');
         }
     }));
 }
 
-async function subscribeSessionEvents(extensionContext: vscode.ExtensionContext) {
+async function subscribeSessionEvents(ctx: vscode.ExtensionContext) {
     // QBS session status.
-    extensionContext.subscriptions.push(qbsSession.onStatusChanged(status => {
+    ctx.subscriptions.push(qbsSession.onStatusChanged(status => {
         if (status === QbsSessionStatus.Started) {
             autoResolveProject();
         }
     }));
     // QBS session configuration.
-    extensionContext.subscriptions.push(qbsSession.onProjectUriChanged(uri => {
+    ctx.subscriptions.push(qbsSession.onProjectUriChanged(uri => {
         qbsAutoResolveRequired = true;
         autoResolveProject();
     }));
-    extensionContext.subscriptions.push(qbsSession.onProfileNameChanged(name => {
+    ctx.subscriptions.push(qbsSession.onProfileNameChanged(name => {
         qbsAutoResolveRequired = true;
         autoResolveProject();
     }));
-    extensionContext.subscriptions.push(qbsSession.onConfigurationNameChanged(name => {
+    ctx.subscriptions.push(qbsSession.onConfigurationNameChanged(name => {
         qbsAutoResolveRequired = true;
         autoResolveProject();
     }));
     // QBS session logging.
-    extensionContext.subscriptions.push(qbsSession.onTaskStarted(result => {
+    ctx.subscriptions.push(qbsSession.onTaskStarted(result => {
         qbsSessionLogger.handleTaskStarted(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onProjectResolved(result => {
+    ctx.subscriptions.push(qbsSession.onProjectResolved(result => {
         qbsSessionLogger.handleProjectResolved(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onProjectBuilt(result => {
+    ctx.subscriptions.push(qbsSession.onProjectBuilt(result => {
         qbsSessionLogger.handleProjectBuilt(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onProjectCleaned(result => {
+    ctx.subscriptions.push(qbsSession.onProjectCleaned(result => {
         qbsSessionLogger.handleProjectCleaned(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onProjectInstalled(result => {
+    ctx.subscriptions.push(qbsSession.onProjectInstalled(result => {
         qbsSessionLogger.handleProjectInstalled(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onCommandDescriptionReceived(result => {
+    ctx.subscriptions.push(qbsSession.onCommandDescriptionReceived(result => {
         qbsSessionLogger.handleCommandDesctiptionReceived(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onProcessResultReceived(result => {
+    ctx.subscriptions.push(qbsSession.onProcessResultReceived(result => {
         qbsSessionLogger.handleProcessResultReceived(result);
     }));
-    extensionContext.subscriptions.push(qbsSession.onLogMessageReceived(result => {
+    ctx.subscriptions.push(qbsSession.onLogMessageReceived(result => {
         qbsSessionLogger.handleMessageReceived(result);
     }));
 }
@@ -77,28 +74,21 @@ async function autoResolveProject() {
     }
 }
 
-async function setupDefaultProject() {
-    const projects = await QbsUtils.enumerateProjects();
-    if (projects.length) {
-        qbsSession.projectUri = projects[0];
-    }
-}
-
-export async function activate(extensionContext: vscode.ExtensionContext) {
+export async function activate(ctx: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
     // Create all required singletons.
-    qbsSessionLogger = new QbsSessionLogger(extensionContext);
-    qbsSession = new QbsSession(extensionContext);
+    qbsSessionLogger = new QbsSessionLogger(ctx);
+    qbsSession = new QbsSession(ctx);
     qbsStatusBar = new QbsStatusBar(qbsSession);
 
     // Subscribe to all required events.
-    await QbsCommands.subscribeCommands(extensionContext, qbsSession);
-    await subscribeWorkspaceConfigurationEvents(extensionContext);
-    await subscribeSessionEvents(extensionContext);
+    await QbsCommands.subscribeCommands(ctx, qbsSession);
+    await subscribeWorkspaceConfigurationEvents(ctx);
+    await subscribeSessionEvents(ctx);
 
-    await setupDefaultProject();
-    vscode.commands.executeCommand('qbs.autoRestartSession');
+    await vscode.commands.executeCommand('qbs.setupDefaultProject');
+    await vscode.commands.executeCommand('qbs.autoRestartSession');
 }
 
 export async function deactivate() {
