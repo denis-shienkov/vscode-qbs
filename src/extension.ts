@@ -6,9 +6,9 @@ import * as fs from 'fs';
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
-import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
 import * as QbsConfig from './qbsconfig';
+import * as QbsCommands from './qbssessioncommands';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -17,57 +17,6 @@ let qbsSession!: QbsSession;
 let qbsStatusBar!: QbsStatusBar;
 let qbsAutoResolveRequired: boolean = false;
 let qbsAutoRestartRequired: boolean = false;
-
-async function subscribeCommands(extensionContext: vscode.ExtensionContext) {
-    const startSessionCmd = vscode.commands.registerCommand('qbs.startSession', () => {
-         qbsSession!.start();
-    });
-    extensionContext.subscriptions.push(startSessionCmd);
-
-    const stopSessionCmd = vscode.commands.registerCommand('qbs.stopSession', () => {
-        qbsSession!.stop();
-    });
-    extensionContext.subscriptions.push(stopSessionCmd);
-
-    const selectProjectCmd = vscode.commands.registerCommand('qbs.selectProject', () => {
-        QbsSelectors.selectProject().then(projectUri => {
-            if (projectUri)
-                qbsSession!.projectUri = projectUri;
-        });
-    });
-    extensionContext.subscriptions.push(selectProjectCmd);
-
-    const selectProfileCmd = vscode.commands.registerCommand('qbs.selectProfile', () => {
-        QbsSelectors.selectProfile().then(profileName => {
-            if (profileName)
-                qbsSession!.profileName = profileName;
-        });
-    });
-    extensionContext.subscriptions.push(selectProfileCmd);
-
-    const selectConfigurationCmd = vscode.commands.registerCommand('qbs.selectConfiguration', () => {
-        QbsSelectors.selectConfiguration().then(configurationName => {
-             if (configurationName)
-                qbsSession!.configurationName = configurationName;
-        });
-    });
-    extensionContext.subscriptions.push(selectConfigurationCmd);
-
-    const resolveCmd = vscode.commands.registerCommand('qbs.resolve', () => {
-        qbsSession!.resolve();
-    });
-    extensionContext.subscriptions.push(resolveCmd);
-
-    const buildCmd = vscode.commands.registerCommand('qbs.build', () => {
-        qbsSession!.build();
-    });
-    extensionContext.subscriptions.push(buildCmd);
-
-    const cleanCmd = vscode.commands.registerCommand('qbs.clean', () => {
-        qbsSession!.clean();
-    });
-    extensionContext.subscriptions.push(cleanCmd);
-}
 
 async function subscribeWorkspaceConfigurationEvents(extensionContext: vscode.ExtensionContext) {
     extensionContext.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
@@ -193,7 +142,7 @@ export async function activate(extensionContext: vscode.ExtensionContext) {
     qbsStatusBar = new QbsStatusBar(qbsSession);
 
     // Subscribe to all required events.
-    await subscribeCommands(extensionContext);
+    await QbsCommands.subscribeCommands(extensionContext, qbsSession);
     await subscribeWorkspaceConfigurationEvents(extensionContext);
     await subscribeSessionEvents(extensionContext);
 
