@@ -27,6 +27,7 @@
     ],
     "icon": "res/logo.png",
     "activationEvents": [
+        "onCommand:qbs.autoRestartSession",
         "onCommand:qbs.startSession",
         "onCommand:qbs.stopSession",
         "onCommand:qbs.selectProject",
@@ -47,6 +48,11 @@
             }
         ],
         "commands": [
+            {
+                "command": "qbs.autoRestartSession",
+                "title": "%qbs-tools.command.qbs.autorestart.session.title%",
+                "category": "QBS"
+            },
             {
                 "command": "qbs.startSession",
                 "title": "%qbs-tools.command.qbs.start.session.title%",

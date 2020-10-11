@@ -1,18 +1,116 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
+import * as fs from 'fs';
 
 // From user code.
-import {QbsSession} from './qbssession';
+import {QbsSession, QbsSessionStatus} from './qbssession';
 
 import * as QbsSelectors from './qbsselectors';
+import * as QbsConfig from './qbsconfig';
+
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 // Private functions.
 
+async function ensureQbsExecutableConfigured(): Promise<boolean> {
+    const qbsPath = QbsConfig.fetchQbsPath();
+    if (qbsPath.length === 0) {
+        vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
+                                                'QBS executable not set in configuration.'));
+        return false;
+    } else if (!fs.existsSync(qbsPath)) {
+        vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
+                                                `QBS executable ${qbsPath} not found.`));
+        return false;
+    }
+    vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
+                                                  `QBS executable found in ${qbsPath}.`));
+    return true;
+}
+
+async function autoRestartSession(session: QbsSession) {
+    await new Promise<void>(resolve => {
+        if (!ensureQbsExecutableConfigured()) {
+            vscode.commands.executeCommand('qbs.stopSession');
+            resolve();
+        }
+
+        let qbsAutoRestartRequired: boolean = false;
+        session.onStatusChanged(status => {
+            if (status === QbsSessionStatus.Stopped) {
+                if (qbsAutoRestartRequired) {
+                    qbsAutoRestartRequired = false;
+                    vscode.commands.executeCommand('qbs.startSession');
+                    resolve();
+                }
+            }
+        });
+
+        if (session.status === QbsSessionStatus.Started  || session.status === QbsSessionStatus.Starting) {
+            qbsAutoRestartRequired = true;
+            vscode.commands.executeCommand('qbs.stopSession');
+            resolve();
+        } else if (session.status === QbsSessionStatus.Stopping) {
+            qbsAutoRestartRequired = true;
+        } else if (session.status === QbsSessionStatus.Stopped) {
+            vscode.commands.executeCommand('qbs.startSession');
+            resolve();
+        }
+    });
+}
+
 async function startSession(session: QbsSession) {
-    await session.start();
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.status.progress.title', 'QBS session status')
+    }, async (progress) => {
+        progress.report({ increment: 0 });
+        await session.start();
+        return new Promise(resolve => {
+            session.onStatusChanged((status => {
+                if (status === QbsSessionStatus.Starting) {
+                    progress.report({ increment: 50, message: localize('qbs.session.starting.progress.message', 'Session starting...') });
+                } else if (status === QbsSessionStatus.Started) {
+                    progress.report({ increment: 100, message: localize('qbs.session.successfully.started.progress.message', 'Session successfully started.') });
+                    setTimeout(() => {
+                        resolve();
+                    }, 2000);
+                }
+            }));
+
+            setTimeout(() => {
+                progress.report({ increment: 100, message: localize('qbs.session.starting.timeout.progress.message', 'Session starting timeout...') });
+                resolve();
+            }, 5000);
+        });
+    });
 }
 
 async function stopSession(session: QbsSession) {
-    await session.stop();
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.status.progress.title', 'QBS session status')
+    }, async (progress) => {
+        progress.report({ increment: 0 });
+        await session.stop();
+        return new Promise(resolve => {
+            session.onStatusChanged((status => {
+                if (status === QbsSessionStatus.Stopping) {
+                    progress.report({ increment: 50, message: localize('qbs.session.stopping.progress.message', 'Session stopping...') });
+                } else if (status === QbsSessionStatus.Stopped) {
+                    progress.report({ increment: 100, message: localize('qbs.session.successfully.stopped.progress.message', 'Session successfully stopped.') });
+                    setTimeout(() => {
+                        resolve();
+                    }, 2000);
+                }
+            }));
+
+            setTimeout(() => {
+                progress.report({ increment: 100, message: localize('qbs.session.stopping.timeout.progress.message', 'Session stopping timeout...') });
+                resolve();
+            }, 5000);
+        });
+    });
 }
 
 async function selectProject(session: QbsSession) {
@@ -55,6 +153,9 @@ async function clean(session: QbsSession) {
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
     // Start/stop session commands.
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
+        autoRestartSession(session);
+    }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.startSession', () => {
         startSession(session);
     }));

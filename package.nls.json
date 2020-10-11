@@ -1,4 +1,5 @@
 {
+    "qbs-tools.command.qbs.autorestart.session.title": "AutoRestartSession",
     "qbs-tools.command.qbs.start.session.title": "StartSession",
     "qbs-tools.command.qbs.stop.session.title": "StopSession",
     "qbs-tools.command.qbs.select.project.title": "SelectProject",
