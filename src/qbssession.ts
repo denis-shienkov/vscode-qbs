@@ -183,6 +183,13 @@ export class QbsSession implements vscode.Disposable {
         await this._protocol.sendRequest(request);
     }
 
+    async cancel() {
+        let request: any = {};
+        request['type'] = 'cancel-job';
+
+        await this._protocol.sendRequest(request);
+    }
+
     set status(st: QbsSessionStatus) {
         if (st !== this._status) {
             this._status = st;

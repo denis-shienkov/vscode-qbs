@@ -309,6 +309,10 @@ async function install(session: QbsSession) {
     });
 }
 
+async function cancel(session: QbsSession) {
+    await session.cancel();
+}
+
 // Public function.
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
@@ -348,5 +352,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', () => {
         install(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', () => {
+        cancel(session);
     }));
 }
