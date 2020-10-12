@@ -25,7 +25,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
 
     // Constructors.
 
-    constructor(readonly extensionContext: vscode.ExtensionContext) {
+    constructor() {
     }
 
     // Public overriden methods.

@@ -21,7 +21,7 @@ export enum QbsSessionStatus {
 
 export class QbsSession implements vscode.Disposable {
     // Private members.
-    private _protocol?: QbsSessionProtocol;
+    private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri;
     private _profileName: string = '';
@@ -67,9 +67,7 @@ export class QbsSession implements vscode.Disposable {
 
     // Constructors.
 
-    constructor(readonly extensionContext: vscode.ExtensionContext) {
-        this._protocol = new QbsSessionProtocol(extensionContext);
-
+    constructor() {
         this._protocol.onStatusChanged(status => {
             switch (status) {
             case QbsSessionProtocolStatus.Started:
@@ -87,9 +85,7 @@ export class QbsSession implements vscode.Disposable {
             }
         });
 
-        this._protocol.onResponseReceived(response => {
-            this.parseResponse(response);
-        });
+        this._protocol.onResponseReceived(response => this.parseResponse(response));
     }
 
     // Public overriden methods.
