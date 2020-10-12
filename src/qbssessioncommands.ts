@@ -136,7 +136,7 @@ async function selectConfiguration(session: QbsSession) {
 async function resolve(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.resolve.progress.title', 'QBS project resolve')
+        title: localize('qbs.session.resolve.progress.title', 'Project resolving')
     }, async (p) => {
         await session.resolve();
         return new Promise(resolve => {
@@ -145,7 +145,7 @@ async function resolve(session: QbsSession) {
             let description: string = '';
 
             const updateReport = () => {
-                const percentage = (maxProgress > 0) ? ((100 * progress) / maxProgress) : 0;
+                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
                 const msg = `${description} ${percentage} %`;
                 p.report({ increment: percentage, message: msg});
             };
@@ -165,13 +165,10 @@ async function resolve(session: QbsSession) {
                 updateReport();
             });
             session.onProjectResolved(errors => {
-                if (errors.isEmpty()) {
-                    p.report({ message: localize('qbs.session.resolve.failed.progress.message',
-                                                 'Project successfully resolved.') });
-                } else {
-                    p.report({ message: localize('qbs.session.resolve.successfully.progress.message',
-                                                 'Project resolving failed.') });
-                }
+                maxProgress = progress = 100;
+                description = errors.isEmpty() ? 'Project successfully resolved'
+                                               : 'Project resolving failed';
+                updateReport();
                 setTimeout(() => {
                     resolve();
                 }, 2000);
@@ -183,7 +180,7 @@ async function resolve(session: QbsSession) {
 async function build(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.build.progress.title', 'QBS project build')
+        title: localize('qbs.session.build.progress.title', 'Project building')
     }, async (p) => {
         await session.build();
         return new Promise(resolve => {
@@ -192,7 +189,7 @@ async function build(session: QbsSession) {
             let description: string = '';
 
             const updateReport = () => {
-                const percentage = (maxProgress > 0) ? ((100 * progress) / maxProgress) : 0;
+                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
                 const msg = `${description} ${percentage} %`;
                 p.report({ increment: percentage, message: msg});
             };
@@ -212,13 +209,10 @@ async function build(session: QbsSession) {
                 updateReport();
             });
             session.onProjectBuilt(errors => {
-                if (errors.isEmpty()) {
-                    p.report({ message: localize('qbs.session.build.failed.progress.message',
-                                                 'Project successfully built.') });
-                } else {
-                    p.report({ message: localize('qbs.session.build.successfully.progress.message',
-                                                 'Project building failed.') });
-                }
+                maxProgress = progress = 100;
+                description = errors.isEmpty() ? 'Project successfully built'
+                                               : 'Project building failed';
+                updateReport();
                 setTimeout(() => {
                     resolve();
                 }, 2000);
@@ -230,7 +224,7 @@ async function build(session: QbsSession) {
 async function clean(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.clean.progress.title', 'QBS project clean')
+        title: localize('qbs.session.clean.progress.title', 'Project cleaning')
     }, async (p) => {
         await session.clean();
         return new Promise(resolve => {
@@ -239,7 +233,7 @@ async function clean(session: QbsSession) {
             let description: string = '';
 
             const updateReport = () => {
-                const percentage = (maxProgress > 0) ? ((100 * progress) / maxProgress) : 0;
+                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
                 const msg = `${description} ${percentage} %`;
                 p.report({ increment: percentage, message: msg});
             };
@@ -259,13 +253,10 @@ async function clean(session: QbsSession) {
                 updateReport();
             });
             session.onProjectCleaned(errors => {
-                if (errors.isEmpty()) {
-                    p.report({ message: localize('qbs.session.clean.failed.progress.message',
-                                                 'Project successfully cleaned.') });
-                } else {
-                    p.report({ message: localize('qbs.session.clean.successfully.progress.message',
-                                                 'Project cleaning failed.') });
-                }
+                maxProgress = progress = 100;
+                description = errors.isEmpty() ? 'Project successfully cleaned'
+                                               : 'Project cleaning failed';
+                updateReport();
                 setTimeout(() => {
                     resolve();
                 }, 2000);
