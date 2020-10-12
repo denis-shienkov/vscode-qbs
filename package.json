@@ -37,6 +37,7 @@
         "onCommand:qbs.resolve",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
+        "onCommand:qbs.install",
         "workspaceContains:*.qbs"
     ],
     "main": "./out/extension.js",
@@ -97,6 +98,11 @@
             {
                 "command": "qbs.clean",
                 "title": "%qbs-tools.command.qbs.clean.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.install",
+                "title": "%qbs-tools.command.qbs.install.title%",
                 "category": "QBS"
             }
         ],

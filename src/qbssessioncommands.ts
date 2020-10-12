@@ -265,6 +265,50 @@ async function clean(session: QbsSession) {
     });
 }
 
+async function install(session: QbsSession) {
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.install.progress.title', 'Project installing')
+    }, async (p) => {
+        await session.install();
+        return new Promise(resolve => {
+            let maxProgress: number = 0;
+            let progress: number = 0;
+            let description: string = '';
+
+            const updateReport = () => {
+                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                const msg = `${description} ${percentage} %`;
+                p.report({ increment: percentage, message: msg});
+            };
+
+            session.onTaskStarted(result => {
+                description = result._description;
+                maxProgress = result._maxProgress;
+                progress = 0;
+                updateReport();
+            });
+            session.onTaskMaxProgressChanged(result => {
+                maxProgress = result._maxProgress;
+                updateReport();
+            });
+            session.onTaskProgressUpdated(result => {
+                progress = result._progress;
+                updateReport();
+            });
+            session.onProjectInstalled(errors => {
+                maxProgress = progress = 100;
+                description = errors.isEmpty() ? 'Project successfully installed'
+                                               : 'Project installing failed';
+                updateReport();
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        });
+    });
+}
+
 // Public function.
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
@@ -301,5 +345,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.clean', () => {
         clean(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', () => {
+        install(session);
     }));
 }

@@ -100,14 +100,14 @@ export class QbsSession implements vscode.Disposable {
         if (this._status === QbsSessionStatus.Stopped) {
             const qbsPath = QbsConfig.fetchQbsPath();
             if (qbsPath.length > 0) {
-                await this._protocol?.start(qbsPath);
+                await this._protocol.start(qbsPath);
             }
         }
     }
 
     async stop() {
         if (this._status === QbsSessionStatus.Started) {
-            await this._protocol?.stop();
+            await this._protocol.stop();
         }
     }
 
@@ -141,13 +141,12 @@ export class QbsSession implements vscode.Disposable {
         const forceProbes = QbsConfig.fetchQbsForceProbes();
         request['orce-probe-execution'] = forceProbes;
 
-        await this._protocol?.sendRequest(request);
+        await this._protocol.sendRequest(request);
     }
 
     async build() {
         let request: any = {};
         request['type'] = 'build-project';
-        request['keep-going'] = true;
         request['data-mode'] = 'only-if-changed';
 
         const maxJobs = QbsConfig.fetchQbsMaxJobs();
@@ -161,7 +160,7 @@ export class QbsSession implements vscode.Disposable {
         const showCommandLines = QbsConfig.fetchQbsShowCommandLines();
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
-        await this._protocol?.sendRequest(request);
+        await this._protocol.sendRequest(request);
     }
 
     async clean() {
@@ -171,7 +170,17 @@ export class QbsSession implements vscode.Disposable {
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
 
-        await this._protocol?.sendRequest(request);
+        await this._protocol.sendRequest(request);
+    }
+
+    async install() {
+        let request: any = {};
+        request['type'] = 'install-project';
+
+        const keepGoing = QbsConfig.fetchQbsKeepGoing();
+        request['keep-going'] = keepGoing;
+
+        await this._protocol.sendRequest(request);
     }
 
     set status(st: QbsSessionStatus) {
