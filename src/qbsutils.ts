@@ -3,6 +3,8 @@ import * as nls from 'vscode-nls';
 import * as cp from 'child_process';
 import * as fs from 'fs';
 
+import { basename } from 'path';
+
 // From user code.
 import { QbsSessionStatus } from './qbssession';
 import * as QbsConfig from './qbsconfig';
@@ -91,4 +93,8 @@ export async function ensureQbsExecutableConfigured(): Promise<boolean> {
     vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
                                                   `QBS executable found in ${qbsPath}.`));
     return true;
+}
+
+export function fileBaseName(uri: vscode.Uri): string {
+    return basename(uri.fsPath);
 }

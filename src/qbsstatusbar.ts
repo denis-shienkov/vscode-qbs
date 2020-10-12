@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
-import { basename } from 'path'; 
-
 // From user code.
-import {QbsSession, QbsSessionStatus} from './qbssession';
+import {QbsSession} from './qbssession';
 import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
@@ -90,7 +88,7 @@ export class QbsStatusBar implements vscode.Disposable {
     }
 
     private async updateProjectFileName(uri?: vscode.Uri) {
-        const text = uri ? basename(uri.fsPath)
+        const text = uri ? QbsUtils.fileBaseName(uri)
                          : localize('qbs.active.project.empty', 'empty');
         this._projectButton.text = localize('qbs.active.project.select',
                                             `$(project) [${text}]`);

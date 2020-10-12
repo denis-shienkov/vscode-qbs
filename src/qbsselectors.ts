@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { basename } from 'path';
 
 // From user code.
 import * as QbsUtils from './qbsutils';
@@ -11,7 +10,7 @@ export async function selectProject(): Promise<vscode.Uri | undefined> {
     const projects = await QbsUtils.enumerateProjects();
     const items: ProjectQuickPickItem[] = projects.map(project => {
         return {
-            label: basename(project.fsPath),
+            label: QbsUtils.fileBaseName(project),
             uri: project
         };
     });
