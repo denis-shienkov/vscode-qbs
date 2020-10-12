@@ -231,7 +231,7 @@ export class QbsSession implements vscode.Disposable {
 
     private parseResponse(response: any) {
         const type = response['type'];
-        console.debug(`t: ${type}`);
+        //console.debug(`t: ${type}`);
 
         if (type === 'hello') {
             const result = new QbsSessionHelloResult(response)

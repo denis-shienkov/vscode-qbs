@@ -53,17 +53,17 @@ export class QbsSessionProtocol implements vscode.Disposable {
 
         this._process.stdout?.on('data', (data) => {
             this.status = QbsSessionProtocolStatus.Started;
-            console.log(`stdout: ${data}`);
+            //console.log(`stdout: ${data}`);
             this._input += data;
             this.parseStdOutput();
         });
         
         this._process.stderr?.on('data', (data) => {
-            console.error(`stderr: ${data}`);
+            //console.error(`stderr: ${data}`);
         });
           
         this._process.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
+            //console.log(`child process exited with code ${code}`);
             this.status = QbsSessionProtocolStatus.Stopped;
         });
     }
@@ -97,7 +97,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
                 const length = parseInt(sizeString);
                 if (isNaN(length) || length < 0) {
                     // The received packet has wrong length field.
-                    console.debug('qbs: wrong size string received');
+                    //console.debug('qbs: wrong size string received');
                 } else {
                     this._expectedLength = length;
                 }
