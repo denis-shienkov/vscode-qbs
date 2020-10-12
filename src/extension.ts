@@ -5,12 +5,12 @@ import * as nls from 'vscode-nls';
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
-import * as QbsCommands from './qbssessioncommands';
+import * as QbsSessionCommands from './qbssessioncommands';
 
-let qbsSessionLogger!: QbsSessionLogger;
-let qbsSession!: QbsSession;
-let qbsStatusBar!: QbsStatusBar;
-let qbsAutoResolveRequired: boolean = false;
+let logger!: QbsSessionLogger;
+let session!: QbsSession;
+let statusBar!: QbsStatusBar;
+let autoResolveRequired: boolean = false;
 
 async function subscribeWorkspaceConfigurationEvents(ctx: vscode.ExtensionContext) {
     ctx.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
@@ -22,54 +22,29 @@ async function subscribeWorkspaceConfigurationEvents(ctx: vscode.ExtensionContex
 
 async function subscribeSessionEvents(ctx: vscode.ExtensionContext) {
     // QBS session status.
-    ctx.subscriptions.push(qbsSession.onStatusChanged(status => {
+    ctx.subscriptions.push(session.onStatusChanged(status => {
         if (status === QbsSessionStatus.Started) {
             autoResolveProject();
         }
     }));
     // QBS session configuration.
-    ctx.subscriptions.push(qbsSession.onProjectUriChanged(uri => {
-        qbsAutoResolveRequired = true;
+    ctx.subscriptions.push(session.onProjectUriChanged(uri => {
+        autoResolveRequired = true;
         autoResolveProject();
     }));
-    ctx.subscriptions.push(qbsSession.onProfileNameChanged(name => {
-        qbsAutoResolveRequired = true;
+    ctx.subscriptions.push(session.onProfileNameChanged(name => {
+        autoResolveRequired = true;
         autoResolveProject();
     }));
-    ctx.subscriptions.push(qbsSession.onConfigurationNameChanged(name => {
-        qbsAutoResolveRequired = true;
+    ctx.subscriptions.push(session.onConfigurationNameChanged(name => {
+        autoResolveRequired = true;
         autoResolveProject();
-    }));
-    // QBS session logging.
-    ctx.subscriptions.push(qbsSession.onTaskStarted(result => {
-        qbsSessionLogger.handleTaskStarted(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onProjectResolved(result => {
-        qbsSessionLogger.handleProjectResolved(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onProjectBuilt(result => {
-        qbsSessionLogger.handleProjectBuilt(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onProjectCleaned(result => {
-        qbsSessionLogger.handleProjectCleaned(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onProjectInstalled(result => {
-        qbsSessionLogger.handleProjectInstalled(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onCommandDescriptionReceived(result => {
-        qbsSessionLogger.handleCommandDesctiptionReceived(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onProcessResultReceived(result => {
-        qbsSessionLogger.handleProcessResultReceived(result);
-    }));
-    ctx.subscriptions.push(qbsSession.onLogMessageReceived(result => {
-        qbsSessionLogger.handleMessageReceived(result);
     }));
 }
 
 async function autoResolveProject() {
-    if (qbsAutoResolveRequired && qbsSession?.status === QbsSessionStatus.Started && qbsSession?.projectUri) {
-        qbsAutoResolveRequired = false;
+    if (autoResolveRequired && session?.status === QbsSessionStatus.Started && session?.projectUri) {
+        autoResolveRequired = false;
         vscode.commands.executeCommand('qbs.resolve');
     }
 }
@@ -78,12 +53,12 @@ export async function activate(ctx: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
 
     // Create all required singletons.
-    qbsSessionLogger = new QbsSessionLogger(ctx);
-    qbsSession = new QbsSession(ctx);
-    qbsStatusBar = new QbsStatusBar(qbsSession);
+    session = new QbsSession(ctx);
+    statusBar = new QbsStatusBar(session);
+    logger = new QbsSessionLogger(ctx, session);
 
     // Subscribe to all required events.
-    await QbsCommands.subscribeCommands(ctx, qbsSession);
+    await QbsSessionCommands.subscribeCommands(ctx, session);
     await subscribeWorkspaceConfigurationEvents(ctx);
     await subscribeSessionEvents(ctx);
 
@@ -92,6 +67,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
 }
 
 export async function deactivate() {
-    qbsStatusBar?.dispose();
-    qbsSession?.dispose();
+    statusBar.dispose();
+    session.dispose();
+    logger.dispose();
 }

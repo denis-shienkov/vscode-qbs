@@ -89,7 +89,7 @@ export class QbsSessionMessageResult {
         if (typeof obj === 'string') {
             const message = new QbsSessionMessageItemResult(obj);
             this._messages.push(message);
-        } else {
+        } else if (obj) {
             const items = obj['items'] || [];
             for (const item of items) {
                 const message = new QbsSessionMessageItemResult(item);
