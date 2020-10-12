@@ -1,33 +1,15 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
-import * as fs from 'fs';
 
 // From user code.
 import {QbsSession, QbsSessionStatus} from './qbssession';
 
 import * as QbsSelectors from './qbsselectors';
-import * as QbsConfig from './qbsconfig';
 import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 // Private functions.
-
-async function ensureQbsExecutableConfigured(): Promise<boolean> {
-    const qbsPath = QbsConfig.fetchQbsPath();
-    if (qbsPath.length === 0) {
-        vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
-                                                'QBS executable not set in configuration.'));
-        return false;
-    } else if (!fs.existsSync(qbsPath)) {
-        vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
-                                                `QBS executable ${qbsPath} not found.`));
-        return false;
-    }
-    vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
-                                                  `QBS executable found in ${qbsPath}.`));
-    return true;
-}
 
 async function setupDefaultProject(session: QbsSession) {
     const projects = await QbsUtils.enumerateProjects();
@@ -38,7 +20,7 @@ async function setupDefaultProject(session: QbsSession) {
 
 async function autoRestartSession(session: QbsSession) {
     await new Promise<void>(resolve => {
-        if (!ensureQbsExecutableConfigured()) {
+        if (!QbsUtils.ensureQbsExecutableConfigured()) {
             vscode.commands.executeCommand('qbs.stopSession');
             resolve();
         }

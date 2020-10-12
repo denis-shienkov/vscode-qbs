@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import * as cp from 'child_process';
+import * as fs from 'fs';
 
 // From user code.
 import { QbsSessionStatus } from './qbssession';
@@ -74,4 +75,20 @@ export function sessionStatusName(status: QbsSessionStatus): string {
     case QbsSessionStatus.Stopping:
         return localize('qbs.session.status.started', "stopping");
     }
+}
+
+export async function ensureQbsExecutableConfigured(): Promise<boolean> {
+    const qbsPath = QbsConfig.fetchQbsPath();
+    if (qbsPath.length === 0) {
+        vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
+                                                'QBS executable not set in configuration.'));
+        return false;
+    } else if (!fs.existsSync(qbsPath)) {
+        vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
+                                                `QBS executable ${qbsPath} not found.`));
+        return false;
+    }
+    vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
+                                                  `QBS executable found in ${qbsPath}.`));
+    return true;
 }
