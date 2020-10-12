@@ -25,11 +25,11 @@ async function autoRestartSession(session: QbsSession) {
             resolve();
         }
 
-        let qbsAutoRestartRequired: boolean = false;
+        let autoRestartRequired: boolean = false;
         session.onStatusChanged(status => {
             if (status === QbsSessionStatus.Stopped) {
-                if (qbsAutoRestartRequired) {
-                    qbsAutoRestartRequired = false;
+                if (autoRestartRequired) {
+                    autoRestartRequired = false;
                     vscode.commands.executeCommand('qbs.startSession');
                     resolve();
                 }
@@ -37,11 +37,11 @@ async function autoRestartSession(session: QbsSession) {
         });
 
         if (session.status === QbsSessionStatus.Started  || session.status === QbsSessionStatus.Starting) {
-            qbsAutoRestartRequired = true;
+            autoRestartRequired = true;
             vscode.commands.executeCommand('qbs.stopSession');
             resolve();
         } else if (session.status === QbsSessionStatus.Stopping) {
-            qbsAutoRestartRequired = true;
+            autoRestartRequired = true;
         } else if (session.status === QbsSessionStatus.Stopped) {
             vscode.commands.executeCommand('qbs.startSession');
             resolve();
@@ -53,15 +53,17 @@ async function startSession(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
-    }, async (progress) => {
-        progress.report({ increment: 0 });
+    }, async (p) => {
+        p.report({ increment: 0 });
         await session.start();
         return new Promise(resolve => {
             session.onStatusChanged((status => {
                 if (status === QbsSessionStatus.Starting) {
-                    progress.report({ increment: 50, message: localize('qbs.session.starting.progress.message', 'Session starting...') });
+                    p.report({ increment: 50, message: localize('qbs.session.starting.progress.message',
+                                                                'Session starting...') });
                 } else if (status === QbsSessionStatus.Started) {
-                    progress.report({ increment: 100, message: localize('qbs.session.successfully.started.progress.message', 'Session successfully started.') });
+                    p.report({ increment: 100, message: localize('qbs.session.successfully.started.progress.message',
+                                                                 'Session successfully started.') });
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -69,7 +71,8 @@ async function startSession(session: QbsSession) {
             }));
 
             setTimeout(() => {
-                progress.report({ increment: 100, message: localize('qbs.session.starting.timeout.progress.message', 'Session starting timeout...') });
+                p.report({ message: localize('qbs.session.starting.timeout.progress.message',
+                                             'Session starting timeout...') });
                 resolve();
             }, 5000);
         });
@@ -80,15 +83,17 @@ async function stopSession(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
-    }, async (progress) => {
-        progress.report({ increment: 0 });
+    }, async (p) => {
+        p.report({ increment: 0 });
         await session.stop();
         return new Promise(resolve => {
             session.onStatusChanged((status => {
                 if (status === QbsSessionStatus.Stopping) {
-                    progress.report({ increment: 50, message: localize('qbs.session.stopping.progress.message', 'Session stopping...') });
+                    p.report({ increment: 50, message: localize('qbs.session.stopping.progress.message',
+                                                                'Session stopping...') });
                 } else if (status === QbsSessionStatus.Stopped) {
-                    progress.report({ increment: 100, message: localize('qbs.session.successfully.stopped.progress.message', 'Session successfully stopped.') });
+                    p.report({ increment: 100, message: localize('qbs.session.successfully.stopped.progress.message',
+                                                                 'Session successfully stopped.') });
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -96,7 +101,8 @@ async function stopSession(session: QbsSession) {
             }));
 
             setTimeout(() => {
-                progress.report({ increment: 100, message: localize('qbs.session.stopping.timeout.progress.message', 'Session stopping timeout...') });
+                p.report({ message: localize('qbs.session.stopping.timeout.progress.message',
+                                             'Session stopping timeout...') });
                 resolve();
             }, 5000);
         });
@@ -128,7 +134,50 @@ async function selectConfiguration(session: QbsSession) {
 }
 
 async function resolve(session: QbsSession) {
-    await session.resolve();
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.resolve.progress.title', 'QBS project resolve')
+    }, async (p) => {
+        await session.resolve();
+        return new Promise(resolve => {
+            let maxProgress: number = 0;
+            let progress: number = 0;
+            let description: string = '';
+
+            const updateReport = () => {
+                const percentage = (maxProgress > 0) ? ((100 * progress) / maxProgress) : 0;
+                const msg = `${description} ${percentage} %`;
+                p.report({ increment: percentage, message: msg});
+            };
+
+            session.onTaskStarted(result => {
+                description = result._description;
+                maxProgress = result._maxProgress;
+                progress = 0;
+                updateReport();
+            });
+            session.onTaskMaxProgressChanged(result => {
+                maxProgress = result._maxProgress;
+                updateReport();
+            });
+            session.onTaskProgressUpdated(result => {
+                progress = result._progress;
+                updateReport();
+            });
+            session.onProjectResolved(errors => {
+                if (errors.isEmpty()) {
+                    p.report({ message: localize('qbs.session.resolve.failed.progress.message',
+                                                 'Project successfully resolved.') });
+                } else {
+                    p.report({ message: localize('qbs.session.resolve.successfully.progress.message',
+                                                 'Project resolving failed.') });
+                }
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        });
+    });
 }
 
 async function build(session: QbsSession) {
