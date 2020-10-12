@@ -181,7 +181,50 @@ async function resolve(session: QbsSession) {
 }
 
 async function build(session: QbsSession) {
-    await session.build();
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.build.progress.title', 'QBS project build')
+    }, async (p) => {
+        await session.build();
+        return new Promise(resolve => {
+            let maxProgress: number = 0;
+            let progress: number = 0;
+            let description: string = '';
+
+            const updateReport = () => {
+                const percentage = (maxProgress > 0) ? ((100 * progress) / maxProgress) : 0;
+                const msg = `${description} ${percentage} %`;
+                p.report({ increment: percentage, message: msg});
+            };
+
+            session.onTaskStarted(result => {
+                description = result._description;
+                maxProgress = result._maxProgress;
+                progress = 0;
+                updateReport();
+            });
+            session.onTaskMaxProgressChanged(result => {
+                maxProgress = result._maxProgress;
+                updateReport();
+            });
+            session.onTaskProgressUpdated(result => {
+                progress = result._progress;
+                updateReport();
+            });
+            session.onProjectBuilt(errors => {
+                if (errors.isEmpty()) {
+                    p.report({ message: localize('qbs.session.build.failed.progress.message',
+                                                 'Project successfully build.') });
+                } else {
+                    p.report({ message: localize('qbs.session.build.successfully.progress.message',
+                                                 'Project building failed.') });
+                }
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        });
+    });
 }
 
 async function clean(session: QbsSession) {
