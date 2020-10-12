@@ -136,8 +136,10 @@ async function selectConfiguration(session: QbsSession) {
 async function resolve(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.resolve.progress.title', 'Project resolving')
-    }, async (p) => {
+        title: localize('qbs.session.resolve.progress.title', 'Project resolving'),
+        cancellable: true
+    }, async (p, c) => {
+        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
         await session.resolve();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -180,8 +182,10 @@ async function resolve(session: QbsSession) {
 async function build(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.build.progress.title', 'Project building')
-    }, async (p) => {
+        title: localize('qbs.session.build.progress.title', 'Project building'),
+        cancellable: true
+    }, async (p, c) => {
+        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
         await session.build();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -224,8 +228,10 @@ async function build(session: QbsSession) {
 async function clean(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.clean.progress.title', 'Project cleaning')
-    }, async (p) => {
+        title: localize('qbs.session.clean.progress.title', 'Project cleaning'),
+        cancellable: true
+    }, async (p, c) => {
+        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
         await session.clean();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -268,8 +274,10 @@ async function clean(session: QbsSession) {
 async function install(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.install.progress.title', 'Project installing')
-    }, async (p) => {
+        title: localize('qbs.session.install.progress.title', 'Project installing'),
+        cancellable: true
+    }, async (p, c) => {
+        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
         await session.install();
         return new Promise(resolve => {
             let maxProgress: number = 0;
