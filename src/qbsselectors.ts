@@ -14,7 +14,7 @@ export async function selectProject(): Promise<vscode.Uri | undefined> {
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item ? item.uri : undefined;
+        return item?.uri;
     });
 }
 
@@ -24,7 +24,7 @@ export async function selectProfile(): Promise<string | undefined> {
         return { label: profile };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item ? item.label : undefined;
+        return item?.label;
     });
 }
 
@@ -34,6 +34,6 @@ export async function selectConfiguration(): Promise<string | undefined> {
         return { label: configuration };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item ? item.label : undefined;
+        return item?.label;
     });
 }
