@@ -1,23 +1,15 @@
 import * as vscode from 'vscode';
 
-// From user code.
 import {QbsSession} from './qbssession';
-import {QbsSessionTaskStartedResult,
-        QbsSessionMessageResult,
-        QbsSessionProcessResult} from './qbssessionresults';
+import {QbsSessionMessageResult} from './qbssessionresults';
 
 export class QbsSessionLogger implements vscode.Disposable {
-    // Private members.
     private _compileOutput: vscode.OutputChannel;
     private _messageOutput: vscode.OutputChannel;
-
-    // Constructors.
 
     constructor(readonly session: QbsSession) {
         this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
         this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
-
-        // Appends the tasks information to the general QBS compile output channel.
 
         const appendCompileOutput = (result: QbsSessionMessageResult) => {
             if (!result.isEmpty()) {
@@ -55,8 +47,6 @@ export class QbsSessionLogger implements vscode.Disposable {
             }
         });
 
-        // Appends the service information to the separate QBS message output channel.
-
         session.onLogMessageReceived(result => {
             if (!result.isEmpty()) {
                 const msg = `[qbs] ${result.toString()}`;
@@ -64,8 +54,6 @@ export class QbsSessionLogger implements vscode.Disposable {
             }
         });
     }
-
-    // Public overriden methods.
 
     dispose() {  }
 }

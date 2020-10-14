@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-// From user code.
 import * as QbsUtils from './qbsutils';
 import * as QbsConfig from './qbsconfig';
 import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
@@ -20,7 +19,6 @@ export enum QbsSessionStatus {
 }
 
 export class QbsSession implements vscode.Disposable {
-    // Private members.
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _projectUri!: vscode.Uri;
@@ -46,7 +44,6 @@ export class QbsSession implements vscode.Disposable {
     private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
     
-    // Public events.
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
@@ -64,8 +61,6 @@ export class QbsSession implements vscode.Disposable {
     readonly onTaskMaxProgressChanged: vscode.Event<QbsSessionTaskMaxProgressResult> = this._onTaskMaxProgressChanged.event;
     readonly onCommandDescriptionReceived: vscode.Event<QbsSessionMessageResult> = this._onCommandDescriptionReceived.event;
     readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
-
-    // Constructors.
 
     constructor() {
         this._protocol.onStatusChanged(status => {
@@ -88,13 +83,9 @@ export class QbsSession implements vscode.Disposable {
         this._protocol.onResponseReceived(response => this.parseResponse(response));
     }
 
-    // Public overriden methods.
-
     dispose() {
         this._protocol?.dispose();
     }
-
-    // Public methods.
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
@@ -256,12 +247,8 @@ export class QbsSession implements vscode.Disposable {
         return this._configurationName;
     }
 
-    // Private methods.
-
     private parseResponse(response: any) {
         const type = response['type'];
-        //console.debug(`t: ${type}`);
-
         if (type === 'hello') {
             const result = new QbsSessionHelloResult(response)
             this._onHelloReceived.fire(result);

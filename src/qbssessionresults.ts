@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 
 export class QbsSessionHelloResult {
     readonly _apiLevel: number = 0;

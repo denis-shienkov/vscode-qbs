@@ -11,7 +11,6 @@ export enum QbsSessionProtocolStatus {
 const PACKET_PREAMBLE = "qbsmsg:";
 
 export class QbsSessionProtocol implements vscode.Disposable {
-    // Private members.
     private _input: string = '';
     private _expectedLength: number = -1;
     private _status: QbsSessionProtocolStatus = QbsSessionProtocolStatus.Stopped;
@@ -19,20 +18,13 @@ export class QbsSessionProtocol implements vscode.Disposable {
     private _onStatusChanged: vscode.EventEmitter<QbsSessionProtocolStatus> = new vscode.EventEmitter<QbsSessionProtocolStatus>();
     private _onResponseReceived: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
-     // Public events.
     readonly onStatusChanged: vscode.Event<QbsSessionProtocolStatus> = this._onStatusChanged.event;
     readonly onResponseReceived: vscode.Event<any> = this._onResponseReceived.event;
-
-    // Constructors.
 
     constructor() {
     }
 
-    // Public overriden methods.
-
     dispose() {  }
-
-    // Public methods.
 
     set status(st: QbsSessionProtocolStatus) {
         if (st === this._status)
@@ -53,17 +45,16 @@ export class QbsSessionProtocol implements vscode.Disposable {
 
         this._process.stdout?.on('data', (data) => {
             this.status = QbsSessionProtocolStatus.Started;
-            //console.log(`stdout: ${data}`);
             this._input += data;
             this.parseStdOutput();
         });
         
         this._process.stderr?.on('data', (data) => {
-            //console.error(`stderr: ${data}`);
+            // TODO: Implement me.
         });
           
         this._process.on('close', (code) => {
-            //console.log(`child process exited with code ${code}`);
+            // TODO: Implement me.
             this.status = QbsSessionProtocolStatus.Stopped;
         });
     }
@@ -80,32 +71,27 @@ export class QbsSessionProtocol implements vscode.Disposable {
         this._process?.stdin?.write(output);
     }
 
-    // Private methods.
-
     private parseStdOutput() {
         for (;;) {
             if (this._expectedLength === -1) {
-                // Lookup the protocol preamble and detect the expected payload length.
                 const preambleIndex = this._input.indexOf(PACKET_PREAMBLE);
                 if (preambleIndex === -1)
-                    break; // Seems, the received packet is incomplete yet.
+                    break;
                 const numberOffset = preambleIndex + PACKET_PREAMBLE.length;
                 const newLineOffset = this._input.indexOf('\n', numberOffset);
                 if (newLineOffset === -1)
-                    return; // Seems, the received packet is incomplete yet.
+                    return;
                 const sizeString = this._input.substring(numberOffset, newLineOffset);
                 const length = parseInt(sizeString);
                 if (isNaN(length) || length < 0) {
-                    // The received packet has wrong length field.
-                    //console.debug('qbs: wrong size string received');
+                    // TODO: Implement me.
                 } else {
                     this._expectedLength = length;
                 }
                 this._input = this._input.substring(newLineOffset + 1);
             } else {
-                // Extract the payload.
                 if (this._input.length < this._expectedLength)
-                    break; // Seems, the received packet is incomplete yet.
+                    break;
                 const data = this._input.substring(0, this._expectedLength);
                 this._input = this._input.slice(this._expectedLength);
                 this._expectedLength = -1;

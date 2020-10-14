@@ -24,7 +24,6 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
     }
 
     async provideConfigurations(uris: vscode.Uri[]): Promise<cpt.SourceFileConfigurationItem[]> {
-        console.debug("REQ CFG: " + uris);
         let items: cpt.SourceFileConfigurationItem[] = [];
         for (const uri of uris) {
             const configuration = this._sourceFileConfigurations.get(uri.toString());
@@ -40,7 +39,6 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
     }
 
     async provideBrowseConfiguration(): Promise<cpt.WorkspaceBrowseConfiguration> { 
-        console.debug("REQ BROWSE CFG");
         return {browsePath: []}; 
     }
 
@@ -49,7 +47,6 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
     }
 
     async provideFolderBrowseConfiguration(uri: vscode.Uri): Promise<cpt.WorkspaceBrowseConfiguration> {
-        console.debug("REQ FOLDER BROWSE CFG: " + uri);
         return {browsePath: []};
     }
 

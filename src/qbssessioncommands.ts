@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
-// From user code.
 import {QbsSession, QbsSessionStatus} from './qbssession';
-
 import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
 
@@ -321,14 +319,10 @@ async function cancel(session: QbsSession) {
     await session.cancel();
 }
 
-// Public function.
-
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
-    // Start/stop session commands.
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
         setupDefaultProject(session);
     }));
-    // Start/stop session commands.
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
         autoRestartSession(session);
     }));
@@ -338,7 +332,6 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.stopSession', () => {
         stopSession(session);
     }));
-    // Session properties commands.
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProject', () => {
         selectProject(session);
     }));
@@ -348,7 +341,6 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectConfiguration', () => {
         selectConfiguration(session);
     }));
-    // Session resolve/build/clean commands.
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', () => {
         resolve(session);
     }));

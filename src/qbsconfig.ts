@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-// From user code.
 import * as QbsUtils from './qbsutils';
 
 export function fetchQbsPath(): string {

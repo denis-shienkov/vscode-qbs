@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-// From user code.
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
@@ -50,13 +49,11 @@ class QbsExtensionManager implements vscode.Disposable {
             }
         }
 
-        // QBS session status.
         ctx.subscriptions.push(this._session.onStatusChanged(status => {
             if (status === QbsSessionStatus.Started) {
                 autoResolveProject();
             }
         }));
-        // QBS session configuration.
         ctx.subscriptions.push(this._session.onProjectUriChanged(uri => {
             this._autoResolveRequired = true;
             autoResolveProject();
