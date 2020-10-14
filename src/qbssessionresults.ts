@@ -64,15 +64,15 @@ export class QbsSessionMessageItemResult {
             this._description = msg;
         } else {
             this._description = msg['description'];
-            const location = msg['location'];
-            this._filePath = location['file-path'];
-            this._line = parseInt(location['line']);
+            const location = msg['location'] || {};
+            this._filePath = location['file-path'] || '';
+            this._line = parseInt(location['line'] || '-1');
         }
     }
 
     toString(): string {
-        let s: string = this._filePath;
-        if (s.length > 0 && this._line != -1)
+        let s: string = this._filePath || '';
+        if (s.length > 0 && !isNaN(this._line) && (this._line != -1))
             s += ':' + this._line;
         if (s.length > 0)
             s += ':';
