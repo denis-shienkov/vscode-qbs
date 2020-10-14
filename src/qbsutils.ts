@@ -5,7 +5,6 @@ import * as fs from 'fs';
 
 import { basename } from 'path';
 
-// From user code.
 import { QbsSessionStatus } from './qbssession';
 import * as QbsConfig from './qbsconfig';
 
@@ -97,4 +96,96 @@ export async function ensureQbsExecutableConfigured(): Promise<boolean> {
 
 export function fileBaseName(uri: vscode.Uri): string {
     return basename(uri.fsPath);
+}
+
+type LanguageStandard = 'c89' | 'c99' | 'c11' | 'c18' | 'gnu89' | 'gnu99' | 'gnu11' | 'gnu18'
+                        | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20'
+                        | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20';
+
+export function extractLanguageStandard(properties?: any, tags?: string[]): LanguageStandard {
+    if (properties && tags) {
+        if (tags.indexOf('cpp') !== -1) {
+            const versions = properties['cpp.cxxLanguageVersion'];
+            return (versions && versions.length > 0) ? versions[0] : 'c++98';
+        } else if (tags.indexOf('c') !== -1) {
+            const versions = properties['cpp.cLanguageVersion'];
+            return (versions && versions.length > 0) ? versions[0] : 'c89';
+        }
+    }
+    return 'c89';
+}
+
+export function extractPrefixHeaders(properties?: any): string[] {
+    return properties ? ([].concat(properties['cpp.prefixHeaders'])) : [];
+}
+
+export function extractIncludePaths(properties?: any): string[] {
+    return properties ? ([]
+        .concat(properties['cpp.compilerIncludePaths'])
+        .concat(properties['cpp.distributionIncludePaths'])
+        .concat(properties['cpp.systemIncludePaths'])
+        .concat(properties['cpp.includePaths'])
+        .concat(properties['cpp.frameworkPaths'])
+        .concat(properties['cpp.systemFrameworkPaths'])) : [];
+}
+
+export function extractDefines(properties?: any): string[] {
+    return properties ? ([].concat(properties['cpp.defines'])) : [];
+}
+
+export function extractCompilerPath(properties?: any): string {
+    return properties ? (properties['cpp.compilerPath'] || '') : '';
+}
+
+type IntelliSenseMode = 'msvc-x86' | 'msvc-x64' | 'msvc-arm' | 'msvc-arm64'
+                        | 'gcc-x86' | 'gcc-x64' | 'gcc-arm' | 'gcc-arm64'
+                        | 'clang-x86' | 'clang-x64' | 'clang-arm' | 'clang-arm64';
+
+export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
+    if (properties) {
+        const architecture = properties['qbs.architecture'];
+        const toolchain = properties['qbs.toolchain'];
+        if (architecture && toolchain && toolchain.length > 0) {
+            if (toolchain.indexOf('msvc') !== -1) {
+                if (architecture === 'x86') {
+                    return 'msvc-x86';
+                } else if (architecture === 'x86_64') {
+                    return 'msvc-x64';
+                } else if (architecture.indexOf('arm') !== -1) {
+                    return (architecture.indexOf('64') !== -1) ? 'msvc-arm64' : 'msvc-arm';
+                }
+            } else if (toolchain.indexOf('clang') !== -1
+                        || toolchain.indexOf('clang-cl') !== -1
+                        || toolchain.indexOf('llvm') !== -1) {
+                if (architecture === 'x86') {
+                    return 'clang-x86';
+                } else if (architecture === 'x86_64') {
+                    return 'clang-x64';
+                } else if (architecture.indexOf('arm') !== -1) {
+                    return (architecture.indexOf('64') !== -1) ? 'clang-arm64' : 'clang-arm';
+                }
+            } else if (toolchain.indexOf('gcc') !== -1
+                        || toolchain.indexOf('mingw') !== -1) {
+                if (architecture === 'x86') {
+                    return 'gcc-x86';
+                } else if (architecture === 'x86_64') {
+                    return 'gcc-x64';
+                } else if (architecture.indexOf('arm') !== -1) {
+                    return (architecture.indexOf('64') !== -1) ? 'gcc-arm64' : 'gcc-arm';
+                }
+            } else if (toolchain.indexOf('iar') !== -1) {
+                if (architecture.indexOf('arm') !== -1) {
+                    // Use closer value to IAR ARM compiler intelli sense mode.
+                    return 'gcc-arm';
+                }
+            } else if (toolchain.indexOf('sdcc') !== -1) {
+                if (architecture.indexOf('arm') !== -1) {
+                    const compilerName = properties['cpp.compilerName'] || '';
+                    // Use closer value to KEIL ARM compiler intelli sense mode.
+                    return (compilerName.indexOf('armclang') === -1) ? 'gcc-arm' : 'clang-arm';
+                }
+            }
+        }
+    }
+    return 'gcc-x86';
 }

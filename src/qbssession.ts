@@ -116,6 +116,24 @@ export class QbsSession implements vscode.Disposable {
         request['type'] = 'resolve-project';
         request['environment'] = process.env;
         request['data-mode'] = 'only-if-changed';
+        request['module-properties'] = [
+            'cpp.compilerIncludePaths',
+            'cpp.distributionIncludePaths',
+            'cpp.systemIncludePaths',
+            'cpp.includePaths',
+            'cpp.frameworkPaths',
+            'cpp.systemFrameworkPaths',
+            'cpp.compilerDefinesByLanguage',
+            'cpp.defines',
+            'cpp.compilerName',
+            'cpp.compilerPath',
+            'cpp.compilerPathByLanguage',
+            'cpp.cLanguageVersion',
+            'cpp.cxxLanguageVersion',
+            'cpp.prefixHeaders',
+            'qbs.architecture',
+            'qbs.toolchain'
+        ];
 
         if (this._projectUri) {
             request['project-file-path'] = QbsUtils.expandPath(this._projectUri.fsPath);
@@ -188,6 +206,10 @@ export class QbsSession implements vscode.Disposable {
         request['type'] = 'cancel-job';
 
         await this._protocol.sendRequest(request);
+    }
+
+    fetchProjectData(): any {
+        return this._projectData;
     }
 
     set status(st: QbsSessionStatus) {
