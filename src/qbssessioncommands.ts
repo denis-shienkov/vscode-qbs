@@ -144,10 +144,15 @@ async function resolve(session: QbsSession) {
             let progress: number = 0;
             let description: string = '';
 
-            const updateReport = () => {
-                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                const msg = `${description} ${percentage} %`;
-                p.report({ increment: percentage, message: msg});
+            const updateReport = (showPercentage: boolean = true) => {
+                if (showPercentage) {
+                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const msg = `${description} ${percentage} %`;
+                    p.report({ increment: percentage, message: msg});
+                } else {
+                    const msg = description;
+                    p.report({ message: msg});
+                }
             };
 
             session.onTaskStarted(result => {
@@ -165,13 +170,12 @@ async function resolve(session: QbsSession) {
                 updateReport();
             });
             session.onProjectResolved(errors => {
-                maxProgress = progress = 100;
                 description = errors.isEmpty() ? 'Project successfully resolved'
                                                : 'Project resolving failed';
-                updateReport();
+                updateReport(false);
                 setTimeout(() => {
                     resolve();
-                }, 2000);
+                }, 5000);
             });
         });
     });
@@ -190,10 +194,15 @@ async function build(session: QbsSession) {
             let progress: number = 0;
             let description: string = '';
 
-            const updateReport = () => {
-                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                const msg = `${description} ${percentage} %`;
-                p.report({ increment: percentage, message: msg});
+            const updateReport = (showPercentage: boolean = true) => {
+                if (showPercentage) {
+                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const msg = `${description} ${percentage} %`;
+                    p.report({ increment: percentage, message: msg});
+                } else {
+                    const msg = description;
+                    p.report({ message: msg});
+                }
             };
 
             session.onTaskStarted(result => {
@@ -211,13 +220,12 @@ async function build(session: QbsSession) {
                 updateReport();
             });
             session.onProjectBuilt(errors => {
-                maxProgress = progress = 100;
                 description = errors.isEmpty() ? 'Project successfully built'
                                                : 'Project building failed';
-                updateReport();
+                updateReport(false);
                 setTimeout(() => {
                     resolve();
-                }, 2000);
+                }, 5000);
             });
         });
     });
@@ -236,10 +244,15 @@ async function clean(session: QbsSession) {
             let progress: number = 0;
             let description: string = '';
 
-            const updateReport = () => {
-                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                const msg = `${description} ${percentage} %`;
-                p.report({ increment: percentage, message: msg});
+            const updateReport = (showPercentage: boolean = true) => {
+                if (showPercentage) {
+                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const msg = `${description} ${percentage} %`;
+                    p.report({ increment: percentage, message: msg});
+                } else {
+                    const msg = description;
+                    p.report({ message: msg});
+                }
             };
 
             session.onTaskStarted(result => {
@@ -257,13 +270,12 @@ async function clean(session: QbsSession) {
                 updateReport();
             });
             session.onProjectCleaned(errors => {
-                maxProgress = progress = 100;
                 description = errors.isEmpty() ? 'Project successfully cleaned'
                                                : 'Project cleaning failed';
-                updateReport();
+                updateReport(false);
                 setTimeout(() => {
                     resolve();
-                }, 2000);
+                }, 5000);
             });
         });
     });
@@ -282,10 +294,15 @@ async function install(session: QbsSession) {
             let progress: number = 0;
             let description: string = '';
 
-            const updateReport = () => {
-                const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                const msg = `${description} ${percentage} %`;
-                p.report({ increment: percentage, message: msg});
+            const updateReport = (showPercentage: boolean = true) => {
+                if (showPercentage) {
+                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const msg = `${description} ${percentage} %`;
+                    p.report({ increment: percentage, message: msg});
+                } else {
+                    const msg = description;
+                    p.report({ message: msg});
+                }
             };
 
             session.onTaskStarted(result => {
@@ -303,13 +320,12 @@ async function install(session: QbsSession) {
                 updateReport();
             });
             session.onProjectInstalled(errors => {
-                maxProgress = progress = 100;
                 description = errors.isEmpty() ? 'Project successfully installed'
                                                : 'Project installing failed';
-                updateReport();
+                updateReport(false);
                 setTimeout(() => {
                     resolve();
-                }, 2000);
+                }, 5000);
             });
         });
     });
