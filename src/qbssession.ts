@@ -148,7 +148,7 @@ export class QbsSession implements vscode.Disposable {
         }
 
         const forceProbes = QbsConfig.fetchQbsForceProbes();
-        request['orce-probe-execution'] = forceProbes;
+        request['force-probe-execution'] = forceProbes;
 
         await this._protocol.sendRequest(request);
     }
