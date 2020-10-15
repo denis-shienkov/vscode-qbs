@@ -7,8 +7,6 @@ import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-// Private functions.
-
 async function setupDefaultProject(session: QbsSession) {
     const projects = await QbsUtils.enumerateProjects();
     if (projects.length) {
@@ -52,7 +50,6 @@ async function startSession(session: QbsSession) {
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
     }, async (p) => {
-        p.report({ increment: 0 });
         await session.start();
         return new Promise(resolve => {
             session.onStatusChanged((status => {
@@ -82,7 +79,6 @@ async function stopSession(session: QbsSession) {
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
     }, async (p) => {
-        p.report({ increment: 0 });
         await session.stop();
         return new Promise(resolve => {
             session.onStatusChanged((status => {
@@ -143,15 +139,21 @@ async function resolve(session: QbsSession) {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
+            let oldPercentage: number = 0;
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                    const msg = `${description} ${percentage} %`;
-                    p.report({ increment: percentage, message: msg});
+                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const delta = newPercentage - oldPercentage;
+                    if (delta > 0) {
+                        oldPercentage = newPercentage;
+                        p.report({increment: delta});
+                    }
+                    const message = `${description} ${newPercentage} %`;
+                    p.report({message: message});
                 } else {
-                    const msg = description;
-                    p.report({ message: msg});
+                    const message = description;
+                    p.report({ message: message});
                 }
             };
 
@@ -193,15 +195,21 @@ async function build(session: QbsSession) {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
+            let oldPercentage: number = 0;
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                    const msg = `${description} ${percentage} %`;
-                    p.report({ increment: percentage, message: msg});
+                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const delta = newPercentage - oldPercentage;
+                    if (delta > 0) {
+                        oldPercentage = newPercentage;
+                        p.report({increment: delta});
+                    }
+                    const message = `${description} ${newPercentage} %`;
+                    p.report({message: message});
                 } else {
-                    const msg = description;
-                    p.report({ message: msg});
+                    const message = description;
+                    p.report({ message: message});
                 }
             };
 
@@ -220,6 +228,7 @@ async function build(session: QbsSession) {
                 updateReport();
             });
             session.onProjectBuilt(errors => {
+                maxProgress = progress = oldPercentage = 0;
                 description = errors.isEmpty() ? 'Project successfully built'
                                                : 'Project building failed';
                 updateReport(false);
@@ -243,15 +252,21 @@ async function clean(session: QbsSession) {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
+            let oldPercentage: number = 0;
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                    const msg = `${description} ${percentage} %`;
-                    p.report({ increment: percentage, message: msg});
+                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const delta = newPercentage - oldPercentage;
+                    if (delta > 0) {
+                        oldPercentage = newPercentage;
+                        p.report({increment: delta});
+                    }
+                    const message = `${description} ${newPercentage} %`;
+                    p.report({message: message});
                 } else {
-                    const msg = description;
-                    p.report({ message: msg});
+                    const message = description;
+                    p.report({ message: message});
                 }
             };
 
@@ -293,15 +308,21 @@ async function install(session: QbsSession) {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
+            let oldPercentage: number = 0;
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const percentage = (maxProgress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
-                    const msg = `${description} ${percentage} %`;
-                    p.report({ increment: percentage, message: msg});
+                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const delta = newPercentage - oldPercentage;
+                    if (delta > 0) {
+                        oldPercentage = newPercentage;
+                        p.report({increment: delta});
+                    }
+                    const message = `${description} ${newPercentage} %`;
+                    p.report({message: message});
                 } else {
-                    const msg = description;
-                    p.report({ message: msg});
+                    const message = description;
+                    p.report({ message: message});
                 }
             };
 
