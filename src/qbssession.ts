@@ -143,6 +143,7 @@ export class QbsSession implements vscode.Disposable {
 
         const buildDirectory = QbsConfig.fetchQbsBuildDirectory();
         request['build-root'] = buildDirectory;
+        // Do not store the build graph if the build directory does not exist yet.
         request['dry-run'] = !fs.existsSync(buildDirectory);
 
         const settingsDirectory = QbsConfig.fetchQbsSettingsDirectory();
