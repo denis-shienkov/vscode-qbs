@@ -24,12 +24,14 @@ export class QbsSession implements vscode.Disposable {
     private _projectUri!: vscode.Uri;
     private _profileName: string = '';
     private _configurationName: string = '';
+    private _runProductName: string = '';
     private _projectData: any = {};
 
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+    private _onRunProductNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
     private _onProjectResolved: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
@@ -43,11 +45,12 @@ export class QbsSession implements vscode.Disposable {
     private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsSessionTaskMaxProgressResult> = new vscode.EventEmitter<QbsSessionTaskMaxProgressResult>();
     private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
-    
+
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
+    readonly onRunProductNameChanged: vscode.Event<string> = this._onRunProductNameChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
     readonly onProjectResolved: vscode.Event<QbsSessionMessageResult> = this._onProjectResolved.event;
@@ -222,6 +225,14 @@ export class QbsSession implements vscode.Disposable {
         await this._protocol.sendRequest(request);
     }
 
+    async fetchRunEnvironment() {
+        let request: any = {};
+        request['type'] = 'get-run-environment';
+        request['product'] = this._runProductName;
+
+        await this._protocol.sendRequest(request);
+    }
+
     fetchProjectData(): any {
         return this._projectData;
     }
@@ -268,6 +279,17 @@ export class QbsSession implements vscode.Disposable {
 
     get configurationName(): string {
         return this._configurationName;
+    }
+
+    set runProductName(name: any) {
+        if (name !== this._runProductName) {
+            this._runProductName = name;
+            this._onRunProductNameChanged.fire(this._runProductName);
+        }
+    }
+
+    get runProductName(): any {
+        return this._runProductName;
     }
 
     private parseResponse(response: any) {

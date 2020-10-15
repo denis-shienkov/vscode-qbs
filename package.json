@@ -39,6 +39,7 @@
         "onCommand:qbs.clean",
         "onCommand:qbs.install",
         "onCommand:qbs.cancel",
+        "onCommand:qbs.getRunEnvironment",
         "workspaceContains:*.qbs"
     ],
     "main": "./out/extension.js",
@@ -113,6 +114,11 @@
             {
                 "command": "qbs.cancel",
                 "title": "%qbs-tools.command.qbs.cancel.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.getRunEnvironment",
+                "title": "%qbs-tools.command.qbs.getrunenv.title%",
                 "category": "QBS"
             }
         ],

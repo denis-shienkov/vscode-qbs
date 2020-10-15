@@ -356,6 +356,10 @@ async function cancel(session: QbsSession) {
     await session.cancel();
 }
 
+async function fetchRunEnvironment(session: QbsSession) {
+    await session.fetchRunEnvironment();
+}
+
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
         setupDefaultProject(session);
@@ -392,5 +396,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', () => {
         cancel(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.getRunEnvironment', () => {
+        fetchRunEnvironment(session);
     }));
 }

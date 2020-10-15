@@ -11,6 +11,7 @@
     "qbs-tools.command.qbs.clean.title": "Clean",
     "qbs-tools.command.qbs.install.title": "Install",
     "qbs-tools.command.qbs.cancel.title": "Cancel",
+    "qbs-tools.command.qbs.getrunenv.title": "GetRunEnvironment",
 
     "qbs-tools.configuration.qbs.qbsPath.description": "Name/path of the Qbs executable to use.",
     "qbs-tools.configuration.qbs.settingsDirectory.description": "The settings directory. An empty value means the default directory.",
