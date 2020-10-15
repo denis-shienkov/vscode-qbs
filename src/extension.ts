@@ -31,40 +31,44 @@ class QbsExtensionManager implements vscode.Disposable {
         this._session.dispose();
     }
 
+    private autoResolveProject = () => {
+        if (this._autoResolveRequired
+            && this._session.status === QbsSessionStatus.Started
+            && this._session.projectUri) {
+            this._autoResolveRequired = false;
+            vscode.commands.executeCommand('qbs.resolve');
+        }
+    }
+
     private subscribeWorkspaceConfigurationEvents(ctx: vscode.ExtensionContext) {
         ctx.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
             if (e.affectsConfiguration('qbs.qbsPath')) {
                 vscode.commands.executeCommand('qbs.autoRestartSession');
             }
+            if (e.affectsConfiguration('qbs.forceProbes')) {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            }
         }));
     }
 
     private subscribeSessionEvents(ctx: vscode.ExtensionContext) {
-        const autoResolveProject = () => {
-            if (this._autoResolveRequired
-                && this._session.status === QbsSessionStatus.Started
-                && this._session.projectUri) {
-                this._autoResolveRequired = false;
-                vscode.commands.executeCommand('qbs.resolve');
-            }
-        }
-
         ctx.subscriptions.push(this._session.onStatusChanged(status => {
             if (status === QbsSessionStatus.Started) {
-                autoResolveProject();
+                this.autoResolveProject();
             }
         }));
         ctx.subscriptions.push(this._session.onProjectUriChanged(uri => {
             this._autoResolveRequired = true;
-            autoResolveProject();
+            this.autoResolveProject();
         }));
         ctx.subscriptions.push(this._session.onProfileNameChanged(name => {
             this._autoResolveRequired = true;
-            autoResolveProject();
+            this.autoResolveProject();
         }));
         ctx.subscriptions.push(this._session.onConfigurationNameChanged(name => {
             this._autoResolveRequired = true;
-            autoResolveProject();
+            this.autoResolveProject();
         }));
     }
 }
