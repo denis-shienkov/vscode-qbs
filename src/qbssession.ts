@@ -301,7 +301,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     get buildProductName(): any {
-        return this._runProductName;
+        return this._buildProductName;
     }
 
     set runProductName(name: any) {

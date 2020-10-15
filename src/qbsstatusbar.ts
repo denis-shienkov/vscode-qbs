@@ -12,6 +12,7 @@ export class QbsStatusBar implements vscode.Disposable {
     private _profileButton: vscode.StatusBarItem;
     private _configurationButton: vscode.StatusBarItem;
     private _buildRunButton: vscode.StatusBarItem;
+    private _buildSelectButton: vscode.StatusBarItem;
 
     constructor(private readonly _session: QbsSession) {
         const alignment = vscode.StatusBarAlignment.Left;
@@ -45,16 +46,25 @@ export class QbsStatusBar implements vscode.Disposable {
         this._buildRunButton.command = 'qbs.build';
         this._buildRunButton.show();
 
+        this._buildSelectButton = vscode.window.createStatusBarItem(alignment, -6);
+        this._buildSelectButton.text = '[none]';
+        this._buildSelectButton.tooltip = localize('qbs.build.select.tooltip',
+                                                'Select the build project');
+        this._buildSelectButton.command = 'qbs.selectBuild';
+        this._buildSelectButton.show();
+
         _session.onStatusChanged(status => this.updateSessionStatus(
             QbsUtils.sessionStatusName(this._session.status)));
         _session.onProjectUriChanged(uri => this.updateProjectFileName(uri));
         _session.onProfileNameChanged(name => this.updateProfileName(name));
         _session.onConfigurationNameChanged(name => this.updateConfigurationName(name));
+        _session.onBuildProductNameChanged(name => this.updateBuildProjectName(name));
 
         this.initialize();
     }
 
     dispose() {
+        this._buildSelectButton.dispose();
         this._buildRunButton.dispose();
         this._configurationButton.dispose();
         this._profileButton.dispose();
@@ -68,6 +78,7 @@ export class QbsStatusBar implements vscode.Disposable {
         await this.updateProjectFileName();
         await this.updateProfileName();
         await this.updateConfigurationName();
+        await this.updateBuildProjectName();
     }
 
     private async updateSessionStatus(status: string) {
@@ -91,5 +102,10 @@ export class QbsStatusBar implements vscode.Disposable {
         const text = configuration ? configuration : 'default';
         this._configurationButton.text = localize('qbs.build.configuration.select',
                                                   `$(settings) [${text}]`);
+    }
+
+    private async updateBuildProjectName(project?: string) {
+        const text = project ? project : 'all';
+        this._buildSelectButton.text = `[${text}]`;
     }
 }
