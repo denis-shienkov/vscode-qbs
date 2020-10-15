@@ -23,6 +23,7 @@ export class QbsSessionLogger implements vscode.Disposable {
         session.onProjectCleaned(result => appendCompileOutput(result));
         session.onProjectInstalled(result => appendCompileOutput(result));
         session.onCommandDescriptionReceived(result => appendCompileOutput(result));
+        session.onRunEnvironmentResultReceived(result => appendCompileOutput(result));
 
         session.onTaskStarted(result => {
             if (result._description.length > 0) {

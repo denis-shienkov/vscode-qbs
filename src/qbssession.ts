@@ -26,6 +26,7 @@ export class QbsSession implements vscode.Disposable {
     private _configurationName: string = '';
     private _runProductName: string = '';
     private _projectData: any = {};
+    private _runEnvironment: any = {};
 
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
@@ -45,6 +46,7 @@ export class QbsSession implements vscode.Disposable {
     private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsSessionTaskMaxProgressResult> = new vscode.EventEmitter<QbsSessionTaskMaxProgressResult>();
     private _onCommandDescriptionReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
     private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
+    private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
 
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
@@ -64,6 +66,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onTaskMaxProgressChanged: vscode.Event<QbsSessionTaskMaxProgressResult> = this._onTaskMaxProgressChanged.event;
     readonly onCommandDescriptionReceived: vscode.Event<QbsSessionMessageResult> = this._onCommandDescriptionReceived.event;
     readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
+    readonly onRunEnvironmentResultReceived: vscode.Event<QbsSessionMessageResult> = this._onRunEnvironmentResultReceived.event;
 
     constructor() {
         this._protocol.onStatusChanged(status => {
@@ -225,7 +228,7 @@ export class QbsSession implements vscode.Disposable {
         await this._protocol.sendRequest(request);
     }
 
-    async fetchRunEnvironment() {
+    async runEnvironment() {
         let request: any = {};
         request['type'] = 'get-run-environment';
         request['product'] = this._runProductName;
@@ -235,6 +238,10 @@ export class QbsSession implements vscode.Disposable {
 
     fetchProjectData(): any {
         return this._projectData;
+    }
+
+    fetchRunEnvironment(): any {
+        return this._runEnvironment;
     }
 
     set status(st: QbsSessionStatus) {
@@ -337,11 +344,15 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsSessionProcessResult(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
-            // TODO: Implement me.
+            this.setRunEnvironment(response);
+            const result = new QbsSessionMessageResult(response['error']);
+            this._onRunEnvironmentResultReceived.fire(result);
         }
     }
 
     private setProjectData(response: any, withBuildSystemFiles: boolean) {
+        this._runProductName = '';
+
         const data = response['project-data'];
         if (data) {
             const files = data['build-system-files'];
@@ -349,5 +360,9 @@ export class QbsSession implements vscode.Disposable {
             if (!withBuildSystemFiles)
                 this._projectData['build-system-files'] = files;
         }
+    }
+
+    private setRunEnvironment(response: any) {
+        this._runEnvironment = response['full-environment'] || {};
     }
 }
