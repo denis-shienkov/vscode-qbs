@@ -182,6 +182,9 @@ export class QbsSession implements vscode.Disposable {
         const logLevel = QbsConfig.fetchQbsLogLevel();
         request['log-level'] = logLevel;
 
+        const cleanInstallRoot = QbsConfig.fetchQbsCleanInstallRoot();
+        request['clean-install-root'] = cleanInstallRoot;
+
         await this._protocol.sendRequest(request);
     }
 

@@ -37,6 +37,11 @@ export function fetchQbsForceProbes(): boolean {
     return v || false;
 }
 
+export function fetchQbsCleanInstallRoot(): boolean {
+    const v = vscode.workspace.getConfiguration('qbs').get('cleanInstallRoot') as boolean;
+    return v || false;
+}
+
 export function fetchQbsErrorHandlingMode(): string {
     const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as string;
     return v || 'relaxed';

@@ -162,6 +162,12 @@
                     "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
                     "scope": "resource"
                 },
+                "qbs.cleanInstallRoot": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.cleanInstallRoot.description%",
+                    "scope": "resource"
+                },
                 "qbs.errorHandlingMode": {
                     "type": "string",
                     "default": "relaxed",
