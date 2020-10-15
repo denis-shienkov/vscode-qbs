@@ -25,7 +25,7 @@ export class QbsSession implements vscode.Disposable {
     private _profileName: string = '';
     private _configurationName: string = '';
     private _runProductName: string = '';
-    private _buildProductName: string = '';
+    private _buildProductName: string = 'all';
     private _projectData: any = {};
     private _runEnvironment: any = {};
 
@@ -177,6 +177,7 @@ export class QbsSession implements vscode.Disposable {
         request['type'] = 'build-project';
         request['data-mode'] = 'only-if-changed';
         request['install'] = true;
+        request['products'] = [this._buildProductName];
 
         const maxJobs = QbsConfig.fetchQbsMaxJobs();
         if (maxJobs > 0) {
@@ -201,6 +202,7 @@ export class QbsSession implements vscode.Disposable {
     async clean() {
         let request: any = {};
         request['type'] = 'clean-project';
+        request['products'] = [this._buildProductName];
 
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
