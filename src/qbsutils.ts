@@ -110,14 +110,110 @@ type LanguageStandard = 'c89' | 'c99' | 'c11' | 'c18' | 'gnu89' | 'gnu99' | 'gnu
 export function extractLanguageStandard(properties?: any, tags?: string[]): LanguageStandard {
     if (properties && tags) {
         if (tags.indexOf('cpp') !== -1) {
-            const versions = properties['cpp.cxxLanguageVersion'];
-            return (versions && versions.length > 0) ? versions[0] : 'c++98';
+            const languageVersion = properties['cpp.cxxLanguageVersion'];
+            if (languageVersion && languageVersion.length > 0) {
+                return languageVersion[0];
+            } else {
+                // FIXME: We need to determine the correct version
+                // of the compiler for the supported standard.
+                // Because all current values are taken approximately.
+                const toolchain = properties['qbs.toolchain'];
+                const major = properties['cpp.compilerVersionMajor'] || 0;
+                const minor = properties['cpp.compilerVersionMinor'] || 0;
+                const patch = properties['cpp.compilerVersionPatch'] || 0;
+                const architecture = properties['qbs.architecture'] || [];
+                if (toolchain.indexOf('msvc') !== -1) {
+                    return 'c++11';
+                } else if (toolchain.indexOf('clang') !== -1) {
+                    if (major >= 10) {
+                        return 'c++20';
+                    } else if (major >= 5) {
+                        return 'c++17';
+                    } else if (major > 3 || (major === 3 && minor > 4)) {
+                        return 'c++14';
+                    } else if (major > 3 || (major === 3 && minor > 3)) {
+                        return 'c++11';
+                    } else {
+                        return 'c++03';
+                    }
+                } else if (toolchain.indexOf('gcc') !== -1) {
+                    if (major >= 11) {
+                        return 'c++17';
+                    } else if (major > 6 || (major === 6 && minor > 1)) {
+                        return 'c++14';
+                    } else if (major > 4 || (major === 4 && minor > 8)
+                            || (major === 4 && minor == 8 && patch > 1)) {
+                        return 'c++11';
+                    } else {
+                        return 'c++03';
+                    }
+                } else if (toolchain.indexOf('iar') !== -1) {
+                    return 'c++03';
+                } else if (toolchain.indexOf('keil') !== -1
+                            && architecture.indexOf('arm') !== -1) {
+                    if (major >= 5) {
+                        return 'c++11';
+                    } else {
+                        return 'c++03';
+                    }
+                }
+            }
         } else if (tags.indexOf('c') !== -1) {
-            const versions = properties['cpp.cLanguageVersion'];
-            return (versions && versions.length > 0) ? versions[0] : 'c89';
+            const languageVersion = properties['cpp.cLanguageVersion'];
+            if (languageVersion && languageVersion.length > 0) {
+                return languageVersion[0];
+            } else {
+                // FIXME: We need to determine the correct version
+                // of the compiler for the supported standard.
+                // Because all current values are taken approximately.
+                const toolchain = properties['qbs.toolchain'];
+                const major = properties['cpp.compilerVersionMajor'] || 0;
+                const minor = properties['cpp.compilerVersionMinor'] || 0;
+                const patch = properties['cpp.compilerVersionPatch'] || 0;
+                if (toolchain.indexOf('msvc') !== -1) {
+                    return 'c99';
+                } else if (toolchain.indexOf('clang') !== -1) {
+                    if (major >= 5) {
+                        return 'c99';
+                    } else {
+                        return 'c89';
+                    }
+                } else if (toolchain.indexOf('gcc') !== -1) {
+                    if (major >= 11) {
+                        return 'c11';
+                    } else if (major > 6 || (major === 6 && minor > 1)) {
+                        return 'c11';
+                    } else if (major > 4 || (major === 4 && minor > 8)
+                                || (major === 4 && minor == 8 && patch > 1)) {
+                        return 'c99';
+                    } else {
+                        return 'c89';
+                    }
+                } else if (toolchain.indexOf('iar') !== -1) {
+                    return 'c99';
+                } else if (toolchain.indexOf('keil') !== -1) {
+                    if (major >= 5) {
+                        return 'c99';
+                    } else {
+                        return 'c89';
+                    }
+                } else if (toolchain.indexOf('sdcc') !== -1) {
+                    if (major >= 3) {
+                        return 'c11';
+                    } else {
+                        return 'c99';
+                    }
+                }
+            }
+        }
+    } else if (tags) {
+        if (tags.indexOf('cpp') !== -1) {
+            return 'c++03';
+        } else if (tags.indexOf('c') !== -1) {
+            return 'c89';
         }
     }
-    return 'c89';
+    return 'c++98';
 }
 
 export function extractPrefixHeaders(properties?: any): string[] {

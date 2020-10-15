@@ -108,6 +108,9 @@ export class QbsSession implements vscode.Disposable {
         request['environment'] = process.env;
         request['data-mode'] = 'only-if-changed';
         request['module-properties'] = [
+            'cpp.compilerVersionMajor',
+            'cpp.compilerVersionMinor',
+            'cpp.compilerVersionPatch',
             'cpp.compilerIncludePaths',
             'cpp.distributionIncludePaths',
             'cpp.systemIncludePaths',
