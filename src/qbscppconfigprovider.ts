@@ -81,37 +81,44 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
     private async buildSourceFileConfigurations(data: any) {
         // Where the map is <source file path, configuration>.
         this._sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
-        const products = data['products'] || [];
-        for (const product of products) {
-            const moduleProperties = product['module-properties'];
-            const groups = product['groups'] || [];
-            for (const group of groups) {
-                const enabled = group['is-enabled'] || false;
-                if (enabled) {
-                    const sources = group['source-artifacts'] || [];
-                    for (const source of sources) {
-                        const filepath = source['file-path'];
-                        const tags = source['file-tags'];
-                        const includePath = QbsUtils.extractIncludePaths(moduleProperties);
-                        const defines = QbsUtils.extractDefines(moduleProperties);
-                        const forcedInclude = QbsUtils.extractPrefixHeaders(moduleProperties);
-                        const compilerPath = QbsUtils.extractCompilerPath(moduleProperties);
-                        const intelliSenseMode = QbsUtils.extractIntelliSenseMode(moduleProperties);  
-                        const standard = QbsUtils.extractLanguageStandard(moduleProperties, tags);
-                
-                        const cfg: cpt.SourceFileConfiguration = {
-                            includePath: includePath,
-                            defines: defines,
-                            intelliSenseMode: intelliSenseMode,
-                            standard: standard,
-                            forcedInclude: forcedInclude,
-                            compilerPath: compilerPath
-                        };
-
-                        this._sourceFileConfigurations.set(vscode.Uri.file(filepath).toString(), cfg);
+        const parseProject = (project: any) => {
+            const products = project['products'] || [];
+            for (const product of products) {
+                const moduleProperties = product['module-properties'];
+                const groups = product['groups'] || [];
+                for (const group of groups) {
+                    const enabled = group['is-enabled'] || false;
+                    if (enabled) {
+                        const sources = group['source-artifacts'] || [];
+                        for (const source of sources) {
+                            const filepath = source['file-path'];
+                            const tags = source['file-tags'];
+                            const includePath = QbsUtils.extractIncludePaths(moduleProperties);
+                            const defines = QbsUtils.extractDefines(moduleProperties);
+                            const forcedInclude = QbsUtils.extractPrefixHeaders(moduleProperties);
+                            const compilerPath = QbsUtils.extractCompilerPath(moduleProperties);
+                            const intelliSenseMode = QbsUtils.extractIntelliSenseMode(moduleProperties);
+                            const standard = QbsUtils.extractLanguageStandard(moduleProperties, tags);
+                            const cfg: cpt.SourceFileConfiguration = {
+                                includePath: includePath,
+                                defines: defines,
+                                intelliSenseMode: intelliSenseMode,
+                                standard: standard,
+                                forcedInclude: forcedInclude,
+                                compilerPath: compilerPath
+                            };
+                            this._sourceFileConfigurations.set(vscode.Uri.file(filepath).toString(), cfg);
+                        }
                     }
                 }
             }
-        }
+
+            const subProjects = project['sub-projects'] || [];
+            for (const subProject of subProjects) {
+                parseProject(subProject);
+            }
+        };
+
+        parseProject(data);
     }
 }
