@@ -6,6 +6,7 @@
     "qbs-tools.command.qbs.select.project.title": "SelectProject",
     "qbs-tools.command.qbs.select.profile.title": "SelectProfile",
     "qbs-tools.command.qbs.select.configuration.title": "SelectConfiguration",
+    "qbs-tools.command.qbs.select.build.title": "SelectBuild",
     "qbs-tools.command.qbs.resolve.title": "Resolve",
     "qbs-tools.command.qbs.build.title": "Build",
     "qbs-tools.command.qbs.clean.title": "Clean",

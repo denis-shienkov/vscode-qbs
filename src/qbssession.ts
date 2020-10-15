@@ -25,6 +25,7 @@ export class QbsSession implements vscode.Disposable {
     private _profileName: string = '';
     private _configurationName: string = '';
     private _runProductName: string = '';
+    private _buildProductName: string = '';
     private _projectData: any = {};
     private _runEnvironment: any = {};
 
@@ -32,6 +33,7 @@ export class QbsSession implements vscode.Disposable {
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+    private _onBuildProductNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onRunProductNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
@@ -52,6 +54,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
+    readonly onBuildProductNameChanged: vscode.Event<string> = this._onBuildProductNameChanged.event;
     readonly onRunProductNameChanged: vscode.Event<string> = this._onRunProductNameChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
@@ -286,6 +289,17 @@ export class QbsSession implements vscode.Disposable {
 
     get configurationName(): string {
         return this._configurationName;
+    }
+
+    set buildProductName(name: any) {
+        if (name !== this._buildProductName) {
+            this._buildProductName = name;
+            this._onBuildProductNameChanged.fire(this._buildProductName);
+        }
+    }
+
+    get buildProductName(): any {
+        return this._runProductName;
     }
 
     set runProductName(name: any) {

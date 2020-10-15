@@ -290,3 +290,42 @@ export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
     }
     return 'gcc-x86';
 }
+
+export interface QbsProduct {
+    fullName: string;
+    executablePath?: vscode.Uri;
+    isRunnable: boolean;
+}
+
+export async function enumerateAllProducts(project: any, prependAll: boolean):  Promise<QbsProduct[]> {
+    let enabledProducts: QbsProduct[] = [];
+    if (prependAll) {
+        enabledProducts.push({fullName: 'all', isRunnable: false});
+    };
+    const parseProject = (project: any) => {
+        const products = project['products'] || [];
+        for (const product of products) {
+            const isEnabled = product['is-enabled'] || false;
+            if (isEnabled) {
+                const fullName = product['full-display-name'];
+                if (fullName) {
+                    const isRunnable = product['is-runnable'];
+                    if (isRunnable) {
+                        const executablePath = vscode.Uri.file(product['target-executable']);
+                        enabledProducts.push({fullName: fullName, isRunnable: true, executablePath: executablePath});
+                    } else {
+                        enabledProducts.push({fullName: fullName, isRunnable: false});
+                    }
+                }
+            }
+        }
+
+        const subProjects = project['sub-projects'] || [];
+        for (const subProject of subProjects) {
+            parseProject(subProject);
+        }
+    };
+
+    parseProject(project);
+    return enabledProducts;
+}

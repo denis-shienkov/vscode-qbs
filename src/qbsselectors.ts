@@ -37,3 +37,19 @@ export async function selectConfiguration(): Promise<string | undefined> {
         return item?.label;
     });
 }
+
+export async function selectBuild(project: any): Promise<string | undefined> {
+    interface ProductQuickPickItem extends vscode.QuickPickItem {
+        fullName: string;
+    }
+    const products = await QbsUtils.enumerateAllProducts(project, true);
+    const items: ProductQuickPickItem[] = products.map(product => {
+        return {
+            label: product.fullName === 'all' ? '[all]' : product.fullName,
+            fullName: product.fullName
+        };
+    });
+    return await vscode.window.showQuickPick(items).then(item => {
+        return item?.fullName;
+    });
+}
