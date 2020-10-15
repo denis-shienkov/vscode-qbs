@@ -171,6 +171,18 @@
                     ],
                     "description": "%qbs-tools.configuration.qbs.errorHandlingMode.description%",
                     "scope": "resource"
+                },
+                "qbs.logLevel": {
+                    "type": "string",
+                    "default": "info",
+                    "enum": [
+                      "error",
+                      "warning",
+                      "info",
+                      "debug"
+                    ],
+                    "description": "%qbs-tools.configuration.qbs.logLevel.description%",
+                    "scope": "resource"
                 }
             }
         }

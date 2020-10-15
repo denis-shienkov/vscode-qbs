@@ -41,3 +41,8 @@ export function fetchQbsErrorHandlingMode(): string {
     const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as string;
     return v || 'relaxed';
 }
+
+export function fetchQbsLogLevel(): string {
+    const v = vscode.workspace.getConfiguration('qbs').get('logLevel') as string;
+    return v || 'info';
+}

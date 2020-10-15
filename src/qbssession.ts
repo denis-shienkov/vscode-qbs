@@ -156,6 +156,9 @@ export class QbsSession implements vscode.Disposable {
         const errorHandlingMode = QbsConfig.fetchQbsErrorHandlingMode();
         request['error-handling-mode'] = errorHandlingMode;
 
+        const logLevel = QbsConfig.fetchQbsLogLevel();
+        request['log-level'] = logLevel;
+
         await this._protocol.sendRequest(request);
     }
 
@@ -175,6 +178,9 @@ export class QbsSession implements vscode.Disposable {
         const showCommandLines = QbsConfig.fetchQbsShowCommandLines();
         request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
 
+        const logLevel = QbsConfig.fetchQbsLogLevel();
+        request['log-level'] = logLevel;
+
         await this._protocol.sendRequest(request);
     }
 
@@ -185,6 +191,9 @@ export class QbsSession implements vscode.Disposable {
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
 
+        const logLevel = QbsConfig.fetchQbsLogLevel();
+        request['log-level'] = logLevel;
+
         await this._protocol.sendRequest(request);
     }
 
@@ -194,6 +203,9 @@ export class QbsSession implements vscode.Disposable {
 
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
+
+        const logLevel = QbsConfig.fetchQbsLogLevel();
+        request['log-level'] = logLevel;
 
         await this._protocol.sendRequest(request);
     }
