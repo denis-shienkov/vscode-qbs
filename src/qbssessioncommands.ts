@@ -135,6 +135,14 @@ async function selectBuild(session: QbsSession) {
    });
 }
 
+async function selectRun(session: QbsSession) {
+    await QbsSelectors.selectRun(session.fetchProjectData()).then(productName => {
+        if (productName) {
+            session.runProductName = productName;
+        }
+   });
+}
+
 async function resolve(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -392,6 +400,9 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectBuild', () => {
         selectBuild(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectRun', () => {
+        selectRun(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', () => {
         resolve(session);

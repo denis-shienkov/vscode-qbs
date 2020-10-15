@@ -35,6 +35,7 @@
         "onCommand:qbs.selectProfile",
         "onCommand:qbs.selectConfiguration",
         "onCommand:qbs.selectBuild",
+        "onCommand:qbs.selectRun",
         "onCommand:qbs.resolve",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
@@ -95,6 +96,11 @@
             {
                 "command": "qbs.selectBuild",
                 "title": "%qbs-tools.command.qbs.select.build.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.selectRun",
+                "title": "%qbs-tools.command.qbs.select.run.title%",
                 "category": "QBS"
             },
             {

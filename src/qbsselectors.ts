@@ -53,3 +53,15 @@ export async function selectBuild(project: any): Promise<string | undefined> {
         return item?.fullName;
     });
 }
+
+export async function selectRun(project: any): Promise<string | undefined> {
+    const products = (await QbsUtils.enumerateAllProducts(project, false)).filter(project => project.isRunnable);
+    const items: vscode.QuickPickItem[] = products.map(product => {
+        return {
+            label: product.fullName,
+        };
+    });
+    return await vscode.window.showQuickPick(items).then(item => {
+        return item?.label;
+    });
+}
