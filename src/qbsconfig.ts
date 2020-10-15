@@ -36,3 +36,8 @@ export function fetchQbsForceProbes(): boolean {
     const v = vscode.workspace.getConfiguration('qbs').get('forceProbes') as boolean;
     return v || false;
 }
+
+export function fetchQbsErrorHandlingMode(): string {
+    const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as string;
+    return v || 'relaxed';
+}

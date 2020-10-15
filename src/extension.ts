@@ -49,6 +49,10 @@ class QbsExtensionManager implements vscode.Disposable {
                 this._autoResolveRequired = true;
                 this.autoResolveProject();
             }
+            if (e.affectsConfiguration('qbs.errorHandlingMode')) {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            }
         }));
     }
 

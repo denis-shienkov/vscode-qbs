@@ -161,6 +161,16 @@
                     "default": false,
                     "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
                     "scope": "resource"
+                },
+                "qbs.errorHandlingMode": {
+                    "type": "string",
+                    "default": "relaxed",
+                    "enum": [
+                      "relaxed",
+                      "strict"
+                    ],
+                    "description": "%qbs-tools.configuration.qbs.errorHandlingMode.description%",
+                    "scope": "resource"
                 }
             }
         }
