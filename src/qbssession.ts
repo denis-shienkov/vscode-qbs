@@ -167,6 +167,7 @@ export class QbsSession implements vscode.Disposable {
         let request: any = {};
         request['type'] = 'build-project';
         request['data-mode'] = 'only-if-changed';
+        request['install'] = true;
 
         const maxJobs = QbsConfig.fetchQbsMaxJobs();
         if (maxJobs > 0) {
