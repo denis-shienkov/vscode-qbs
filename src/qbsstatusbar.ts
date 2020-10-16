@@ -13,6 +13,7 @@ export class QbsStatusBar implements vscode.Disposable {
     private _configurationButton: vscode.StatusBarItem;
     private _buildRunButton: vscode.StatusBarItem;
     private _buildSelectButton: vscode.StatusBarItem;
+    private _runSelectButton: vscode.StatusBarItem;
 
     constructor(private readonly _session: QbsSession) {
         const alignment = vscode.StatusBarAlignment.Left;
@@ -53,17 +54,26 @@ export class QbsStatusBar implements vscode.Disposable {
         this._buildSelectButton.command = 'qbs.selectBuild';
         this._buildSelectButton.show();
 
+        this._runSelectButton = vscode.window.createStatusBarItem(alignment, -100);
+        this._runSelectButton.text = '[]';
+        this._runSelectButton.tooltip = localize('qbs.run.select.tooltip',
+                                                'Select the run project');
+        this._runSelectButton.command = 'qbs.selectRun';
+        this._runSelectButton.show();
+
         _session.onStatusChanged(status => this.updateSessionStatus(
             QbsUtils.sessionStatusName(this._session.status)));
         _session.onProjectUriChanged(uri => this.updateProjectFileName(uri));
         _session.onProfileNameChanged(name => this.updateProfileName(name));
         _session.onConfigurationNameChanged(name => this.updateConfigurationName(name));
         _session.onBuildProductChanged(product => this.updateBuildProductName(product.fullDisplayName));
+        _session.onRunProductChanged(product => this.updateRunProductName(product.fullDisplayName));
 
         this.initialize();
     }
 
     dispose() {
+        this._runSelectButton.dispose();
         this._buildSelectButton.dispose();
         this._buildRunButton.dispose();
         this._configurationButton.dispose();
@@ -79,6 +89,7 @@ export class QbsStatusBar implements vscode.Disposable {
         await this.updateProfileName();
         await this.updateConfigurationName();
         await this.updateBuildProductName();
+        await this.updateRunProductName();
     }
 
     private async updateSessionStatus(status: string) {
@@ -107,5 +118,10 @@ export class QbsStatusBar implements vscode.Disposable {
     private async updateBuildProductName(name?: string) {
         const text = name ? name : 'all';
         this._buildSelectButton.text = `[${text}]`;
+    }
+
+    private async updateRunProductName(name?: string) {
+        const text = name ? name : '';
+        this._runSelectButton.text = `[${text}]`;
     }
 }
