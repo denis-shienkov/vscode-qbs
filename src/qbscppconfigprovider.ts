@@ -1,9 +1,16 @@
+/**
+ * @file This file implements the custom intelli sense provider.
+ */
+
 import * as vscode from 'vscode';
 import * as cpt from 'vscode-cpptools';
 
 import * as QbsUtils from './qbsutils';
 import {QbsSession} from './qbssession';
 
+/**
+ * Custom intelli sense provider for the QBS.
+ */
 export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvider {
     readonly name = 'QBS';
     readonly extensionId = 'ms-vscode.qbs-tools';
@@ -18,11 +25,17 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
         });
     }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async canProvideConfiguration(uri: vscode.Uri): Promise<boolean> {
         const has = this._sourceFileConfigurations.has(uri.toString());
         return has;
     }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async provideConfigurations(uris: vscode.Uri[]): Promise<cpt.SourceFileConfigurationItem[]> {
         let items: cpt.SourceFileConfigurationItem[] = [];
         for (const uri of uris) {
@@ -34,18 +47,30 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
         return items;
      }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async canProvideBrowseConfiguration(): Promise<boolean> { 
         return false; 
     }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async provideBrowseConfiguration(): Promise<cpt.WorkspaceBrowseConfiguration> { 
         return {browsePath: []}; 
     }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async canProvideBrowseConfigurationsPerFolder(): Promise<boolean> { 
         return false; 
     }
 
+    /**
+     * @note From the cpt.CustomConfigurationProvider interface.
+     */
     async provideFolderBrowseConfiguration(uri: vscode.Uri): Promise<cpt.WorkspaceBrowseConfiguration> {
         return {browsePath: []};
     }
@@ -56,6 +81,13 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
         }
     }
 
+    /**
+     * Re-initializes the provider configuration from the
+     * resolved QBS project @c data.
+     *
+     * @note Gets called when the QBS session resolves the new opened
+     * project.
+     */
     private async setup(data: any) {
         if (!this._api) {
             this._api = await cpt.getCppToolsApi(cpt.Version.v4);
@@ -78,6 +110,11 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
         }
     }
 
+    /**
+     * Enumerates all project source files and fills the information
+     * required for the intelli sense engine from the resolved QBS
+     * project @c data paroperty.
+     */
     private async buildSourceFileConfigurations(data: any) {
         // Where the map is <source file path, configuration>.
         this._sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
