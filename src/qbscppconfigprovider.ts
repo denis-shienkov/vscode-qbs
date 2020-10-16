@@ -9,7 +9,10 @@ import * as QbsUtils from './qbsutils';
 import {QbsSession} from './qbssession';
 
 /**
- * Custom intelli sense provider for the QBS.
+ * Custom intelli sense provider for the QBS plugin.
+ *
+ * @note We need in this class for the correct highlighting of the
+ * includes, defines and other stuff for the opened project sources.
  */
 export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvider {
     readonly name = 'QBS';
