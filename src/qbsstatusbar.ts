@@ -7,59 +7,60 @@ import * as QbsUtils from './qbsutils';
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export class QbsStatusBar implements vscode.Disposable {
-    private _statusButton: vscode.StatusBarItem;
-    private _projectButton: vscode.StatusBarItem;
-    private _profileButton: vscode.StatusBarItem;
-    private _configurationButton: vscode.StatusBarItem;
-    private _buildRunButton: vscode.StatusBarItem;
-    private _buildSelectButton: vscode.StatusBarItem;
-    private _runSelectButton: vscode.StatusBarItem;
+    private _sessionStatusButton: vscode.StatusBarItem;
+    private _selectProjectButton: vscode.StatusBarItem;
+    private _selectBuildProfileButton: vscode.StatusBarItem;
+    private _selectBuildConfigurationButton: vscode.StatusBarItem;
+    private _startBuildProductButton: vscode.StatusBarItem;
+    private _selectBuildProductButton: vscode.StatusBarItem;
+    private _selectRunProductButton: vscode.StatusBarItem;
 
     constructor(private readonly _session: QbsSession) {
         const alignment = vscode.StatusBarAlignment.Left;
 
-        this._statusButton = vscode.window.createStatusBarItem(alignment, -1);
-        this._statusButton.tooltip = localize('qbs.status.tooltip', 'QBS session status');
-        this._statusButton.show();
+        this._sessionStatusButton = vscode.window.createStatusBarItem(alignment, -1);
+        this._sessionStatusButton.tooltip = localize('qbs.session.status.tooltip', 
+                                                     'QBS session status');
+        this._sessionStatusButton.show();
 
-        this._projectButton = vscode.window.createStatusBarItem(alignment, -2);
-        this._projectButton.tooltip = localize('qbs.active.project.select.tooltip',
-                                               'Click to select the active project');
-        this._projectButton.command = 'qbs.selectProject';
-        this._projectButton.show();
+        this._selectProjectButton = vscode.window.createStatusBarItem(alignment, -2);
+        this._selectProjectButton.tooltip = localize('qbs.select.active.project.file.tooltip',
+                                                     'Click to select the active project');
+        this._selectProjectButton.command = 'qbs.selectProject';
+        this._selectProjectButton.show();
 
-        this._profileButton = vscode.window.createStatusBarItem(alignment, -3);
-        this._profileButton.tooltip = localize('qbs.build.profile.select.tooltip',
-                                               'Click to select the build profile');
-        this._profileButton.command = 'qbs.selectProfile';
-        this._profileButton.show();
+        this._selectBuildProfileButton = vscode.window.createStatusBarItem(alignment, -3);
+        this._selectBuildProfileButton.tooltip = localize('qbs.select.build.profile.tooltip',
+                                                          'Click to select the build profile');
+        this._selectBuildProfileButton.command = 'qbs.selectProfile';
+        this._selectBuildProfileButton.show();
 
-        this._configurationButton = vscode.window.createStatusBarItem(alignment, -4);
-        this._configurationButton.tooltip = localize('qbs.build.configuration.select.tooltip',
-                                                     'Click to select the build configuration');
-        this._configurationButton.command = 'qbs.selectConfiguration';
-        this._configurationButton.show();
+        this._selectBuildConfigurationButton = vscode.window.createStatusBarItem(alignment, -4);
+        this._selectBuildConfigurationButton.tooltip = localize('qbs.select.build.configuration.tooltip',
+                                                                'Click to select the build configuration');
+        this._selectBuildConfigurationButton.command = 'qbs.selectConfiguration';
+        this._selectBuildConfigurationButton.show();
 
-        this._buildRunButton = vscode.window.createStatusBarItem(alignment, -5);
-        this._buildRunButton.text = localize('qbs.build.run', `$(gear) Build`);
-        this._buildRunButton.tooltip = localize('qbs.build.run.tooltip',
-                                                'Build the selected target');
-        this._buildRunButton.command = 'qbs.build';
-        this._buildRunButton.show();
+        this._startBuildProductButton = vscode.window.createStatusBarItem(alignment, -5);
+        this._startBuildProductButton.text = localize('qbs.start.build.product', `$(gear) Build`);
+        this._startBuildProductButton.tooltip = localize('qbs.start.build.product.tooltip',
+                                                         'Click to build the selected product');
+        this._startBuildProductButton.command = 'qbs.build';
+        this._startBuildProductButton.show();
 
-        this._buildSelectButton = vscode.window.createStatusBarItem(alignment, -6);
-        this._buildSelectButton.text = '[none]';
-        this._buildSelectButton.tooltip = localize('qbs.build.select.tooltip',
-                                                'Select the build project');
-        this._buildSelectButton.command = 'qbs.selectBuild';
-        this._buildSelectButton.show();
+        this._selectBuildProductButton = vscode.window.createStatusBarItem(alignment, -6);
+        this._selectBuildProductButton.text = '[none]';
+        this._selectBuildProductButton.tooltip = localize('qbs.select.build.product.tooltip',
+                                                          'Click to select the product to build');
+        this._selectBuildProductButton.command = 'qbs.selectBuild';
+        this._selectBuildProductButton.show();
 
-        this._runSelectButton = vscode.window.createStatusBarItem(alignment, -100);
-        this._runSelectButton.text = '[]';
-        this._runSelectButton.tooltip = localize('qbs.run.select.tooltip',
-                                                'Select the run project');
-        this._runSelectButton.command = 'qbs.selectRun';
-        this._runSelectButton.show();
+        this._selectRunProductButton = vscode.window.createStatusBarItem(alignment, -100);
+        this._selectRunProductButton.text = '[]';
+        this._selectRunProductButton.tooltip = localize('qbs.select.run.product,tooltip',
+                                                        'Click to select the product to run');
+        this._selectRunProductButton.command = 'qbs.selectRun';
+        this._selectRunProductButton.show();
 
         _session.onStatusChanged(status => this.updateSessionStatus(
             QbsUtils.sessionStatusName(this._session.status)));
@@ -73,13 +74,13 @@ export class QbsStatusBar implements vscode.Disposable {
     }
 
     dispose() {
-        this._runSelectButton.dispose();
-        this._buildSelectButton.dispose();
-        this._buildRunButton.dispose();
-        this._configurationButton.dispose();
-        this._profileButton.dispose();
-        this._projectButton.dispose();
-        this._statusButton.dispose();
+        this._selectRunProductButton.dispose();
+        this._selectBuildProductButton.dispose();
+        this._startBuildProductButton.dispose();
+        this._selectBuildConfigurationButton.dispose();
+        this._selectBuildProfileButton.dispose();
+        this._selectProjectButton.dispose();
+        this._sessionStatusButton.dispose();
     }
 
     private async initialize() {
@@ -93,35 +94,36 @@ export class QbsStatusBar implements vscode.Disposable {
     }
 
     private async updateSessionStatus(status: string) {
-        this._statusButton.text = localize('qbs.session.status', `$(info) QBS: ${status}`);
+        this._sessionStatusButton.text = localize('qbs.session.status', 
+                                                  `$(info) QBS: ${status}`);
     }
 
     private async updateProjectFileName(uri?: vscode.Uri) {
         const text = uri ? QbsUtils.fileBaseName(uri)
                          : localize('qbs.active.project.empty', 'empty');
-        this._projectButton.text = localize('qbs.active.project.select',
-                                            `$(project) [${text}]`);
+        this._selectProjectButton.text = localize('qbs.select.active.project',
+                                                  `$(project) [${text}]`);
     }
 
     private async updateProfileName(profile?: string) {
         const text = profile ? profile : localize('qbs.active.profile.empty', 'none');
-        this._profileButton.text = localize('qbs.build.profile.select',
-                                            `$(tools) [${text}]`);
+        this._selectBuildProfileButton.text = localize('qbs.select.build.profile',
+                                                       `$(tools) [${text}]`);
     }
 
     private async updateConfigurationName(configuration?: string) {
         const text = configuration ? configuration : 'default';
-        this._configurationButton.text = localize('qbs.build.configuration.select',
-                                                  `$(settings) [${text}]`);
+        this._selectBuildConfigurationButton.text = localize('qbs.select.build.configuration',
+                                                             `$(settings) [${text}]`);
     }
 
     private async updateBuildProductName(name?: string) {
         const text = name ? name : 'all';
-        this._buildSelectButton.text = `[${text}]`;
+        this._selectBuildProductButton.text = `[${text}]`;
     }
 
     private async updateRunProductName(name?: string) {
         const text = name ? name : '';
-        this._runSelectButton.text = `[${text}]`;
+        this._selectRunProductButton.text = `[${text}]`;
     }
 }
