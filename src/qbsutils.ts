@@ -292,31 +292,23 @@ export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
 }
 
 export interface QbsProduct {
-    fullName: string;
-    executablePath?: vscode.Uri;
-    isRunnable: boolean;
+    fullDisplayName: string;
+    targetExecutable?: string;
 }
 
-export async function enumerateAllProducts(project: any, prependAll: boolean):  Promise<QbsProduct[]> {
+export async function enumerateProducts(project: any): Promise<QbsProduct[]> {
     let enabledProducts: QbsProduct[] = [];
-    if (prependAll) {
-        enabledProducts.push({fullName: 'all', isRunnable: false});
-    };
     const parseProject = (project: any) => {
         const products = project['products'] || [];
         for (const product of products) {
-            const isEnabled = product['is-enabled'] || false;
-            if (isEnabled) {
-                const fullName = product['full-display-name'];
-                if (fullName) {
-                    const isRunnable = product['is-runnable'];
-                    if (isRunnable) {
-                        const executablePath = vscode.Uri.file(product['target-executable']);
-                        enabledProducts.push({fullName: fullName, isRunnable: true, executablePath: executablePath});
-                    } else {
-                        enabledProducts.push({fullName: fullName, isRunnable: false});
-                    }
-                }
+            if (product['is-enabled']) {
+                const fullDisplayName = product['full-display-name'];
+                const targetExecutable = product['target-executable'];
+                enabledProducts.push({
+                    fullDisplayName: fullDisplayName,
+                    targetExecutable: (targetExecutable && targetExecutable.length > 0)
+                        ? targetExecutable : undefined
+                });
             }
         }
 

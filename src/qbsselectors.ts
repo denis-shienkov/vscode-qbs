@@ -40,25 +40,28 @@ export async function selectConfiguration(): Promise<string | undefined> {
 
 export async function selectBuild(project: any): Promise<string | undefined> {
     interface ProductQuickPickItem extends vscode.QuickPickItem {
-        fullName: string;
+        fullDisplayName: string;
     }
-    const products = await QbsUtils.enumerateAllProducts(project, true);
+    const products = [{
+        fullDisplayName: 'all'
+    }].concat(await QbsUtils.enumerateProducts(project));
     const items: ProductQuickPickItem[] = products.map(product => {
         return {
-            label: product.fullName === 'all' ? '[all]' : product.fullName,
-            fullName: product.fullName
+            label: (product.fullDisplayName === 'all') ? '[all]' : product.fullDisplayName,
+            fullDisplayName: product.fullDisplayName
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item?.fullName;
+        return item?.fullDisplayName;
     });
 }
 
 export async function selectRun(project: any): Promise<string | undefined> {
-    const products = (await QbsUtils.enumerateAllProducts(project, false)).filter(project => project.isRunnable);
+    const products = (await QbsUtils.enumerateProducts(project))
+        .filter(product => product.targetExecutable);
     const items: vscode.QuickPickItem[] = products.map(product => {
         return {
-            label: product.fullName,
+            label: product.fullDisplayName,
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
