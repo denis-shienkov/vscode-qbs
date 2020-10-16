@@ -411,6 +411,11 @@ async function run(session: QbsSession) {
     }
 }
 
+async function debug(session: QbsSession) {
+    // TODO: Implement me
+    console.debug("*** debugging requested");
+}
+
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
         setupDefaultProject(session);
@@ -459,5 +464,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.run', () => {
         run(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.debug', () => {
+        debug(session);
     }));
 }
