@@ -128,17 +128,17 @@ async function selectConfiguration(session: QbsSession) {
 }
 
 async function selectBuild(session: QbsSession) {
-    await QbsSelectors.selectBuild(session.fetchProjectData()).then(productName => {
-        if (productName) {
-            session.buildProductName = productName;
+    await QbsSelectors.selectBuild(session.fetchProjectData()).then(product => {
+        if (product) {
+            session.buildProduct = product;
         }
    });
 }
 
 async function selectRun(session: QbsSession) {
-    await QbsSelectors.selectRun(session.fetchProjectData()).then(productName => {
-        if (productName) {
-            session.runProductName = productName;
+    await QbsSelectors.selectRun(session.fetchProjectData()).then(product => {
+        if (product) {
+            session.runProduct = product;
         }
    });
 }

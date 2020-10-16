@@ -38,33 +38,37 @@ export async function selectConfiguration(): Promise<string | undefined> {
     });
 }
 
-export async function selectBuild(project: any): Promise<string | undefined> {
+export async function selectBuild(project: any): Promise<QbsUtils.QbsProduct | undefined> {
     interface ProductQuickPickItem extends vscode.QuickPickItem {
-        fullDisplayName: string;
+        product: QbsUtils.QbsProduct;
     }
-    const products = [{
-        fullDisplayName: 'all'
-    }].concat(await QbsUtils.enumerateProducts(project));
+    const products = [
+        {fullDisplayName: 'all'}
+    ].concat(await QbsUtils.enumerateProducts(project));
     const items: ProductQuickPickItem[] = products.map(product => {
         return {
             label: (product.fullDisplayName === 'all') ? '[all]' : product.fullDisplayName,
-            fullDisplayName: product.fullDisplayName
+            product: product
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item?.fullDisplayName;
+        return item?.product;
     });
 }
 
-export async function selectRun(project: any): Promise<string | undefined> {
+export async function selectRun(project: any): Promise<QbsUtils.QbsProduct | undefined> {
+    interface ProductQuickPickItem extends vscode.QuickPickItem {
+        product: QbsUtils.QbsProduct;
+    }
     const products = (await QbsUtils.enumerateProducts(project))
         .filter(product => product.targetExecutable);
-    const items: vscode.QuickPickItem[] = products.map(product => {
+    const items: ProductQuickPickItem[] = products.map(product => {
         return {
             label: product.fullDisplayName,
+            product: product
         };
     });
     return await vscode.window.showQuickPick(items).then(item => {
-        return item?.label;
+        return item?.product;
     });
 }

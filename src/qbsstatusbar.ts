@@ -58,7 +58,7 @@ export class QbsStatusBar implements vscode.Disposable {
         _session.onProjectUriChanged(uri => this.updateProjectFileName(uri));
         _session.onProfileNameChanged(name => this.updateProfileName(name));
         _session.onConfigurationNameChanged(name => this.updateConfigurationName(name));
-        _session.onBuildProductNameChanged(name => this.updateBuildProjectName(name));
+        _session.onBuildProductChanged(product => this.updateBuildProductName(product.fullDisplayName));
 
         this.initialize();
     }
@@ -78,7 +78,7 @@ export class QbsStatusBar implements vscode.Disposable {
         await this.updateProjectFileName();
         await this.updateProfileName();
         await this.updateConfigurationName();
-        await this.updateBuildProjectName();
+        await this.updateBuildProductName();
     }
 
     private async updateSessionStatus(status: string) {
@@ -104,8 +104,8 @@ export class QbsStatusBar implements vscode.Disposable {
                                                   `$(settings) [${text}]`);
     }
 
-    private async updateBuildProjectName(project?: string) {
-        const text = project ? project : 'all';
+    private async updateBuildProductName(name?: string) {
+        const text = name ? name : 'all';
         this._buildSelectButton.text = `[${text}]`;
     }
 }

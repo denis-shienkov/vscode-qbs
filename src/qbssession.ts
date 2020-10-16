@@ -24,8 +24,8 @@ export class QbsSession implements vscode.Disposable {
     private _projectUri!: vscode.Uri;
     private _profileName: string = '';
     private _configurationName: string = '';
-    private _runProductName: string = '';
-    private _buildProductName: string = 'all';
+    private _runProduct: QbsUtils.QbsProduct = { fullDisplayName: ''};
+    private _buildProduct: QbsUtils.QbsProduct = {fullDisplayName: 'all'};
     private _projectData: any = {};
     private _runEnvironment: any = {};
 
@@ -33,8 +33,8 @@ export class QbsSession implements vscode.Disposable {
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onBuildProductNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onRunProductNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
+    private _onBuildProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
+    private _onRunProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
     private _onProjectResolved: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
@@ -54,8 +54,8 @@ export class QbsSession implements vscode.Disposable {
     readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
-    readonly onBuildProductNameChanged: vscode.Event<string> = this._onBuildProductNameChanged.event;
-    readonly onRunProductNameChanged: vscode.Event<string> = this._onRunProductNameChanged.event;
+    readonly onBuildProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onBuildProductChanged.event;
+    readonly onRunProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onRunProductChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
     readonly onProjectResolved: vscode.Event<QbsSessionMessageResult> = this._onProjectResolved.event;
@@ -177,7 +177,7 @@ export class QbsSession implements vscode.Disposable {
         request['type'] = 'build-project';
         request['data-mode'] = 'only-if-changed';
         request['install'] = true;
-        request['products'] = [this._buildProductName];
+        request['products'] = [this._buildProduct.fullDisplayName];
 
         const maxJobs = QbsConfig.fetchQbsMaxJobs();
         if (maxJobs > 0) {
@@ -202,7 +202,7 @@ export class QbsSession implements vscode.Disposable {
     async clean() {
         let request: any = {};
         request['type'] = 'clean-project';
-        request['products'] = [this._buildProductName];
+        request['products'] = [this._buildProduct.fullDisplayName];
 
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
@@ -236,7 +236,7 @@ export class QbsSession implements vscode.Disposable {
     async runEnvironment() {
         let request: any = {};
         request['type'] = 'get-run-environment';
-        request['product'] = this._runProductName;
+        request['product'] = this._runProduct.fullDisplayName;
 
         await this._protocol.sendRequest(request);
     }
@@ -293,26 +293,26 @@ export class QbsSession implements vscode.Disposable {
         return this._configurationName;
     }
 
-    set buildProductName(name: any) {
-        if (name !== this._buildProductName) {
-            this._buildProductName = name;
-            this._onBuildProductNameChanged.fire(this._buildProductName);
+    set buildProduct(product: QbsUtils.QbsProduct) {
+        if (product !== this._buildProduct) {
+            this._buildProduct = product;
+            this._onBuildProductChanged.fire(this._buildProduct);
         }
     }
 
-    get buildProductName(): any {
-        return this._buildProductName;
+    get buildProduct(): QbsUtils.QbsProduct {
+        return this._buildProduct;
     }
 
-    set runProductName(name: any) {
-        if (name !== this._runProductName) {
-            this._runProductName = name;
-            this._onRunProductNameChanged.fire(this._runProductName);
+    set runProduct(product: QbsUtils.QbsProduct) {
+        if (product !== this._runProduct) {
+            this._runProduct = product;
+            this._onRunProductChanged.fire(this._runProduct);
         }
     }
 
-    get runProductName(): any {
-        return this._runProductName;
+    get runProduct(): QbsUtils.QbsProduct {
+        return this._runProduct;
     }
 
     private parseResponse(response: any) {
@@ -367,7 +367,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     private setProjectData(response: any, withBuildSystemFiles: boolean) {
-        this._runProductName = '';
+        this._runProduct = { fullDisplayName: ''};
 
         const data = response['project-data'];
         if (data) {
