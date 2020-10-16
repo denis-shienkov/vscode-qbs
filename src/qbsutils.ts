@@ -1,3 +1,7 @@
+/**
+ * @file This file contains a set of useful helper functions.
+ */
+
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import * as cp from 'child_process';
@@ -11,10 +15,19 @@ import * as QbsConfig from './qbsconfig';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
+/**
+ * Returns the list of paths of all found QBS project files
+ * with the *.qbs extension in the current workspace directory.
+ */
 export async function enumerateProjects(): Promise<vscode.Uri[]> {
     return await vscode.workspace.findFiles('*.qbs');
 }
 
+/**
+ * Returns the list of all available QBS build profile names.
+ *
+ * @note This function calls the Qbs executable and parses the output.
+ */
 export async function enumerateBuildProfiles(): Promise<string[]> {
     return new Promise<string[]>((resolve, reject) => {
         const qbsPath = QbsConfig.fetchQbsPath();
@@ -51,10 +64,22 @@ export async function enumerateBuildProfiles(): Promise<string[]> {
     });
 }
 
+/**
+ * Returns the list of all available QBS build configuration names.
+ *
+ * @note Right now these are just two hardcoded configurations
+ * @c debug and @c release.
+ */
 export async function enumerateBuildConfigurations(): Promise<string[]> {
     return ['debug', 'release'];
 }
 
+/**
+ * Fixes and fills the @c path that contains the pre-defined templates
+ * like '$ {workspaceFolder}' and returns the resulting full path.
+ *
+ * @note Can be used to fix paths obtained from the plugin configurations.
+ */
 export function expandPath(path?: string): string | undefined {
     if (path?.includes('${workspaceFolder}')) {
         const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -66,6 +91,9 @@ export function expandPath(path?: string): string | undefined {
     return path?.replace(/\\/g, '/');
 }
 
+/**
+ * Returns the localized QBS session @c status name.
+ */
 export function sessionStatusName(status: QbsSessionStatus): string {
     switch (status) {
     case QbsSessionStatus.Started:
@@ -79,6 +107,12 @@ export function sessionStatusName(status: QbsSessionStatus): string {
     }
 }
 
+/**
+ * Requests the path to the QBS executable file from the plugin
+ * configuration and checks for its presence in the file system.
+ * Depending on the result, displays the appropriate message box
+ * and then returns the ensuring result.
+ */
 export async function ensureQbsExecutableConfigured(): Promise<boolean> {
     let qbsPath = QbsConfig.fetchQbsPath();
     if (qbsPath === 'qbs') {
@@ -99,14 +133,25 @@ export async function ensureQbsExecutableConfigured(): Promise<boolean> {
     return true;
 }
 
+/**
+ * Returns the base file name from the specified @c uri.
+ */
 export function fileBaseName(uri: vscode.Uri): string {
     return basename(uri.fsPath);
 }
 
+/**
+ * Supported language standards by the intelli sense engine.
+ */
 type LanguageStandard = 'c89' | 'c99' | 'c11' | 'c18' | 'gnu89' | 'gnu99' | 'gnu11' | 'gnu18'
                         | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20'
                         | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20';
 
+/**
+ * Returns the required language standard for the intelli sense
+ * engine determines from the QBS product @c properties and the
+ * QBS file @c tags.
+ */
 export function extractLanguageStandard(properties?: any, tags?: string[]): LanguageStandard {
     if (properties && tags) {
         if (tags.indexOf('cpp') !== -1) {
@@ -216,10 +261,18 @@ export function extractLanguageStandard(properties?: any, tags?: string[]): Lang
     return 'c++98';
 }
 
+/**
+ * Returns the list of the full pre-include header paths
+ * obtained from the QBS product @c properties.
+ */
 export function extractPrefixHeaders(properties?: any): string[] {
     return properties ? ([].concat(properties['cpp.prefixHeaders'])) : [];
 }
 
+/**
+ * Returns the list of the full include paths
+ * obtained from the QBS product @c properties.
+ */
 export function extractIncludePaths(properties?: any): string[] {
     return properties ? ([]
         .concat(properties['cpp.compilerIncludePaths'])
@@ -230,18 +283,33 @@ export function extractIncludePaths(properties?: any): string[] {
         .concat(properties['cpp.systemFrameworkPaths'])) : [];
 }
 
+/**
+ * Returns the list of the defines obtained from the
+ * QBS product @c properties.
+ */
 export function extractDefines(properties?: any): string[] {
     return properties ? ([].concat(properties['cpp.defines'])) : [];
 }
 
+/**
+ * Returns the full compiler path obtained from the
+ * QBS product @c properties.
+ */
 export function extractCompilerPath(properties?: any): string {
     return properties ? (properties['cpp.compilerPath'] || '') : '';
 }
 
+/**
+ * Supported intelli sense modes by the intelli sense engine.
+ */
 type IntelliSenseMode = 'msvc-x86' | 'msvc-x64' | 'msvc-arm' | 'msvc-arm64'
                         | 'gcc-x86' | 'gcc-x64' | 'gcc-arm' | 'gcc-arm64'
                         | 'clang-x86' | 'clang-x64' | 'clang-arm' | 'clang-arm64';
 
+ /**
+  * Returns the required intelli sense mode for the intelli sense
+  * engine determines from the QBS product @c properties.
+  */
 export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
     if (properties) {
         const architecture = properties['qbs.architecture'];
@@ -291,11 +359,17 @@ export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
     return 'gcc-x86';
 }
 
+/**
+ * Simplified interface for the QBS product access.
+ */
 export interface QbsProduct {
-    fullDisplayName: string;
-    targetExecutable?: string;
+    fullDisplayName: string; /**< The full display name of the product. */
+    targetExecutable?: string; /**< The full target executable path of the product (if ixists). */
 }
 
+/**
+ * Returns the list of all available products in the specified @c project.
+ */
 export async function enumerateProducts(project: any): Promise<QbsProduct[]> {
     let enabledProducts: QbsProduct[] = [];
     const parseProject = (project: any) => {
@@ -322,6 +396,10 @@ export async function enumerateProducts(project: any): Promise<QbsProduct[]> {
     return enabledProducts;
 }
 
+/**
+ * Adds the quotes to the specified @c shell path and returns
+ * the resulting string.
+ */
 export function escapeShell(shell: string): string {
     if (shell == '') {
         return '""';
