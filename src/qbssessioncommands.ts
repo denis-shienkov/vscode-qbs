@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
+import * as path from 'path';
 
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import * as QbsSelectors from './qbsselectors';
@@ -376,6 +377,40 @@ async function runEnvironment(session: QbsSession) {
     await session.runEnvironment();
 }
 
+async function run(session: QbsSession) {
+    const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
+    for (const terminal of terminals) {
+        if (terminal.name === 'QBS Run') {
+            terminal.dispose();
+        }
+    }
+
+    const env = await new Promise<any|undefined>((resolve, reject) => {
+        session.onRunEnvironmentResultReceived(result => {
+            if (!result.isEmpty()) {
+                reject(undefined);
+            } else {
+                resolve(session.fetchRunEnvironment());
+            }
+        });
+        session.runEnvironment();
+    });
+
+    const executable = session.runProduct.targetExecutable;
+    if (!executable) {
+        return;
+    } else {
+        const escaped = QbsUtils.escapeShell(executable);
+        const terminal = vscode.window.createTerminal({
+            name: 'QBS Run',
+            env: env,
+            cwd: path.dirname(executable)
+        });
+        terminal.sendText(escaped);
+        terminal.show();
+    }
+}
+
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
         setupDefaultProject(session);
@@ -421,5 +456,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.getRunEnvironment', () => {
         runEnvironment(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.run', () => {
+        run(session);
     }));
 }

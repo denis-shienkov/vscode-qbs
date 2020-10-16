@@ -132,6 +132,11 @@
                 "command": "qbs.getRunEnvironment",
                 "title": "%qbs-tools.command.qbs.getrunenv.title%",
                 "category": "QBS"
+            },
+            {
+                "command": "qbs.run",
+                "title": "%qbs-tools.command.qbs.run.title%",
+                "category": "QBS"
             }
         ],
         "configuration": {

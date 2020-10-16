@@ -321,3 +321,14 @@ export async function enumerateProducts(project: any): Promise<QbsProduct[]> {
     parseProject(project);
     return enabledProducts;
 }
+
+export function escapeShell(shell: string): string {
+    if (shell == '') {
+        return '""';
+    }
+    if (/[^\w@%\-+=:,./|]/.test(shell)) {
+        shell = shell.replace(/"/g, '\\"');
+        return `"${shell}"`;
+    }
+    return shell;
+}
