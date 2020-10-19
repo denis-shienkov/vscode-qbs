@@ -3,15 +3,16 @@ import * as nls from 'vscode-nls';
 import * as path from 'path';
 
 import {QbsSession, QbsSessionStatus} from './qbssession';
+import {QbsProject} from './qbsproject';
 import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 async function setupDefaultProject(session: QbsSession) {
-    const projects = await QbsUtils.enumerateProjects();
-    if (projects.length) {
-        session.projectUri = projects[0];
+    const projects = await QbsProject.enumerateWorkspaceProjects();
+    if (projects.length > 0) {
+        session.setActiveProject(projects[0]);
     }
 }
 
@@ -122,9 +123,9 @@ async function stopSession(session: QbsSession) {
 }
 
 async function selectProject(session: QbsSession) {
-    await QbsSelectors.selectProject().then(projectUri => {
-        if (projectUri) {
-            session.projectUri = projectUri;
+    await QbsProject.selectWorkspaceProject().then(uri => {
+        if (uri) {
+            session.setActiveProject(uri);
         }
     });
 }
@@ -146,7 +147,8 @@ async function selectConfiguration(session: QbsSession) {
 }
 
 async function selectBuild(session: QbsSession) {
-    await QbsSelectors.selectBuild(session.fetchProjectData()).then(product => {
+    const project = session.activeProject();
+    await project?.selectBuild().then(product => {
         if (product) {
             session.buildProduct = product;
         }
@@ -154,7 +156,8 @@ async function selectBuild(session: QbsSession) {
 }
 
 async function selectRun(session: QbsSession) {
-    await QbsSelectors.selectRun(session.fetchProjectData()).then(product => {
+    const project = session.activeProject();
+    await project?.selectRun().then(product => {
         if (product) {
             session.runProduct = product;
         }
@@ -425,7 +428,7 @@ async function run(session: QbsSession) {
         session.runEnvironment();
     });
 
-    const executable = session.runProduct.targetExecutable;
+    const executable = session.runProduct.targetExecutable();
     if (!executable) {
         return;
     } else {

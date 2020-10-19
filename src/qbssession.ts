@@ -3,6 +3,8 @@ import * as fs from 'fs';
 
 import * as QbsUtils from './qbsutils';
 import * as QbsConfig from './qbsconfig';
+import {QbsProject} from './qbsproject';
+import {QbsProduct} from './qbsproduct';
 import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {QbsSessionHelloResult,
         QbsSessionProcessResult,
@@ -21,21 +23,20 @@ export enum QbsSessionStatus {
 export class QbsSession implements vscode.Disposable {
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
-    private _projectUri!: vscode.Uri;
+    private _project?: QbsProject;
     private _profileName: string = '';
     private _configurationName: string = '';
-    private _runProduct: QbsUtils.QbsProduct = { fullDisplayName: ''};
-    private _buildProduct: QbsUtils.QbsProduct = {fullDisplayName: 'all'};
-    private _projectData: any = {};
+    private _runProduct: QbsProduct = QbsProduct.createEmptyProduct();
+    private _buildProduct: QbsProduct = QbsProduct.createEmptyProduct();
     private _runEnvironment: any = {};
     private _debugger: any = {};
 
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
-    private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
+    private _onProjectActivated: vscode.EventEmitter<QbsProject> = new vscode.EventEmitter<QbsProject>();
     private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onBuildProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
-    private _onRunProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
+    private _onBuildProductChanged: vscode.EventEmitter<QbsProduct> = new vscode.EventEmitter<QbsProduct>();
+    private _onRunProductChanged: vscode.EventEmitter<QbsProduct> = new vscode.EventEmitter<QbsProduct>();
     private _onDebuggerChanged: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
@@ -53,11 +54,11 @@ export class QbsSession implements vscode.Disposable {
     private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
 
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
-    readonly onProjectUriChanged: vscode.Event<vscode.Uri> = this._onProjectUriChanged.event;
+    readonly onProjectActivated: vscode.Event<QbsProject> = this._onProjectActivated.event;
     readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
-    readonly onBuildProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onBuildProductChanged.event;
-    readonly onRunProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onRunProductChanged.event;
+    readonly onBuildProductChanged: vscode.Event<QbsProduct> = this._onBuildProductChanged.event;
+    readonly onRunProductChanged: vscode.Event<QbsProduct> = this._onRunProductChanged.event;
     readonly onDebuggerChanged: vscode.Event<any> = this._onDebuggerChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
@@ -141,9 +142,7 @@ export class QbsSession implements vscode.Disposable {
             'qbs.toolchain'
         ];
 
-        if (this._projectUri) {
-            request['project-file-path'] = QbsUtils.expandPath(this._projectUri.fsPath);
-        }
+        request['project-file-path'] = this._project?.filePath();
 
         if (this._configurationName.length > 0) {
             request['configuration-name'] = this._configurationName;
@@ -244,10 +243,6 @@ export class QbsSession implements vscode.Disposable {
         await this._protocol.sendRequest(request);
     }
 
-    fetchProjectData(): any {
-        return this._projectData;
-    }
-
     fetchRunEnvironment(): any {
         return this._runEnvironment;
     }
@@ -263,15 +258,13 @@ export class QbsSession implements vscode.Disposable {
         return this._status;
     }
 
-    set projectUri(uri: vscode.Uri) {
-        if (uri !== this._projectUri) {
-            this._projectUri = uri;
-            this._onProjectUriChanged.fire(this._projectUri);
-        }
+    setActiveProject(uri: vscode.Uri) {
+        this._project = new QbsProject(uri);
+        this._onProjectActivated.fire(this._project);
     }
 
-    get projectUri(): vscode.Uri {
-        return this._projectUri;
+    activeProject(): QbsProject | undefined {
+        return this._project;
     }
 
     set profileName(name: string) {
@@ -296,25 +289,25 @@ export class QbsSession implements vscode.Disposable {
         return this._configurationName;
     }
 
-    set buildProduct(product: QbsUtils.QbsProduct) {
+    set buildProduct(product: QbsProduct) {
         if (product !== this._buildProduct) {
             this._buildProduct = product;
             this._onBuildProductChanged.fire(this._buildProduct);
         }
     }
 
-    get buildProduct(): QbsUtils.QbsProduct {
+    get buildProduct(): QbsProduct {
         return this._buildProduct;
     }
 
-    set runProduct(product: QbsUtils.QbsProduct) {
+    set runProduct(product: QbsProduct) {
         if (product !== this._runProduct) {
             this._runProduct = product;
             this._onRunProductChanged.fire(this._runProduct);
         }
     }
 
-    get runProduct(): QbsUtils.QbsProduct {
+    get runProduct(): QbsProduct {
         return this._runProduct;
     }
 
@@ -335,11 +328,11 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsSessionHelloResult(response)
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
-            this.setProjectData(response, true);
+            this._project?.setData(response, true);
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
-            this.setProjectData(response, false);
+            this._project?.setData(response, false);
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
@@ -377,18 +370,6 @@ export class QbsSession implements vscode.Disposable {
             this.setRunEnvironment(response);
             const result = new QbsSessionMessageResult(response['error']);
             this._onRunEnvironmentResultReceived.fire(result);
-        }
-    }
-
-    private setProjectData(response: any, withBuildSystemFiles: boolean) {
-        this._runProduct = { fullDisplayName: ''};
-
-        const data = response['project-data'];
-        if (data) {
-            const files = data['build-system-files'];
-            this._projectData = data;
-            if (!withBuildSystemFiles)
-                this._projectData['build-system-files'] = files;
         }
     }
 

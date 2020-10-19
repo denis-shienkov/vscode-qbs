@@ -16,14 +16,6 @@ import * as QbsConfig from './qbsconfig';
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 /**
- * Returns the list of paths of all found QBS project files
- * with the *.qbs extension in the current workspace directory.
- */
-export async function enumerateProjects(): Promise<vscode.Uri[]> {
-    return await vscode.workspace.findFiles('*.qbs');
-}
-
-/**
  * Returns the list of all available QBS build profile names.
  *
  * @note This function calls the Qbs executable and parses the output.
@@ -379,43 +371,6 @@ export function extractIntelliSenseMode(properties?: any): IntelliSenseMode {
         }
     }
     return 'gcc-x86';
-}
-
-/**
- * Simplified interface for the QBS product access.
- */
-export interface QbsProduct {
-    fullDisplayName: string; /**< The full display name of the product. */
-    targetExecutable?: string; /**< The full target executable path of the product (if ixists). */
-}
-
-/**
- * Returns the list of all available products in the specified @c project.
- */
-export async function enumerateProducts(project: any): Promise<QbsProduct[]> {
-    let enabledProducts: QbsProduct[] = [];
-    const parseProject = (project: any) => {
-        const products = project['products'] || [];
-        for (const product of products) {
-            if (product['is-enabled']) {
-                const fullDisplayName = product['full-display-name'];
-                const targetExecutable = product['target-executable'];
-                enabledProducts.push({
-                    fullDisplayName: fullDisplayName,
-                    targetExecutable: (targetExecutable && targetExecutable.length > 0)
-                        ? targetExecutable : undefined
-                });
-            }
-        }
-
-        const subProjects = project['sub-projects'] || [];
-        for (const subProject of subProjects) {
-            parseProject(subProject);
-        }
-    };
-
-    parseProject(project);
-    return enabledProducts;
 }
 
 /**
