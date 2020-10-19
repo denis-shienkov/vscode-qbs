@@ -144,6 +144,14 @@ async function selectRun(session: QbsSession) {
    });
 }
 
+async function selectDebugger(session: QbsSession) {
+    await QbsSelectors.selectDebugger().then(config => {
+        if (config) {
+            session.debugger = config;
+        }
+   });
+}
+
 async function resolve(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -443,6 +451,9 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectRun', () => {
         selectRun(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectDebugger', () => {
+        selectDebugger(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', () => {
         resolve(session);

@@ -96,3 +96,12 @@ export function fetchQbsLogLevel(): string {
     const v = vscode.workspace.getConfiguration('qbs').get('logLevel') as string;
     return v || 'info';
 }
+
+/**
+ * Returns the full path to the 'launch.json' file
+ * obtained from the plugin configuration.
+ */
+export function fetchLaunchFilePath(): string {
+    const v = vscode.workspace.getConfiguration('qbs').get('launchFilePath') as string;
+    return QbsUtils.expandPath(v) || '';
+}

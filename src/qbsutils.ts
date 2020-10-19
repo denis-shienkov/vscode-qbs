@@ -75,6 +75,28 @@ export async function enumerateBuildConfigurations(): Promise<string[]> {
 }
 
 /**
+ * Returns the list of all available debug configurations
+ * stored in the 'launch.json' files.
+ */
+export async function enumerateDebuggers(): Promise<any[]> {
+    return new Promise<any[]>((resolve, reject) => {
+        const filePath = QbsConfig.fetchLaunchFilePath();
+        fs.readFile(filePath, (error, data) => {
+            if (error) {
+                reject(undefined);
+            } else {
+                try {
+                    const json = JSON.parse(data.toString());
+                    resolve(json['configurations'] || []);
+                } catch (e) {
+                    reject(undefined);
+                }
+            }
+        });
+    });
+}
+
+/**
  * Fixes and fills the @c path that contains the pre-defined templates
  * like '$ {workspaceFolder}' and returns the resulting full path.
  *

@@ -8,6 +8,7 @@
     "qbs-tools.command.qbs.select.configuration.title": "SelectConfiguration",
     "qbs-tools.command.qbs.select.build.title": "SelectBuild",
     "qbs-tools.command.qbs.select.run.title": "SelectRun",
+    "qbs-tools.command.qbs.select.debugger.title": "SelectDebugger",
     "qbs-tools.command.qbs.resolve.title": "Resolve",
     "qbs-tools.command.qbs.build.title": "Build",
     "qbs-tools.command.qbs.clean.title": "Clean",
@@ -26,5 +27,6 @@
     "qbs-tools.configuration.qbs.forceProbes.description": "Force probes execution.",
     "qbs-tools.configuration.qbs.cleanInstallRoot.description": "Clean the install root directory before building.",
     "qbs-tools.configuration.qbs.errorHandlingMode.description": "Specifies how Qbs should deal with issues in project files, such as assigning to an unknown property.",
-    "qbs-tools.configuration.qbs.logLevel.description": "Indicates whether the client would like to receive log-data and/or warning messages."
+    "qbs-tools.configuration.qbs.logLevel.description": "Indicates whether the client would like to receive log-data and/or warning messages.",
+    "qbs-tools.configuration.qbs.launchFilePath.description": "The full path to the 'launch.json' file, containing the debugging rules."
 }

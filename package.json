@@ -35,6 +35,7 @@
         "onCommand:qbs.selectProfile",
         "onCommand:qbs.selectConfiguration",
         "onCommand:qbs.selectBuild",
+        "onCommand:qbs.selectDebugger",
         "onCommand:qbs.selectRun",
         "onCommand:qbs.resolve",
         "onCommand:qbs.build",
@@ -103,6 +104,11 @@
             {
                 "command": "qbs.selectRun",
                 "title": "%qbs-tools.command.qbs.select.run.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.selectDebugger",
+                "title": "%qbs-tools.command.qbs.select.debugger.title%",
                 "category": "QBS"
             },
             {
@@ -218,6 +224,12 @@
                       "debug"
                     ],
                     "description": "%qbs-tools.configuration.qbs.logLevel.description%",
+                    "scope": "resource"
+                },
+                "qbs.launchFilePath": {
+                    "type": "string",
+                    "default": "${workspaceFolder}/.vscode/launch.json",
+                    "description": "%qbs-tools.configuration.qbs.launchFilePath.description%",
                     "scope": "resource"
                 }
             }

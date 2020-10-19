@@ -72,3 +72,20 @@ export async function selectRun(project: any): Promise<QbsUtils.QbsProduct | und
         return item?.product;
     });
 }
+
+export async function selectDebugger(): Promise<any | undefined> {
+    interface DebuggerQuickPickItem extends vscode.QuickPickItem {
+        config: any;
+    }
+    const configs = (await QbsUtils.enumerateDebuggers())
+        .filter(config => config['name']);
+    const items: DebuggerQuickPickItem[] = configs.map(config => {
+        return {
+            label: config['name'],
+            config: config
+        };
+    });
+    return await vscode.window.showQuickPick(items).then(item => {
+        return item?.config;
+    });
+}

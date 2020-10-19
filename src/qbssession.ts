@@ -28,6 +28,7 @@ export class QbsSession implements vscode.Disposable {
     private _buildProduct: QbsUtils.QbsProduct = {fullDisplayName: 'all'};
     private _projectData: any = {};
     private _runEnvironment: any = {};
+    private _debugger: any = {};
 
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectUriChanged: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
@@ -35,6 +36,7 @@ export class QbsSession implements vscode.Disposable {
     private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
     private _onBuildProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
     private _onRunProductChanged: vscode.EventEmitter<QbsUtils.QbsProduct> = new vscode.EventEmitter<QbsUtils.QbsProduct>();
+    private _onDebuggerChanged: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
     private _onProjectResolved: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
@@ -56,6 +58,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
     readonly onBuildProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onBuildProductChanged.event;
     readonly onRunProductChanged: vscode.Event<QbsUtils.QbsProduct> = this._onRunProductChanged.event;
+    readonly onDebuggerChanged: vscode.Event<any> = this._onDebuggerChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
     readonly onProjectResolved: vscode.Event<QbsSessionMessageResult> = this._onProjectResolved.event;
@@ -313,6 +316,17 @@ export class QbsSession implements vscode.Disposable {
 
     get runProduct(): QbsUtils.QbsProduct {
         return this._runProduct;
+    }
+
+    set debugger(config: any) {
+        if (config !== this._debugger) {
+            this._debugger = config;
+            this._onDebuggerChanged.fire(this._debugger);
+        }
+    }
+
+    get debugger(): any {
+        return this._debugger;
     }
 
     private parseResponse(response: any) {
