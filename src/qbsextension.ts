@@ -4,7 +4,7 @@ import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import {QbsCppConfigurationProvider} from './qbscppconfigprovider';
-import * as QbsSessionCommands from './qbssessioncommands';
+import * as QbsCommands from './qbscommands';
 
 let manager: QbsExtensionManager;
 
@@ -16,7 +16,7 @@ class QbsExtensionManager implements vscode.Disposable {
     private _autoResolveRequired: boolean = false;
 
     constructor(readonly ctx: vscode.ExtensionContext) {
-        QbsSessionCommands.subscribeCommands(ctx, this._session);
+        QbsCommands.subscribeCommands(ctx, this._session);
         this.subscribeWorkspaceConfigurationEvents(ctx);
         this.subscribeSessionEvents(ctx);
 

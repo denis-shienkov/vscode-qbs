@@ -33,7 +33,8 @@ async function autoRestartSession(session: QbsSession) {
             }
         });
 
-        if (session.status === QbsSessionStatus.Started  || session.status === QbsSessionStatus.Starting) {
+        if (session.status === QbsSessionStatus.Started
+            || session.status === QbsSessionStatus.Starting) {
             autoRestartRequired = true;
             vscode.commands.executeCommand('qbs.stopSession');
             resolve();
@@ -55,11 +56,17 @@ async function startSession(session: QbsSession) {
         return new Promise(resolve => {
             session.onStatusChanged((status => {
                 if (status === QbsSessionStatus.Starting) {
-                    p.report({ increment: 50, message: localize('qbs.session.starting.progress.message',
-                                                                'Session starting...') });
+                    p.report({ 
+                        increment: 50,
+                        message: localize('qbs.session.starting.progress.message',
+                                          'Session starting...')
+                    });
                 } else if (status === QbsSessionStatus.Started) {
-                    p.report({ increment: 100, message: localize('qbs.session.successfully.started.progress.message',
-                                                                 'Session successfully started.') });
+                    p.report({
+                        increment: 100,
+                        message: localize('qbs.session.successfully.started.progress.message',
+                                          'Session successfully started.')
+                    });
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -67,8 +74,10 @@ async function startSession(session: QbsSession) {
             }));
 
             setTimeout(() => {
-                p.report({ message: localize('qbs.session.starting.timeout.progress.message',
-                                             'Session starting timeout...') });
+                p.report({
+                    message: localize('qbs.session.starting.timeout.progress.message',
+                                      'Session starting timeout...')
+                });
                 resolve();
             }, 5000);
         });
@@ -84,11 +93,17 @@ async function stopSession(session: QbsSession) {
         return new Promise(resolve => {
             session.onStatusChanged((status => {
                 if (status === QbsSessionStatus.Stopping) {
-                    p.report({ increment: 50, message: localize('qbs.session.stopping.progress.message',
-                                                                'Session stopping...') });
+                    p.report({
+                        increment: 50,
+                        message: localize('qbs.session.stopping.progress.message',
+                                          'Session stopping...') 
+                    });
                 } else if (status === QbsSessionStatus.Stopped) {
-                    p.report({ increment: 100, message: localize('qbs.session.successfully.stopped.progress.message',
-                                                                 'Session successfully stopped.') });
+                    p.report({
+                        increment: 100,
+                        message: localize('qbs.session.successfully.stopped.progress.message',
+                                          'Session successfully stopped.')
+                    });
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -96,8 +111,10 @@ async function stopSession(session: QbsSession) {
             }));
 
             setTimeout(() => {
-                p.report({ message: localize('qbs.session.stopping.timeout.progress.message',
-                                             'Session stopping timeout...') });
+                p.report({
+                    message: localize('qbs.session.stopping.timeout.progress.message',
+                                      'Session stopping timeout...')
+                });
                 resolve();
             }, 5000);
         });
@@ -168,7 +185,8 @@ async function resolve(session: QbsSession) {
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const newPercentage = (progress > 0)
+                        ? Math.round((100 * progress) / maxProgress) : 0;
                     const delta = newPercentage - oldPercentage;
                     if (delta > 0) {
                         oldPercentage = newPercentage;
@@ -224,7 +242,8 @@ async function build(session: QbsSession) {
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const newPercentage = (progress > 0)
+                        ? Math.round((100 * progress) / maxProgress) : 0;
                     const delta = newPercentage - oldPercentage;
                     if (delta > 0) {
                         oldPercentage = newPercentage;
@@ -281,7 +300,8 @@ async function clean(session: QbsSession) {
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const newPercentage = (progress > 0)
+                        ? Math.round((100 * progress) / maxProgress) : 0;
                     const delta = newPercentage - oldPercentage;
                     if (delta > 0) {
                         oldPercentage = newPercentage;
@@ -337,7 +357,8 @@ async function install(session: QbsSession) {
 
             const updateReport = (showPercentage: boolean = true) => {
                 if (showPercentage) {
-                    const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                    const newPercentage = (progress > 0)
+                        ? Math.round((100 * progress) / maxProgress) : 0;
                     const delta = newPercentage - oldPercentage;
                     if (delta > 0) {
                         oldPercentage = newPercentage;

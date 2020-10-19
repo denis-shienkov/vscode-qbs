@@ -47,7 +47,7 @@
         "onCommand:qbs.debug",
         "workspaceContains:*.qbs"
     ],
-    "main": "./out/extension.js",
+    "main": "./out/qbsextension.js",
     "contributes": {
         "languages": [
             {
