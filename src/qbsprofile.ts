@@ -1,4 +1,5 @@
 import * as cp from 'child_process';
+
 import * as QbsConfig from './qbsconfig';
 
 export class QbsProfile {

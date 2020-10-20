@@ -3,7 +3,9 @@ import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 
 import * as QbsConfig from './qbsconfig';
+
 import {QbsProject} from './qbsproject';
+import {QbsRunEnvironment} from './qbsrunenvironment';
 
 import {
     QbsSessionProtocol,
@@ -18,7 +20,6 @@ import {
     QbsSessionTaskMaxProgressResult,
     QbsSessionMessageResult
 } from './qbssessionresults';
-import { QbsRunEnvironment } from './qbsrunenvironment';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 

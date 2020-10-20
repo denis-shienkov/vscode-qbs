@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import * as cpt from 'vscode-cpptools';
 
 import * as QbsUtils from './qbsutils';
+
 import {QbsSession} from './qbssession';
 
 /**

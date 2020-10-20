@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {basename} from 'path';
 
 import * as QbsUtils from './qbsutils';
+
 import {QbsProduct} from './qbsproduct';
 import {QbsBuildStep} from './qbsbuildstep';
 import {QbsRunStep} from './qbsrunstep';

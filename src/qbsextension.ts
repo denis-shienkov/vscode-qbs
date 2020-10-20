@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 
+import * as QbsCommands from './qbscommands';
+
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import {QbsCppConfigurationProvider} from './qbscppconfigprovider';
-import * as QbsCommands from './qbscommands';
 
 let manager: QbsExtensionManager;
 

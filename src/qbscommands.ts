@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import * as path from 'path';
 
-import {QbsSession, QbsSessionStatus} from './qbssession';
-import {QbsProject} from './qbsproject';
 import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
+
+import {QbsSession, QbsSessionStatus} from './qbssession';
+import {QbsProject} from './qbsproject';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
