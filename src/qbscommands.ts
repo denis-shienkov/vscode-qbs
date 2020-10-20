@@ -422,8 +422,37 @@ async function onRunProductCommand(session: QbsSession) {
 }
 
 async function onDebugProductCommand(session: QbsSession) {
-    // TODO: Implement me
-    console.debug("*** debugging requested");
+    const runStep = session.project()?.runStep();
+    const debuggerConfig = runStep?.debugger();
+    if (!debuggerConfig) {
+        return;
+    }
+
+    await new Promise<void>((resolve, reject) => {
+        session.onRunEnvironmentResultReceived(result => {
+            if (!result.isEmpty()) {
+                reject(undefined);
+            } else {
+                resolve();
+            }
+        });
+        session.getRunEnvironment();
+    });
+
+    const env = runStep?.runEnvironment()?.data();
+    const executable = runStep?.targetExecutable();
+    if (!executable || !env) {
+        return;
+    }
+
+    const targetConfig = {
+        program: executable,
+        cwd: path.dirname(executable),
+        env: env
+    };
+
+    const fullConfig = Object.assign(debuggerConfig.data(), targetConfig);
+    await vscode.debug.startDebugging(undefined, fullConfig);
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {

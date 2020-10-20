@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 import * as QbsConfig from './qbsconfig';
@@ -7,7 +8,11 @@ export class QbsDebugger {
     }
 
     name(): string {
-        return 'foo';
+        return this._data['name'];
+    }
+
+    data(): vscode.DebugConfiguration {
+        return this._data;
     }
 
     /**
@@ -18,13 +23,16 @@ export class QbsDebugger {
         return new Promise<QbsDebugger[]>((resolve, reject) => {
             const filePath = QbsConfig.fetchLaunchFilePath();
             fs.readFile(filePath, (error, data) => {
-                let configurations: QbsDebugger[] = [];
+                let debuggers: QbsDebugger[] = [];
                 try {
                     const json = JSON.parse(data.toString());
-                    configurations = json['configurations'] || [];
+                    const configurations = (json['configurations'] || []);
+                    for (const configuration of configurations) {
+                        debuggers.push(new QbsDebugger(configuration));
+                    }
                 } catch (e) {
                 }
-                resolve(configurations);
+                resolve(debuggers);
             });
         });
     }
