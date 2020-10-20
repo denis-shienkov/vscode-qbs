@@ -70,15 +70,14 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectRunProductButton.command = 'qbs.selectRun';
         this._selectRunProductButton.show();
 
-        _session.onStatusChanged(status => this.updateSessionStatus(
-            QbsUtils.sessionStatusName(this._session.status)));
-        _session.onProjectActivated(project => this.updateProjectFileName(project.name()));
-        _session.onProfileNameChanged(name => this.updateProfileName(name));
-        _session.onConfigurationNameChanged(name => this.updateConfigurationName(name));
-        _session.onBuildProductChanged(product => this.updateBuildProductName(product.fullDisplayName()));
-        _session.onRunProductChanged(product => this.updateRunProductName(product.fullDisplayName()));
+        _session.onStatusChanged(x => this.updateControls());
+        _session.onProjectActivated(project => {
+            this.updateControls();
+            project.buildStep().onChanged(x => this.updateControls());
+            project.runStep().onChanged(x => this.updateControls());
+        });
 
-        this.initialize();
+        this.updateControls();
     }
 
     dispose() {
@@ -91,46 +90,34 @@ export class QbsStatusBar implements vscode.Disposable {
         this._sessionStatusButton.dispose();
     }
 
-    private async initialize() {
-        await this.updateSessionStatus(
-            QbsUtils.sessionStatusName(this._session.status));
-        await this.updateProjectFileName();
-        await this.updateProfileName();
-        await this.updateConfigurationName();
-        await this.updateBuildProductName();
-        await this.updateRunProductName();
-    }
-
-    private async updateSessionStatus(status: string) {
-        this._sessionStatusButton.text = localize('qbs.session.status', 
-                                                  `$(info) QBS: ${status}`);
-    }
-
-    private async updateProjectFileName(name?: string) {
-        const text = name ? name : localize('qbs.active.project.empty', 'empty');
+    private async updateControls() {
+        // Update the session status.
+        const statusName = QbsSession.statusName(this._session.status());
+        this._sessionStatusButton.text = localize('qbs.session.status',
+                                                  `$(info) QBS: ${statusName}`);
+        // Update the active project name.
+        const project = this._session.project();
+        const projectName = project?.name()
+            || localize('qbs.active.project.empty', 'empty');
         this._selectProjectButton.text = localize('qbs.select.active.project',
-                                                  `$(project) [${text}]`);
-    }
+                                                  `$(project) [${projectName}]`);
+        const buildStep = project?.buildStep();
+        const runStep = project?.runStep();
 
-    private async updateProfileName(profile?: string) {
-        const text = profile ? profile : localize('qbs.active.profile.empty', 'none');
+        // Update the current build profile name.
+        const profileName = buildStep?.profileName()
+            || localize('qbs.active.profile.empty', 'none');
         this._selectBuildProfileButton.text = localize('qbs.select.build.profile',
-                                                       `$(tools) [${text}]`);
-    }
-
-    private async updateConfigurationName(configuration?: string) {
-        const text = configuration ? configuration : 'default';
+                                                       `$(tools) [${profileName}]`);
+        // Update the current build configuration name.
+        const configName = buildStep?.configurationName() || 'debug';
         this._selectBuildConfigurationButton.text = localize('qbs.select.build.configuration',
-                                                             `$(settings) [${text}]`);
-    }
-
-    private async updateBuildProductName(name?: string) {
-        const text = name ? name : 'all';
-        this._selectBuildProductButton.text = `[${text}]`;
-    }
-
-    private async updateRunProductName(name?: string) {
-        const text = name ? name : '';
-        this._selectRunProductButton.text = `[${text}]`;
+                                                             `$(settings) [${configName}]`);
+        // Update the current build product name.
+        const buildProductName = buildStep?.productName() || 'empty';
+        this._selectBuildProductButton.text = `[${buildProductName}]`;
+        // Update the current run product name.
+        const runProductName = runStep?.productName() || '---';
+        this._selectRunProductButton.text = `[${runProductName}]`;
     }
 }

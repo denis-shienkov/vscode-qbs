@@ -1,12 +1,11 @@
-
 export class QbsProduct {
-    private _data: any;
-
-    constructor(data: any) {
-        this._data = data;
+    constructor(readonly _data: any) {
     }
 
     fullDisplayName(): string {
+        if (typeof this._data === 'string') {
+            return this._data.toString();
+        }
         return this._data['full-display-name'];
     }
 
@@ -23,10 +22,6 @@ export class QbsProduct {
     }
 
     isEmpty(): boolean {
-        return this._data['name'] === undefined;
-    }
-
-    static createEmptyProduct() {
-        return new QbsProduct({});
+        return typeof this._data === 'string';
     }
 }

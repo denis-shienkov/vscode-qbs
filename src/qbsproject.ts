@@ -1,26 +1,35 @@
 import * as vscode from 'vscode';
-import { basename } from 'path';
+import {basename} from 'path';
+
 import * as QbsUtils from './qbsutils';
 import {QbsProduct} from './qbsproduct';
+import {QbsBuildStep} from './qbsbuildstep';
+import {QbsRunStep} from './qbsrunstep';
+import {QbsRunEnvironment} from './qbsrunenvironment';
 
-interface ProductQuickPickItem extends vscode.QuickPickItem {
-    product: QbsProduct;
-}
-
-export class QbsProject {
-    private _uri?: vscode.Uri;
+export class QbsProject implements vscode.Disposable {
     private _data?: any;
+    private _buildStep: QbsBuildStep = new QbsBuildStep();
+    private _runStep: QbsRunStep = new QbsRunStep();
 
-    constructor (uri?: vscode.Uri) {
-        this._uri = uri;
+    constructor(readonly _uri?: vscode.Uri) {
     }
 
-    name(): string | undefined {
-        return this._uri ? basename(this._uri.fsPath) : undefined;
+    dispose() {
+        this._buildStep.dispose();
+        this._runStep.dispose();
     }
 
-    filePath(): string | undefined {
-        return QbsUtils.expandPath(this._uri?.fsPath);
+    uri(): vscode.Uri | undefined {
+        return this._uri;
+    }
+
+    name(): string {
+        return this._uri ? basename(this._uri.fsPath) : '';
+    }
+
+    filePath(): string {
+        return QbsUtils.expandPath(this._uri?.fsPath) || '';
     }
 
     setData(response: any, withBuildSystemFiles: boolean) {
@@ -35,6 +44,18 @@ export class QbsProject {
 
     data(): any | undefined {
         return this._data;
+    }
+
+    setRunEnvironment(env: QbsRunEnvironment) {
+        this._runStep.setRunEnvironment(env);
+    }
+
+    buildStep(): QbsBuildStep {
+        return this._buildStep;
+    }
+
+    runStep(): QbsRunStep {
+        return this._runStep;
     }
 
     async products(): Promise<QbsProduct[]> {
@@ -59,55 +80,11 @@ export class QbsProject {
         return this._data;
     }
 
-    async selectBuild(): Promise<QbsProduct | undefined> {
-        const products = [
-            QbsProduct.createEmptyProduct()
-        ].concat(await this.products());
-        const items: ProductQuickPickItem[] = products.map(product => {
-            return {
-                label: product.isEmpty() ? '[all]' : product.fullDisplayName(),
-                product: product
-            };
-        });
-        return await vscode.window.showQuickPick(items).then(item => {
-            return item?.product;
-        });
-    }
-
-    async selectRun(): Promise<QbsProduct | undefined> {
-        const products = (await this.products()).filter(product => product.isRunnable());
-        const items: ProductQuickPickItem[] = products.map(product => {
-            return {
-                label: product.fullDisplayName(),
-                product: product
-            };
-        });
-        return await vscode.window.showQuickPick(items).then(item => {
-            return item?.product;
-        });
-    }
-    
     /**
      * Returns the list of paths of all found QBS project files
      * with the *.qbs extension in the current workspace directory.
      */
     static async enumerateWorkspaceProjects(): Promise<vscode.Uri[]> {
         return await vscode.workspace.findFiles('*.qbs');
-    }
-
-    static async selectWorkspaceProject(): Promise<vscode.Uri | undefined> {
-        interface ProjectQuickPickItem extends vscode.QuickPickItem {
-            uri: vscode.Uri;
-        }
-        const projects = await this.enumerateWorkspaceProjects();
-        const items: ProjectQuickPickItem[] = projects.map(project => {
-            return {
-                label: QbsUtils.fileBaseName(project),
-                uri: project
-            };
-        });
-        return await vscode.window.showQuickPick(items).then(item => {
-            return item?.uri;
-        });
     }
 }

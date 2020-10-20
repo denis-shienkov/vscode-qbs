@@ -33,7 +33,7 @@ class QbsExtensionManager implements vscode.Disposable {
 
     private autoResolveProject = () => {
         if (this._autoResolveRequired
-            && this._session.status === QbsSessionStatus.Started
+            && this._session.status() === QbsSessionStatus.Started
             && this._session.activeProject()) {
             this._autoResolveRequired = false;
             vscode.commands.executeCommand('qbs.resolve');
@@ -69,14 +69,10 @@ class QbsExtensionManager implements vscode.Disposable {
         ctx.subscriptions.push(this._session.onProjectActivated(project => {
             this._autoResolveRequired = true;
             this.autoResolveProject();
-        }));
-        ctx.subscriptions.push(this._session.onProfileNameChanged(name => {
-            this._autoResolveRequired = true;
-            this.autoResolveProject();
-        }));
-        ctx.subscriptions.push(this._session.onConfigurationNameChanged(name => {
-            this._autoResolveRequired = true;
-            this.autoResolveProject();
+            ctx.subscriptions.push(project.buildStep().onChanged(x => {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            }));
         }));
     }
 }

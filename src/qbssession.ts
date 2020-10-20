@@ -1,17 +1,26 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 
-import * as QbsUtils from './qbsutils';
 import * as QbsConfig from './qbsconfig';
 import {QbsProject} from './qbsproject';
-import {QbsProduct} from './qbsproduct';
-import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
-import {QbsSessionHelloResult,
-        QbsSessionProcessResult,
-        QbsSessionTaskStartedResult,
-        QbsSessionTaskProgressResult,
-        QbsSessionTaskMaxProgressResult,
-        QbsSessionMessageResult} from './qbssessionresults';
+
+import {
+    QbsSessionProtocol,
+    QbsSessionProtocolStatus
+} from './qbssessionprotocol';
+
+import {
+    QbsSessionHelloResult,
+    QbsSessionProcessResult,
+    QbsSessionTaskStartedResult,
+    QbsSessionTaskProgressResult,
+    QbsSessionTaskMaxProgressResult,
+    QbsSessionMessageResult
+} from './qbssessionresults';
+import { QbsRunEnvironment } from './qbsrunenvironment';
+
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export enum QbsSessionStatus {
     Stopped,
@@ -24,20 +33,9 @@ export class QbsSession implements vscode.Disposable {
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _project?: QbsProject;
-    private _profileName: string = '';
-    private _configurationName: string = '';
-    private _runProduct: QbsProduct = QbsProduct.createEmptyProduct();
-    private _buildProduct: QbsProduct = QbsProduct.createEmptyProduct();
-    private _runEnvironment: any = {};
-    private _debugger: any = {};
 
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectActivated: vscode.EventEmitter<QbsProject> = new vscode.EventEmitter<QbsProject>();
-    private _onProfileNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onConfigurationNameChanged: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
-    private _onBuildProductChanged: vscode.EventEmitter<QbsProduct> = new vscode.EventEmitter<QbsProduct>();
-    private _onRunProductChanged: vscode.EventEmitter<QbsProduct> = new vscode.EventEmitter<QbsProduct>();
-    private _onDebuggerChanged: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
     private _onHelloReceived: vscode.EventEmitter<QbsSessionHelloResult> = new vscode.EventEmitter<QbsSessionHelloResult>();
     private _onProjectResolved: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
@@ -55,11 +53,6 @@ export class QbsSession implements vscode.Disposable {
 
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectActivated: vscode.Event<QbsProject> = this._onProjectActivated.event;
-    readonly onProfileNameChanged: vscode.Event<string> = this._onProfileNameChanged.event;
-    readonly onConfigurationNameChanged: vscode.Event<string> = this._onConfigurationNameChanged.event;
-    readonly onBuildProductChanged: vscode.Event<QbsProduct> = this._onBuildProductChanged.event;
-    readonly onRunProductChanged: vscode.Event<QbsProduct> = this._onRunProductChanged.event;
-    readonly onDebuggerChanged: vscode.Event<any> = this._onDebuggerChanged.event;
 
     readonly onHelloReceived: vscode.Event<QbsSessionHelloResult> = this._onHelloReceived.event;
     readonly onProjectResolved: vscode.Event<QbsSessionMessageResult> = this._onProjectResolved.event;
@@ -76,19 +69,19 @@ export class QbsSession implements vscode.Disposable {
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsSessionMessageResult> = this._onRunEnvironmentResultReceived.event;
 
     constructor() {
-        this._protocol.onStatusChanged(status => {
-            switch (status) {
+         this._protocol.onStatusChanged(protocolStatus => {
+            switch (protocolStatus) {
             case QbsSessionProtocolStatus.Started:
-                this.status = QbsSessionStatus.Started;
+                this.setStatus(QbsSessionStatus.Started);
                 break;
             case QbsSessionProtocolStatus.Starting:
-                this.status = QbsSessionStatus.Starting;
+                this.setStatus(QbsSessionStatus.Starting);
                 break;
             case QbsSessionProtocolStatus.Stopped:
-                this.status = QbsSessionStatus.Stopped;
+                this.setStatus(QbsSessionStatus.Stopped);
                 break;
             case QbsSessionProtocolStatus.Stopping:
-                this.status = QbsSessionStatus.Stopping;
+                this.setStatus(QbsSessionStatus.Stopping);
                 break;
             }
         });
@@ -98,6 +91,11 @@ export class QbsSession implements vscode.Disposable {
 
     dispose() {
         this._protocol?.dispose();
+        this._project?.dispose();
+    }
+
+    project(): QbsProject | undefined {
+        return this._project;
     }
 
     async start() {
@@ -115,7 +113,7 @@ export class QbsSession implements vscode.Disposable {
         }
     }
 
-    async resolve() {
+    async resolveProject() {
         let request: any = {};
         request['type'] = 'resolve-project';
         request['environment'] = process.env;
@@ -143,14 +141,8 @@ export class QbsSession implements vscode.Disposable {
         ];
 
         request['project-file-path'] = this._project?.filePath();
-
-        if (this._configurationName.length > 0) {
-            request['configuration-name'] = this._configurationName;
-        }
-
-        if (this._profileName.length > 0) {
-            request['top-level-profile'] = this._profileName;
-        }
+        request['configuration-name'] = this._project?.buildStep().configurationName();
+        request['top-level-profile'] = this._project?.buildStep().profileName();
 
         const buildDirectory = QbsConfig.fetchQbsBuildDirectory();
         request['build-root'] = buildDirectory;
@@ -171,15 +163,15 @@ export class QbsSession implements vscode.Disposable {
         const logLevel = QbsConfig.fetchQbsLogLevel();
         request['log-level'] = logLevel;
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    async build() {
+    async buildProject() {
         let request: any = {};
         request['type'] = 'build-project';
         request['data-mode'] = 'only-if-changed';
         request['install'] = true;
-        request['products'] = [this._buildProduct.fullDisplayName];
+        request['products'] = [this._project?.buildStep().productName()];
 
         const maxJobs = QbsConfig.fetchQbsMaxJobs();
         if (maxJobs > 0) {
@@ -198,13 +190,13 @@ export class QbsSession implements vscode.Disposable {
         const cleanInstallRoot = QbsConfig.fetchQbsCleanInstallRoot();
         request['clean-install-root'] = cleanInstallRoot;
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    async clean() {
+    async cleanProject() {
         let request: any = {};
         request['type'] = 'clean-project';
-        request['products'] = [this._buildProduct.fullDisplayName];
+        request['products'] = [this._project?.buildStep().productName()];
 
         const keepGoing = QbsConfig.fetchQbsKeepGoing();
         request['keep-going'] = keepGoing;
@@ -212,10 +204,10 @@ export class QbsSession implements vscode.Disposable {
         const logLevel = QbsConfig.fetchQbsLogLevel();
         request['log-level'] = logLevel;
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    async install() {
+    async installProject() {
         let request: any = {};
         request['type'] = 'install-project';
 
@@ -225,101 +217,59 @@ export class QbsSession implements vscode.Disposable {
         const logLevel = QbsConfig.fetchQbsLogLevel();
         request['log-level'] = logLevel;
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    async cancel() {
+    async cancelJob() {
         let request: any = {};
         request['type'] = 'cancel-job';
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    async runEnvironment() {
+    async getRunEnvironment() {
         let request: any = {};
         request['type'] = 'get-run-environment';
-        request['product'] = this._runProduct.fullDisplayName;
+        request['product'] = this._project?.runStep().productName();
 
-        await this._protocol.sendRequest(request);
+        await this.sendRequest(request);
     }
 
-    fetchRunEnvironment(): any {
-        return this._runEnvironment;
-    }
-
-    set status(st: QbsSessionStatus) {
-        if (st !== this._status) {
-            this._status = st;
-            this._onStatusChanged.fire(this._status);
+    async setActiveProject(uri?: vscode.Uri) {
+        const _uri = this.project()?.uri();
+        if (uri?.path !== _uri?.path) {
+            this._project?.dispose();
+            this._project = new QbsProject(uri);
+            this._onProjectActivated.fire(this._project);
         }
-    }
-
-    get status(): QbsSessionStatus {
-        return this._status;
-    }
-
-    setActiveProject(uri: vscode.Uri) {
-        this._project = new QbsProject(uri);
-        this._onProjectActivated.fire(this._project);
     }
 
     activeProject(): QbsProject | undefined {
         return this._project;
     }
 
-    set profileName(name: string) {
-        if (name !== this._profileName) {
-            this._profileName = name;
-            this._onProfileNameChanged.fire(this._profileName);
+    status(): QbsSessionStatus {
+        return this._status;
+    }
+
+    /**
+     * Returns the localized QBS session @c status name.
+     */
+    static statusName(status: QbsSessionStatus): string {
+        switch (status) {
+        case QbsSessionStatus.Started:
+            return localize('qbs.session.status.started', "started");
+        case QbsSessionStatus.Starting:
+            return localize('qbs.session.status.started', "starting");
+        case QbsSessionStatus.Stopped:
+            return localize('qbs.session.status.started', "stopped");
+        case QbsSessionStatus.Stopping:
+            return localize('qbs.session.status.started', "stopping");
         }
     }
 
-    get profileName(): string {
-        return this._profileName;
-    }
-
-    set configurationName(name: string) {
-        if (name !== this._configurationName) {
-            this._configurationName = name;
-            this._onConfigurationNameChanged.fire(this._configurationName);
-        }
-    }
-
-    get configurationName(): string {
-        return this._configurationName;
-    }
-
-    set buildProduct(product: QbsProduct) {
-        if (product !== this._buildProduct) {
-            this._buildProduct = product;
-            this._onBuildProductChanged.fire(this._buildProduct);
-        }
-    }
-
-    get buildProduct(): QbsProduct {
-        return this._buildProduct;
-    }
-
-    set runProduct(product: QbsProduct) {
-        if (product !== this._runProduct) {
-            this._runProduct = product;
-            this._onRunProductChanged.fire(this._runProduct);
-        }
-    }
-
-    get runProduct(): QbsProduct {
-        return this._runProduct;
-    }
-
-    set debugger(config: any) {
-        if (config !== this._debugger) {
-            this._debugger = config;
-            this._onDebuggerChanged.fire(this._debugger);
-        }
-    }
-
-    get debugger(): any {
-        return this._debugger;
+    private async sendRequest(request: any) {
+        await this._protocol.sendRequest(request);
     }
 
     private parseResponse(response: any) {
@@ -367,13 +317,17 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsSessionProcessResult(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
-            this.setRunEnvironment(response);
+            const env = new QbsRunEnvironment(response['full-environment']);
+            this._project?.setRunEnvironment(env);
             const result = new QbsSessionMessageResult(response['error']);
             this._onRunEnvironmentResultReceived.fire(result);
         }
     }
 
-    private setRunEnvironment(response: any) {
-        this._runEnvironment = response['full-environment'] || {};
+    private setStatus(status: QbsSessionStatus) {
+        if (status !== this._status) {
+            this._status = status;
+            this._onStatusChanged.fire(this._status);
+        }
     }
 }

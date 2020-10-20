@@ -9,14 +9,14 @@ import * as QbsUtils from './qbsutils';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-async function setupDefaultProject(session: QbsSession) {
+async function onSetupDefaultProjectCommand(session: QbsSession) {
     const projects = await QbsProject.enumerateWorkspaceProjects();
     if (projects.length > 0) {
         session.setActiveProject(projects[0]);
     }
 }
 
-async function autoRestartSession(session: QbsSession) {
+async function onAutoRestartSessionCommand(session: QbsSession) {
     await new Promise<void>(resolve => {
         if (!QbsUtils.ensureQbsExecutableConfigured()) {
             vscode.commands.executeCommand('qbs.stopSession');
@@ -24,8 +24,8 @@ async function autoRestartSession(session: QbsSession) {
         }
 
         let autoRestartRequired: boolean = false;
-        session.onStatusChanged(status => {
-            if (status === QbsSessionStatus.Stopped) {
+        session.onStatusChanged(sessionStatus => {
+            if (sessionStatus === QbsSessionStatus.Stopped) {
                 if (autoRestartRequired) {
                     autoRestartRequired = false;
                     vscode.commands.executeCommand('qbs.startSession');
@@ -34,21 +34,22 @@ async function autoRestartSession(session: QbsSession) {
             }
         });
 
-        if (session.status === QbsSessionStatus.Started
-            || session.status === QbsSessionStatus.Starting) {
+        const sessionStatus = session.status();
+        if (sessionStatus === QbsSessionStatus.Started
+            || sessionStatus === QbsSessionStatus.Starting) {
             autoRestartRequired = true;
             vscode.commands.executeCommand('qbs.stopSession');
             resolve();
-        } else if (session.status === QbsSessionStatus.Stopping) {
+        } else if (sessionStatus === QbsSessionStatus.Stopping) {
             autoRestartRequired = true;
-        } else if (session.status === QbsSessionStatus.Stopped) {
+        } else if (sessionStatus === QbsSessionStatus.Stopped) {
             vscode.commands.executeCommand('qbs.startSession');
             resolve();
         }
     });
 }
 
-async function startSession(session: QbsSession) {
+async function onStartSessionCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
@@ -85,21 +86,21 @@ async function startSession(session: QbsSession) {
     });
 }
 
-async function stopSession(session: QbsSession) {
+async function onStopSessionCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.status.progress.title', 'QBS session status')
     }, async (p) => {
         await session.stop();
         return new Promise(resolve => {
-            session.onStatusChanged((status => {
-                if (status === QbsSessionStatus.Stopping) {
+            session.onStatusChanged((sessionStatus => {
+                if (sessionStatus === QbsSessionStatus.Stopping) {
                     p.report({
                         increment: 50,
                         message: localize('qbs.session.stopping.progress.message',
                                           'Session stopping...') 
                     });
-                } else if (status === QbsSessionStatus.Stopped) {
+                } else if (sessionStatus === QbsSessionStatus.Stopped) {
                     p.report({
                         increment: 100,
                         message: localize('qbs.session.successfully.stopped.progress.message',
@@ -122,64 +123,38 @@ async function stopSession(session: QbsSession) {
     });
 }
 
-async function selectProject(session: QbsSession) {
-    await QbsProject.selectWorkspaceProject().then(uri => {
-        if (uri) {
-            session.setActiveProject(uri);
-        }
-    });
+async function onSelectProjectCommand(session: QbsSession) {
+    await QbsSelectors.displayWorkspaceProjectSelector(session);
 }
 
-async function selectProfile(session: QbsSession) {
-    await QbsSelectors.selectProfile().then(profileName => {
-        if (profileName) {
-            session.profileName = profileName;
-        }
-    });
+async function onSelectProfileCommand(session: QbsSession) {
+    await QbsSelectors.displayProfileSelector(session);
 }
 
-async function selectConfiguration(session: QbsSession) {
-    await QbsSelectors.selectConfiguration().then(configurationName => {
-        if (configurationName) {
-            session.configurationName = configurationName;
-        }
-   });
+async function onSelectConfigurationCommand(session: QbsSession) {
+    await QbsSelectors.displayConfigurationSelector(session);
 }
 
-async function selectBuild(session: QbsSession) {
-    const project = session.activeProject();
-    await project?.selectBuild().then(product => {
-        if (product) {
-            session.buildProduct = product;
-        }
-   });
+async function onSelectBuildProductCommand(session: QbsSession) {
+    await QbsSelectors.displayBuildProductSelector(session);
 }
 
-async function selectRun(session: QbsSession) {
-    const project = session.activeProject();
-    await project?.selectRun().then(product => {
-        if (product) {
-            session.runProduct = product;
-        }
-   });
+async function onSelectRunProductCommand(session: QbsSession) {
+    await QbsSelectors.displayRunProductSelector(session);
 }
 
-async function selectDebugger(session: QbsSession) {
-    await QbsSelectors.selectDebugger().then(config => {
-        if (config) {
-            session.debugger = config;
-        }
-   });
+async function onSelectDebuggerCommand(session: QbsSession) {
+    await QbsSelectors.displayDebuggerSelector(session);
 }
 
-async function resolve(session: QbsSession) {
+async function onResolveProjectCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.resolve.progress.title', 'Project resolving'),
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
-        await session.resolve();
+        await session.resolveProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
@@ -229,14 +204,14 @@ async function resolve(session: QbsSession) {
     });
 }
 
-async function build(session: QbsSession) {
+async function onBuildProjectCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
-        await session.build();
+        await session.buildProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
@@ -287,14 +262,14 @@ async function build(session: QbsSession) {
     });
 }
 
-async function clean(session: QbsSession) {
+async function onCleanProjectCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.clean.progress.title', 'Project cleaning'),
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
-        await session.clean();
+        await session.cleanProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
@@ -344,14 +319,14 @@ async function clean(session: QbsSession) {
     });
 }
 
-async function install(session: QbsSession) {
+async function onInstallProjectCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.install.progress.title', 'Project installing'),
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
-        await session.install();
+        await session.installProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
@@ -401,15 +376,15 @@ async function install(session: QbsSession) {
     });
 }
 
-async function cancel(session: QbsSession) {
-    await session.cancel();
+async function onCancelJobCommand(session: QbsSession) {
+    await session.cancelJob();
 }
 
-async function runEnvironment(session: QbsSession) {
-    await session.runEnvironment();
+async function onGetRunEnvironmentCommand(session: QbsSession) {
+    await session.getRunEnvironment();
 }
 
-async function run(session: QbsSession) {
+async function onRunProductCommand(session: QbsSession) {
     const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
     for (const terminal of terminals) {
         if (terminal.name === 'QBS Run') {
@@ -417,19 +392,21 @@ async function run(session: QbsSession) {
         }
     }
 
-    const env = await new Promise<any|undefined>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
         session.onRunEnvironmentResultReceived(result => {
             if (!result.isEmpty()) {
                 reject(undefined);
             } else {
-                resolve(session.fetchRunEnvironment());
+                resolve();
             }
         });
-        session.runEnvironment();
+        session.getRunEnvironment();
     });
 
-    const executable = session.runProduct.targetExecutable();
-    if (!executable) {
+    const runStep = session.project()?.runStep();
+    const env = runStep?.runEnvironment()?.data();
+    const executable = runStep?.targetExecutable();
+    if (!executable || !env) {
         return;
     } else {
         const escaped = QbsUtils.escapeShell(executable);
@@ -443,64 +420,64 @@ async function run(session: QbsSession) {
     }
 }
 
-async function debug(session: QbsSession) {
+async function onDebugProductCommand(session: QbsSession) {
     // TODO: Implement me
     console.debug("*** debugging requested");
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
-        setupDefaultProject(session);
+        onSetupDefaultProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
-        autoRestartSession(session);
+        onAutoRestartSessionCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.startSession', () => {
-        startSession(session);
+        onStartSessionCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.stopSession', () => {
-        stopSession(session);
+        onStopSessionCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProject', () => {
-        selectProject(session);
+        onSelectProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProfile', () => {
-        selectProfile(session);
+        onSelectProfileCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectConfiguration', () => {
-        selectConfiguration(session);
+        onSelectConfigurationCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectBuild', () => {
-        selectBuild(session);
+        onSelectBuildProductCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectRun', () => {
-        selectRun(session);
+        onSelectRunProductCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectDebugger', () => {
-        selectDebugger(session);
+        onSelectDebuggerCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', () => {
-        resolve(session);
+        onResolveProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.build', () => {
-        build(session);
+        onBuildProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.clean', () => {
-        clean(session);
+        onCleanProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', () => {
-        install(session);
+        onInstallProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', () => {
-        cancel(session);
+        onCancelJobCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.getRunEnvironment', () => {
-        runEnvironment(session);
+        onGetRunEnvironmentCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.run', () => {
-        run(session);
+        onRunProductCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.debug', () => {
-        debug(session);
+        onDebugProductCommand(session);
     }));
 }
