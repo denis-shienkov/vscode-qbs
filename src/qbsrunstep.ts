@@ -54,4 +54,8 @@ export class QbsRunStep implements vscode.Disposable {
     runEnvironment(): QbsRunEnvironment | undefined {
         return this._env;
     }
+
+    debuggerName(): string | undefined {
+        return this._gdb?.name();
+    }
 }
