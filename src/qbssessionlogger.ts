@@ -11,10 +11,18 @@ export class QbsSessionLogger implements vscode.Disposable {
         this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
         this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
 
+        const appendCompileText = (text: string) => {
+            this._compileOutput.show();
+            this._compileOutput.appendLine(text);
+        };
+
+        const appendMessageText = (text: string) => {
+            this._messageOutput.appendLine(text);
+        };
+
         const appendCompileOutput = (result: QbsSessionMessageResult) => {
             if (!result.isEmpty()) {
-                const msg = result.toString();
-                this._compileOutput.appendLine(msg);
+                appendCompileText(result.toString());
             }
         };
 
@@ -27,7 +35,7 @@ export class QbsSessionLogger implements vscode.Disposable {
 
         session.onTaskStarted(result => {
             if (result._description.length > 0) {
-                this._compileOutput.appendLine(result._description);
+                appendCompileText(result._description);
             }
         });
 
@@ -37,21 +45,21 @@ export class QbsSessionLogger implements vscode.Disposable {
                 return;
             }
             const exe = `${result._executable} ${result._arguments.join(' ')}`;
-            this._compileOutput.appendLine(exe);
+            appendCompileText(exe);
             if (result._stdError.length > 0) {
-                const msg = result._stdError.join('\n');
-                this._compileOutput.appendLine(msg);
+                const text = result._stdError.join('\n');
+                appendCompileText(text);
             }
             if (result._stdOutput.length > 0) {
-                const msg = result._stdOutput.join('\n');
-                this._compileOutput.appendLine(msg);
+                const text = result._stdOutput.join('\n');
+                appendCompileText(text);
             }
         });
 
         session.onLogMessageReceived(result => {
             if (!result.isEmpty()) {
-                const msg = `[qbs] ${result.toString()}`;
-                this._messageOutput.appendLine(msg);
+                const text = `[qbs] ${result.toString()}`;
+                appendMessageText(text);
             }
         });
     }
