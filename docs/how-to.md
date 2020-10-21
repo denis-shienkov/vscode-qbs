@@ -29,4 +29,20 @@ to choose the desired product to build (or `[all]` to build all products in the 
 ## Build a project
 
 * From the command palette in VS Code, run the **QBS: Build** command,
-or select the **Build** button in the status bar.
+or press the **Build** button in the status bar.
+
+## Run a product
+
+* From the command palette in VS Code, run the **QBS: Select Run Product** command
+to select the desired product to run.
+* From the command palette in VS Code, run the **QBS: Run** command,
+or press the **Run** button in the status bar.
+
+## Debug a product
+
+* From the command palette in VS Code, run the **QBS: Select Run Product** command
+to select the desired product to debug.
+* From the command palette in VS Code, run the **QBS: Select Debugger** command,
+to select the desired debugegr configuration for debugging.
+* From the command palette in VS Code, run the **QBS: Debug** command,
+or press the **Debug** button in the status bar.

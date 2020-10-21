@@ -7,3 +7,5 @@ QBS is an extension designed to make it easy to work with QBS-based projects.
 * [Open a project](how-to.md#open-a-project)
 * [Configure a project](how-to.md#configure-a-project)
 * [Build a project](how-to.md#build-a-project)
+* [Run a project](how-to.md#run-a-project)
+* [Debug a project](how-to.md#debug-a-project)

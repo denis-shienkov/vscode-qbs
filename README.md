@@ -6,6 +6,8 @@
 - [Open a project](docs/how-to.md#open-a-project)
 - [Configure a project](docs/how-to.md#open-a-project)
 - [Build a project](docs/how-to.md#build-a-project)
+- [Run a project](docs/how-to.md#run-a-project)
+- [Debug a project](docs/how-to.md#debug-a-project)
 
 ## Issues? Questions? Feature requests?
 
