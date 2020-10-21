@@ -1,5 +1,6 @@
 {
     "qbs-tools.command.qbs.setup.default.project.title": "SetupDefaultProject",
+    "qbs-tools.command.qbs.setup.run.product.title": "SetupRunProduct",
     "qbs-tools.command.qbs.autorestart.session.title": "AutoRestartSession",
     "qbs-tools.command.qbs.start.session.title": "StartSession",
     "qbs-tools.command.qbs.stop.session.title": "StopSession",

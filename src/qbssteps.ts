@@ -13,7 +13,7 @@ export class QbsConfig {
 export class QbsProduct {
     constructor(readonly _data: any) {}
 
-    fullDisplayName(): string { return (typeof this._data === 'string') 
+    fullDisplayName(): string { return (typeof this._data === 'string')
         ? this._data.toString() : this._data['full-display-name']; }
 
     targetExecutable(): string { return this._data['target-executable']; }
@@ -85,10 +85,8 @@ export class QbsRunStep implements vscode.Disposable {
     }
 
     setProduct(product?: QbsProduct) {
-        if (product && product.fullDisplayName() !== this._product?.fullDisplayName()) {
-            this._product = product;
-            this._onChanged.fire();
-        }
+        this._product = product;
+        this._onChanged.fire();
     }
 
     setDebugger(gdb?: QbsDebugger) {

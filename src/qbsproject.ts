@@ -31,6 +31,10 @@ export class QbsProject implements vscode.Disposable {
         }
     }
 
+    setupRunProduct() {
+        vscode.commands.executeCommand('qbs.setupRunProduct');
+    }
+
     data(): any | undefined { return this._data; }
     setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setRunEnvironment(env); }
     buildStep(): QbsBuildStep { return this._buildStep; }
@@ -45,7 +49,7 @@ export class QbsProject implements vscode.Disposable {
                 const product = new QbsProduct(data);
                 products.push(product);
             }
-    
+
             const subProjects = project['sub-projects'] || [];
             for (const subProject of subProjects) {
                 parseProject(subProject);
