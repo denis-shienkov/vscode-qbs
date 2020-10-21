@@ -1,4 +1,3 @@
-
 export class QbsSessionHelloResult {
     readonly _apiLevel: number = 0;
     readonly _apiCompatibilityLevel: number = 0;
@@ -97,9 +96,7 @@ export class QbsSessionMessageResult {
         }
     }
 
-    isEmpty(): boolean {
-        return this._messages.length === 0;
-    }
+    isEmpty(): boolean { return this._messages.length === 0; }
 
     toString(): string {
         let list: string[] = [];

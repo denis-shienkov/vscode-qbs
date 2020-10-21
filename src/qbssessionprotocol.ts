@@ -21,10 +21,9 @@ export class QbsSessionProtocol implements vscode.Disposable {
     readonly onStatusChanged: vscode.Event<QbsSessionProtocolStatus> = this._onStatusChanged.event;
     readonly onResponseReceived: vscode.Event<any> = this._onResponseReceived.event;
 
-    constructor() {
-    }
+    constructor() {}
 
-    dispose() {  }
+    dispose() {}
 
     set status(st: QbsSessionProtocolStatus) {
         if (st === this._status)
@@ -33,9 +32,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
         this._onStatusChanged.fire(this._status);
     }
 
-    get status(): QbsSessionProtocolStatus {
-        return this._status;
-    }
+    get status(): QbsSessionProtocolStatus { return this._status; }
 
     async start(qbsPath: string) {
         this._input = '';
@@ -48,11 +45,11 @@ export class QbsSessionProtocol implements vscode.Disposable {
             this._input += data;
             this.parseStdOutput();
         });
-        
+
         this._process.stderr?.on('data', (data) => {
             // TODO: Implement me.
         });
-          
+
         this._process.on('close', (code) => {
             // TODO: Implement me.
             this.status = QbsSessionProtocolStatus.Stopped;

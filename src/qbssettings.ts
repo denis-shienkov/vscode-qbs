@@ -44,7 +44,7 @@ export class QbsSettings implements vscode.Disposable {
             }
         });
     }
-    
+
     dispose() {
     }
 
@@ -260,8 +260,8 @@ export class QbsSettings implements vscode.Disposable {
         const buildStep = this._session.project()?.buildStep();
         configPath = configPath.replace('${profileName}', buildStep?.profileName() || 'none');
         configPath = configPath.replace('${configurationName}', buildStep?.configurationName() || 'none');
-        const sourceDirectory = (vscode.workspace.workspaceFolders 
-            && vscode.workspace.workspaceFolders.length > 0) 
+        const sourceDirectory = (vscode.workspace.workspaceFolders
+            && vscode.workspace.workspaceFolders.length > 0)
                 ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
         configPath = configPath.replace('${sourceDirectory}', sourceDirectory);
         return QbsUtils.fixPathSeparators(configPath);
