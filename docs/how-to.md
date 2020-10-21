@@ -60,4 +60,4 @@ configuration information for each source file in your project.
 
 ## Next steps
 
-- Explore the [CMake Tools documentation](README.md)
+- Explore the [QBS documentation](README.md)
