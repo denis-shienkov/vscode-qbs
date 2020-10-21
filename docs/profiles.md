@@ -26,7 +26,9 @@ The paths to some compilers (such as `GCC`) must be placed in the `PATH`
 environment variable. But other compilers (such as `MSVC`, `IAR EW`,
 `KEIL`) will be detected automatically from the Windows registry.
 
-To do this, run the following command:
+To do this, run the
+[setup-toolchains](https://doc.qt.io/qbs/cli-setup-toolchains.html)
+command:
 
 ```bash
 $ qbs setup-toolchains --detect
@@ -36,7 +38,8 @@ In this case, QBS will automatically detect the toolchainn architecture,
 the toolchain version, the compiler paths, and on this basis will
 automatically generate the profiles with unique names.
 
-A list of created profiles can be obtained by running the following
+A list of created profiles can be obtained by running the
+[setup-toolchains](https://doc.qt.io/qbs/cli-setup-toolchains.html)
 command:
 
 ```bash
@@ -49,8 +52,9 @@ It is possible to create the custom profiles by manually setting
 the path to the compiler. In this case, the user can specify
 any desired profile name.
 
-For example, to do this, run the following
-[command](https://doc.qt.io/qbs/cli-setup-toolchains.html):
+For example, to do this, run the
+[setup-toolchains](https://doc.qt.io/qbs/cli-setup-toolchains.html)
+command:
 
 ```bash
 $ qbs setup-toolchains C:\mingw530_32\bin\g++.exe mingw
