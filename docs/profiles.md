@@ -49,8 +49,8 @@ It is possible to create the custom profiles by manually setting
 the path to the compiler. In this case, the user can specify
 any desired profile name.
 
-For example, to do this, run the following [command]
-(https://doc.qt.io/qbs/cli-setup-toolchains.html):
+For example, to do this, run the following
+[command](https://doc.qt.io/qbs/cli-setup-toolchains.html):
 
 ```bash
 $ qbs setup-toolchains C:\mingw530_32\bin\g++.exe mingw
