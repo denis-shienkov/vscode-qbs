@@ -19,7 +19,7 @@ async function onSetupDefaultProjectCommand(session: QbsSession) {
 
 async function onAutoRestartSessionCommand(session: QbsSession) {
     await new Promise<void>(resolve => {
-        if (!QbsUtils.ensureQbsExecutableConfigured()) {
+        if (!session.settings().ensureQbsExecutableConfigured()) {
             vscode.commands.executeCommand('qbs.stopSession');
             resolve();
         }

@@ -3,35 +3,23 @@ import {basename} from 'path';
 
 import * as QbsUtils from './qbsutils';
 
-import {QbsProduct} from './qbsproduct';
-import {QbsBuildStep} from './qbsbuildstep';
-import {QbsRunStep} from './qbsrunstep';
-import {QbsRunEnvironment} from './qbsrunenvironment';
+import {QbsBuildStep, QbsRunStep, QbsProduct, QbsRunEnvironment} from './qbssteps';
 
 export class QbsProject implements vscode.Disposable {
     private _data?: any;
     private _buildStep: QbsBuildStep = new QbsBuildStep();
     private _runStep: QbsRunStep = new QbsRunStep();
 
-    constructor(readonly _uri?: vscode.Uri) {
-    }
+    constructor(readonly _uri?: vscode.Uri) {}
 
     dispose() {
         this._buildStep.dispose();
         this._runStep.dispose();
     }
 
-    uri(): vscode.Uri | undefined {
-        return this._uri;
-    }
-
-    name(): string {
-        return this._uri ? basename(this._uri.fsPath) : '';
-    }
-
-    filePath(): string {
-        return QbsUtils.expandPath(this._uri?.fsPath) || '';
-    }
+    uri(): vscode.Uri | undefined { return this._uri; }
+    name(): string { return this._uri ? basename(this._uri.fsPath) : ''; }
+    filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
 
     setData(response: any, withBuildSystemFiles: boolean) {
         const data = response['project-data'];
@@ -43,23 +31,13 @@ export class QbsProject implements vscode.Disposable {
         }
     }
 
-    data(): any | undefined {
-        return this._data;
-    }
+    data(): any | undefined { return this._data; }
+    setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setRunEnvironment(env); }
+    buildStep(): QbsBuildStep { return this._buildStep; }
+    runStep(): QbsRunStep { return this._runStep; }
+    isEmpty(): boolean { return this._data; }
 
-    setRunEnvironment(env: QbsRunEnvironment) {
-        this._runStep.setRunEnvironment(env);
-    }
-
-    buildStep(): QbsBuildStep {
-        return this._buildStep;
-    }
-
-    runStep(): QbsRunStep {
-        return this._runStep;
-    }
-
-    async products(): Promise<QbsProduct[]> {
+    async enumerateProducts(): Promise<QbsProduct[]> {
         let products: QbsProduct[] = [];
         const parseProject = (project: any) => {
             const datas = project['products'] || [];
@@ -75,10 +53,6 @@ export class QbsProject implements vscode.Disposable {
         };
         parseProject(this._data);
         return products;
-    }
-
-    isEmpty(): boolean {
-        return this._data;
     }
 
     /**

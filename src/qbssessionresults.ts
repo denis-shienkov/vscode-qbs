@@ -3,7 +3,7 @@ export class QbsSessionHelloResult {
     readonly _apiLevel: number = 0;
     readonly _apiCompatibilityLevel: number = 0;
 
-    constructor(readonly response: any) {
+    constructor(response: any) {
         this._apiLevel = parseInt(response['api-level']);
         this._apiCompatibilityLevel = parseInt(response['api-compat-level']);
     }
@@ -17,7 +17,7 @@ export class QbsSessionProcessResult {
     readonly _stdError: string[];
     readonly _success: boolean;
 
-    constructor(readonly response: any) {
+    constructor(response: any) {
         this._executable = response['executable-file-path'];
         this._workingDirectory = response['working-directory'];
         this._arguments = response['arguments'];
@@ -31,7 +31,7 @@ export class QbsSessionTaskStartedResult {
     readonly _description: string;
     readonly _maxProgress: number;
 
-    constructor(readonly response: any) {
+    constructor(response: any) {
         this._description = response['description'];
         this._maxProgress = parseInt(response['max-progress']);
     }
@@ -40,7 +40,7 @@ export class QbsSessionTaskStartedResult {
 export class QbsSessionTaskProgressResult {
     readonly _progress: number;
 
-    constructor(readonly response: any) {
+    constructor(response: any) {
         this._progress = parseInt(response['progress']);
     }
 }
@@ -48,7 +48,7 @@ export class QbsSessionTaskProgressResult {
 export class QbsSessionTaskMaxProgressResult {
     readonly _maxProgress: number;
 
-    constructor(readonly response: any) {
+    constructor(response: any) {
         this._maxProgress = parseInt(response['max-progress']);
     }
 }
@@ -59,7 +59,7 @@ export class QbsSessionMessageItemResult {
     readonly _line: number = -1;
 
     constructor(msg: string)
-    constructor(readonly msg: any) {
+    constructor(msg: any) {
         if (typeof msg === 'string') {
             this._description = msg;
         } else {
@@ -84,7 +84,7 @@ export class QbsSessionMessageItemResult {
 export class QbsSessionMessageResult {
     readonly _messages: QbsSessionMessageItemResult[] = [];
 
-    constructor(readonly obj: any) {
+    constructor(obj: any) {
         if (typeof obj === 'string') {
             const message = new QbsSessionMessageItemResult(obj);
             this._messages.push(message);

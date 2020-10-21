@@ -2,10 +2,9 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 
-import * as QbsConfig from './qbsconfig';
-
 import {QbsProject} from './qbsproject';
-import {QbsRunEnvironment} from './qbsrunenvironment';
+import {QbsRunEnvironment} from './qbssteps';
+import {QbsSettings} from './qbssettings';
 
 import {
     QbsSessionProtocol,
@@ -31,6 +30,7 @@ export enum QbsSessionStatus {
 }
 
 export class QbsSession implements vscode.Disposable {
+    private _settings: QbsSettings = new QbsSettings(this);
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _project?: QbsProject;
@@ -93,15 +93,15 @@ export class QbsSession implements vscode.Disposable {
     dispose() {
         this._protocol?.dispose();
         this._project?.dispose();
+        this._settings?.dispose();
     }
 
-    project(): QbsProject | undefined {
-        return this._project;
-    }
+    project(): QbsProject | undefined { return this._project; }
+    settings(): QbsSettings { return this._settings; }
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
-            const qbsPath = QbsConfig.fetchQbsPath();
+            const qbsPath = this._settings.executablePath();
             if (qbsPath.length > 0) {
                 await this._protocol.start(qbsPath);
             }
@@ -140,30 +140,20 @@ export class QbsSession implements vscode.Disposable {
             'qbs.architecture',
             'qbs.toolchain'
         ];
-
         request['project-file-path'] = this._project?.filePath();
         request['configuration-name'] = this._project?.buildStep().configurationName();
         request['top-level-profile'] = this._project?.buildStep().profileName();
-
-        const buildDirectory = QbsConfig.fetchQbsBuildDirectory();
+        const buildDirectory = this._settings.buildDirectory();
         request['build-root'] = buildDirectory;
         // Do not store the build graph if the build directory does not exist yet.
         request['dry-run'] = !fs.existsSync(buildDirectory);
-
-        const settingsDirectory = QbsConfig.fetchQbsSettingsDirectory();
+        const settingsDirectory = this._settings.settingsDirectory();
         if (settingsDirectory.length > 0) {
             request['settings-directory'] = settingsDirectory;
         }
-
-        const forceProbes = QbsConfig.fetchQbsForceProbes();
-        request['force-probe-execution'] = forceProbes;
-
-        const errorHandlingMode = QbsConfig.fetchQbsErrorHandlingMode();
-        request['error-handling-mode'] = errorHandlingMode;
-
-        const logLevel = QbsConfig.fetchQbsLogLevel();
-        request['log-level'] = logLevel;
-
+        request['force-probe-execution'] = this._settings.forceProbes();
+        request['error-handling-mode'] = this._settings.errorHandlingMode();
+        request['log-level'] = this._settings.logLevel();
         await this.sendRequest(request);
     }
 
@@ -173,24 +163,14 @@ export class QbsSession implements vscode.Disposable {
         request['data-mode'] = 'only-if-changed';
         request['install'] = true;
         request['products'] = [this._project?.buildStep().productName()];
-
-        const maxJobs = QbsConfig.fetchQbsMaxJobs();
+        const maxJobs = this._settings.maxJobs();
         if (maxJobs > 0) {
             request['max-job-count'] = maxJobs;
         }
-
-        const keepGoing = QbsConfig.fetchQbsKeepGoing();
-        request['keep-going'] = keepGoing;
-
-        const showCommandLines = QbsConfig.fetchQbsShowCommandLines();
-        request['command-echo-mode'] = showCommandLines ? 'command-line' : 'summary';
-
-        const logLevel = QbsConfig.fetchQbsLogLevel();
-        request['log-level'] = logLevel;
-
-        const cleanInstallRoot = QbsConfig.fetchQbsCleanInstallRoot();
-        request['clean-install-root'] = cleanInstallRoot;
-
+        request['keep-going'] = this._settings.keepGoing();
+        request['command-echo-mode'] = this._settings.showCommandLines() ? 'command-line' : 'summary';
+        request['log-level'] = this._settings.logLevel();
+        request['clean-install-root'] = this._settings.cleanInstallRoot();
         await this.sendRequest(request);
     }
 
@@ -198,26 +178,16 @@ export class QbsSession implements vscode.Disposable {
         let request: any = {};
         request['type'] = 'clean-project';
         request['products'] = [this._project?.buildStep().productName()];
-
-        const keepGoing = QbsConfig.fetchQbsKeepGoing();
-        request['keep-going'] = keepGoing;
-
-        const logLevel = QbsConfig.fetchQbsLogLevel();
-        request['log-level'] = logLevel;
-
+        request['keep-going'] = this._settings.keepGoing();
+        request['log-level'] = this._settings.logLevel();
         await this.sendRequest(request);
     }
 
     async installProject() {
         let request: any = {};
         request['type'] = 'install-project';
-
-        const keepGoing = QbsConfig.fetchQbsKeepGoing();
-        request['keep-going'] = keepGoing;
-
-        const logLevel = QbsConfig.fetchQbsLogLevel();
-        request['log-level'] = logLevel;
-
+        request['keep-going'] = this._settings.keepGoing();
+        request['log-level'] = this._settings.logLevel();
         await this.sendRequest(request);
     }
 
@@ -232,7 +202,6 @@ export class QbsSession implements vscode.Disposable {
         let request: any = {};
         request['type'] = 'get-run-environment';
         request['product'] = this._project?.runStep().productName();
-
         await this.sendRequest(request);
     }
 
@@ -245,13 +214,8 @@ export class QbsSession implements vscode.Disposable {
         }
     }
 
-    activeProject(): QbsProject | undefined {
-        return this._project;
-    }
-
-    status(): QbsSessionStatus {
-        return this._status;
-    }
+    activeProject(): QbsProject | undefined { return this._project; }
+    status(): QbsSessionStatus { return this._status; }
 
     /**
      * Returns the localized QBS session @c status name.
@@ -269,9 +233,7 @@ export class QbsSession implements vscode.Disposable {
         }
     }
 
-    private async sendRequest(request: any) {
-        await this._protocol.sendRequest(request);
-    }
+    private async sendRequest(request: any) { await this._protocol.sendRequest(request); }
 
     private parseResponse(response: any) {
         const type = response['type'];

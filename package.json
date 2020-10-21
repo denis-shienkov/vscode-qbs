@@ -170,7 +170,7 @@
                 },
                 "qbs.buildDirectory": {
                     "type": "string",
-                    "default": "${workspaceFolder}/build",
+                    "default": "${sourceDirectory}/build/${profileName}_${configurationName}",
                     "description": "%qbs-tools.configuration.qbs.buildDirectory.description%",
                     "scope": "resource"
                 },
@@ -228,7 +228,7 @@
                 },
                 "qbs.launchFilePath": {
                     "type": "string",
-                    "default": "${workspaceFolder}/.vscode/launch.json",
+                    "default": "${sourceDirectory}/.vscode/launch.json",
                     "description": "%qbs-tools.configuration.qbs.launchFilePath.description%",
                     "scope": "resource"
                 }

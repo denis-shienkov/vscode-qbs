@@ -3,10 +3,7 @@ import {basename} from 'path';
 
 import {QbsSession} from './qbssession';
 import {QbsProject} from './qbsproject';
-import {QbsProfile} from './qbsprofile';
-import {QbsBuildConfiguration} from './qbsbuildconfiguration';
-import {QbsProduct} from './qbsproduct';
-import {QbsDebugger} from './qbsdebugger';
+import {QbsProfile, QbsConfig, QbsProduct, QbsDebugger} from './qbssteps';
 
 export async function displayWorkspaceProjectSelector(session: QbsSession) {
     const projects = await QbsProject.enumerateWorkspaceProjects();
@@ -26,7 +23,7 @@ export async function displayWorkspaceProjectSelector(session: QbsSession) {
 }
 
 export async function displayProfileSelector(session: QbsSession) {
-    const profiles = await QbsProfile.enumerateProfiles();
+    const profiles = await session.settings().enumerateProfiles();
     interface QbsProfileQuickPickItem extends vscode.QuickPickItem {
         profile: QbsProfile;
     }
@@ -43,9 +40,9 @@ export async function displayProfileSelector(session: QbsSession) {
 }
 
 export async function displayConfigurationSelector(session: QbsSession) {
-    const configurations = await QbsBuildConfiguration.enumerateConfigurations();
+    const configurations = await session.settings().enumerateConfigurations();
     interface QbsConfigQuickPickItem extends vscode.QuickPickItem {
-        configuration: QbsBuildConfiguration;
+        configuration: QbsConfig;
     }
     const items: QbsConfigQuickPickItem[] = configurations.map(configuration => {
         return {
@@ -62,7 +59,7 @@ export async function displayConfigurationSelector(session: QbsSession) {
 export async function displayBuildProductSelector(session: QbsSession) {
     const products = [
         new QbsProduct('all')
-    ].concat(await session.project()?.products() || []);
+    ].concat(await session.project()?.enumerateProducts() || []);
     interface QbsProductQuickPickItem extends vscode.QuickPickItem {
         product: QbsProduct;
     }
@@ -79,7 +76,8 @@ export async function displayBuildProductSelector(session: QbsSession) {
 }
 
 export async function displayRunProductSelector(session: QbsSession) {
-    const products = (await session.project()?.products() || []).filter(product => product.isRunnable());
+    const products = (await session.project()?.enumerateProducts() || [])
+        .filter(product => product.isRunnable());
     interface QbsProductQuickPickItem extends vscode.QuickPickItem {
         product: QbsProduct;
     }
@@ -96,7 +94,7 @@ export async function displayRunProductSelector(session: QbsSession) {
 }
 
 export async function displayDebuggerSelector(session: QbsSession) {
-    const dbgs = (await QbsDebugger.enumerateDebuggers()) || [];
+    const dbgs = (await session.settings().enumerateDebuggers()) || [];
     interface QbsDebuggerQuickPickItem extends vscode.QuickPickItem {
         dbg: QbsDebugger;
     }
