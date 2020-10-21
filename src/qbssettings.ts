@@ -16,8 +16,33 @@ import {QbsProfile, QbsConfig, QbsDebugger} from './qbssteps';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
+export enum QbsSettingsEvent {
+    NothingRequired,
+    SessionRestartRequired,
+    ProjectResolveRequired
+}
+
 export class QbsSettings implements vscode.Disposable {
+    private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
+    readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
+
     constructor(readonly _session: QbsSession) {
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration('qbs.qbsPath')) {
+                this._onChanged.fire(QbsSettingsEvent.SessionRestartRequired);
+            }
+            let signal = QbsSettingsEvent.NothingRequired;
+            if (e.affectsConfiguration('qbs.forceProbes')) {
+                signal = QbsSettingsEvent.ProjectResolveRequired;
+            } else if (e.affectsConfiguration('qbs.errorHandlingMode')) {
+                signal = QbsSettingsEvent.ProjectResolveRequired;
+            } else if (e.affectsConfiguration('qbs.logLevel')) {
+                signal = QbsSettingsEvent.ProjectResolveRequired;
+            }
+            if (signal !== QbsSettingsEvent.NothingRequired) {
+                this._onChanged.fire(signal);
+            }
+        });
     }
     
     dispose() {

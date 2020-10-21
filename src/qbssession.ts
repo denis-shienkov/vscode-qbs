@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import {QbsProject} from './qbsproject';
 import {QbsRunEnvironment} from './qbssteps';
-import {QbsSettings} from './qbssettings';
+import {QbsSettings, QbsSettingsEvent} from './qbssettings';
 
 import {
     QbsSessionProtocol,
@@ -30,6 +30,7 @@ export enum QbsSessionStatus {
 }
 
 export class QbsSession implements vscode.Disposable {
+    private _autoResolveRequired: boolean = true;
     private _settings: QbsSettings = new QbsSettings(this);
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
@@ -70,7 +71,8 @@ export class QbsSession implements vscode.Disposable {
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsSessionMessageResult> = this._onRunEnvironmentResultReceived.event;
 
     constructor() {
-         this._protocol.onStatusChanged(protocolStatus => {
+        // Handle the events from the protocol object.
+        this._protocol.onStatusChanged(protocolStatus => {
             switch (protocolStatus) {
             case QbsSessionProtocolStatus.Started:
                 this.setStatus(QbsSessionStatus.Started);
@@ -86,8 +88,17 @@ export class QbsSession implements vscode.Disposable {
                 break;
             }
         });
-
         this._protocol.onResponseReceived(response => this.parseResponse(response));
+
+        // Handle the events from the settings object.
+        this._settings.onChanged(event => {
+            if (event === QbsSettingsEvent.ProjectResolveRequired) {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            } else if (event === QbsSettingsEvent.SessionRestartRequired) {
+                // restart session
+            }
+        });
     }
 
     dispose() {
@@ -211,6 +222,13 @@ export class QbsSession implements vscode.Disposable {
             this._project?.dispose();
             this._project = new QbsProject(uri);
             this._onProjectActivated.fire(this._project);
+
+            this._autoResolveRequired = true;
+            this.autoResolveProject();
+            this._project.buildStep().onChanged(x => {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            });
         }
     }
 
@@ -234,6 +252,13 @@ export class QbsSession implements vscode.Disposable {
     }
 
     private async sendRequest(request: any) { await this._protocol.sendRequest(request); }
+
+    private async autoResolveProject() {
+        if (this._autoResolveRequired && this._status === QbsSessionStatus.Started && this._project) {
+            this._autoResolveRequired = false;
+            vscode.commands.executeCommand('qbs.resolve');
+        }
+    }
 
     private parseResponse(response: any) {
         const type = response['type'];
@@ -291,6 +316,11 @@ export class QbsSession implements vscode.Disposable {
         if (status !== this._status) {
             this._status = status;
             this._onStatusChanged.fire(this._status);
+
+            if (status === QbsSessionStatus.Started) {
+                this._autoResolveRequired = true;
+                this.autoResolveProject();
+            }
         }
     }
 }
