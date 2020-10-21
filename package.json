@@ -2,8 +2,11 @@
     "name": "qbs-tools",
     "displayName": "QBS",
     "description": "QBS support in Visual Studio Code",
-    "version": "0.0.4",
-    "publisher": "community",
+    "version": "0.0.5",
+    "publisher": "qbs-community",
+    "author": {
+        "name": "Denis Shienkov"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/denis-shienkov/vscode-qbs"

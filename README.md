@@ -1,5 +1,22 @@
 # QBS
 
+This extension provides support for [QBS](https://doc.qt.io/qbs/)
+build system in [Visual Studio Code](https://code.visualstudio.com/).
+
+This build system is a modern, powerfull, and scalable tool intended
+to develop the various projects on C/C++ languages which provides a
+fast speed and the convenience of use.
+
+## Features
+
+- Syntax Highlighting
+- Projects Building
+- Products Running and Debugging
+
+## Requirements
+
+At least the minimum 1.16.0 QBS version must be preinstalled in the system.
+
 ## Important doc links
 
 - [Prepare the QBS](docs/how-to.md#prepare-qbs)
