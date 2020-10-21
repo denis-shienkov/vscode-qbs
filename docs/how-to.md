@@ -46,3 +46,18 @@ to select the desired product to debug.
 to select the desired debugegr configuration for debugging.
 * From the command palette in VS Code, run the **QBS: Debug** command,
 or press the **Debug** button in the status bar.
+
+## Set up include paths for C++ IntelliSense
+
+QBS currently supports Microsoft's `ms-vscode.cpptools` extension. If this extension
+is installed and enabled, then configuring your project will provide this integration
+automatically.
+
+The `ms-vscode.cpptools` will show a prompt confirming that you wish to use QBS to
+provide the configuration information for your project. Accept this prompt to activate
+the integration. Subsequently, QBS will provide and automatically update cpptools
+configuration information for each source file in your project.
+
+## Next steps
+
+- Explore the [CMake Tools documentation](README.md)

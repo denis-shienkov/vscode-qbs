@@ -8,6 +8,9 @@
 - [Build a project](docs/how-to.md#build-a-project)
 - [Run a project](docs/how-to.md#run-a-project)
 - [Debug a project](docs/how-to.md#debug-a-project)
+- [How to](docs/how-to.md)
+- [Read the online documentation](docs/README.md)
+- [Contribute](docs/contribute.md)
 
 ## Issues? Questions? Feature requests?
 
