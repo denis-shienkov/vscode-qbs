@@ -27,14 +27,14 @@ type IntelliSenseMode = 'msvc-x86' | 'msvc-x64' | 'msvc-arm' | 'msvc-arm64'
  * @note We need in this class for the correct highlighting of the
  * includes, defines and other stuff for the opened project sources.
  */
-export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvider {
+export class QbsCpp implements cpt.CustomConfigurationProvider {
     readonly name = 'QBS';
     readonly extensionId = 'ms-vscode.qbs-tools';
 
     private _api?: cpt.CppToolsApi;
     private _registered?: Promise<void>;
     private _sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
- 
+
     constructor(readonly session: QbsSession) {
         session.onProjectResolved(result => {
             this.setup(session.activeProject()?.data());
@@ -83,7 +83,7 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
      */
     async provideFolderBrowseConfiguration(uri: vscode.Uri): Promise<cpt.WorkspaceBrowseConfiguration> { return {browsePath: []}; }
 
-    dispose() { 
+    dispose() {
         if (this._api) {
             this._api.dispose();
         }
@@ -105,7 +105,7 @@ export class QbsCppConfigurationProvider implements cpt.CustomConfigurationProvi
         }
 
         await this.buildSourceFileConfigurations(data);
-        
+
         // Ensure that the provider is already registered.
         if (!this._registered) {
             this._api.registerCustomConfigurationProvider(this);
