@@ -435,21 +435,20 @@ async function onRunProductCommand(session: QbsSession) {
         }
     }
 
-    await new Promise<void>((resolve, reject) => {
-        session.onRunEnvironmentResultReceived(result => {
-            if (!result.isEmpty()) {
-                reject(undefined);
-            } else {
-                resolve();
-            }
-        });
-        session.getRunEnvironment();
-    });
+    // Retrieve the run environment for the selected product.
+    const success = await session.ensureEvnUpdated();
+    if (!success) {
+        vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
+                                                'Run environment missing, please select the runnable product.'));
+        return;
+    }
 
     const runStep = session.project()?.runStep();
     const env = runStep?.runEnvironment()?.data();
     const executable = runStep?.targetExecutable();
     if (!executable || !env) {
+        vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
+                                                'Target executable missing, please re-build the product.'));
         return;
     } else {
         const escaped = QbsUtils.escapeShell(executable);
@@ -467,23 +466,24 @@ async function onDebugProductCommand(session: QbsSession) {
     const runStep = session.project()?.runStep();
     const debuggerConfig = runStep?.debugger();
     if (!debuggerConfig) {
+        vscode.window.showErrorMessage(localize('qbs.product.debugger.missed.error.message',
+                                                'Debugger missing, please select the debugger.'));
         return;
     }
 
-    await new Promise<void>((resolve, reject) => {
-        session.onRunEnvironmentResultReceived(result => {
-            if (!result.isEmpty()) {
-                reject(undefined);
-            } else {
-                resolve();
-            }
-        });
-        session.getRunEnvironment();
-    });
+    // Retrieve the run environment for the selected product.
+    const success = await session.ensureEvnUpdated();
+    if (!success) {
+        vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
+                                                'Run environment missing, please select the runnable product.'));
+        return;
+    }
 
     const env = runStep?.runEnvironment()?.data();
     const executable = runStep?.targetExecutable();
     if (!executable || !env) {
+        vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
+                                                'Target executable missing, please re-build the product.'));
         return;
     }
 

@@ -216,6 +216,13 @@ export class QbsSession implements vscode.Disposable {
         await this.sendRequest(request);
     }
 
+    async ensureEvnUpdated() {
+        return new Promise<boolean>((resolve, reject) => {
+            this.onRunEnvironmentResultReceived(result => { resolve(result.isEmpty()); });
+            this.getRunEnvironment();
+        });
+    }
+
     async setActiveProject(uri?: vscode.Uri) {
         const _uri = this.project()?.uri();
         if (uri?.path !== _uri?.path) {
