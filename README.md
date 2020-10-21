@@ -5,6 +5,7 @@
 - [Prepare the QBS](docs/how-to.md#prepare-qbs)
 - [Open a project](docs/how-to.md#open-a-project)
 - [Configure a project](docs/how-to.md#open-a-project)
+- [Build a project](docs/how-to.md#build-a-project)
 
 ## Issues? Questions? Feature requests?
 
