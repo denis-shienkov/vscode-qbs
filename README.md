@@ -2,8 +2,9 @@
 
 ## Important doc links
 
-- [Prepare QBS](docs/how-to.md#prepare-qbs)
+- [Prepare the QBS](docs/how-to.md#prepare-qbs)
 - [Open a project](docs/how-to.md#open-a-project)
+- [Configure a project](docs/how-to.md#open-a-project)
 
 ## Issues? Questions? Feature requests?
 
