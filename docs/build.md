@@ -14,6 +14,7 @@ be displayed that the QBS executable file has been found and the QBS session
 has started successfully:
 
 ![QBS executable found message](images/qbs-exe-found-popup.png)
+
 ![QBS session started message](images/qbs-session-started-popup.png)
 
 If something goes wrong, the user can manually restart the QBS session
