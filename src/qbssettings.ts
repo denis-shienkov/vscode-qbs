@@ -184,7 +184,7 @@ export class QbsSettings implements vscode.Disposable {
             if (qbsPath.length === 0) {
                 reject(undefined);
             } else {
-                let qbsShell = `${qbsPath} config --list`;
+                let qbsShell = `"${qbsPath}" config --list`;
                 const qbsSettingsDirectory = this.settingsDirectory();
                 if (qbsSettingsDirectory.length > 0) {
                     qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
