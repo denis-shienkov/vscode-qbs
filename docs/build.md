@@ -44,7 +44,7 @@ or press the **Click to Select the Active Project** button in the status bar.
 When the project is selected, its name will be displayed in the
 corresponding button caption:
 
-![QBS active project](images/qbs-active-project-button.png)
+![QBS select active project button](images/qbs-select-active-project-button.png)
 
 ## Resolve a project
 
@@ -60,6 +60,81 @@ popup message:
 The user can start the resolving manually:
 
 * From the command palette in VS Code, run the **QBS: Resolve** command.
+
+## Configure a project
+
+The procedure for configuring a project is to select the desired
+`profile`, `configuration`, and `product` for building:
+
+* To select the build profile, from the VS Code command pallette
+run the **QBS: Select Build Profile** command, or press the
+**Click to Select the Build Profile** button in the status bar:
+
+![QBS select build profile button](images/qbs-select-profile-button.png)
+
+* To select the build configuration, from the VS Code command pallette
+run the **QBS: Select Build Configuration** command, or press the
+**Click to Select the Build Configuration** button in the status bar:
+
+![QBS select build configuration button](images/qbs-select-configuration-button.png)
+
+Currently only `release` and `debug` configurations are supported.
+
+* To select the build product, from the VS Code command pallette
+run the **QBS: Select Build Product** command, or press the
+**Click to Select the Product to Build** button in the status bar:
+
+![QBS select build product button](images/qbs-select-build-product-button.png)
+
+You can choose to build either one product or `[all]` products.
+
+When any of these properties change, QBS will automatically start
+auto-resolving the project again.
+
+The progress of this operation is displayed in the corresponding
+popup message:
+
+![QBS project resolving message](images/qbs-project-resolving-popup.png)
+
+## Build a project
+
+To build the project, from the VS Code command pallette run the
+**QBS: Build** command, or press the **Build** button in the status bar:
+
+![QBS build project button](images/qbs-build-project-button.png)
+
+The progress of this operation is displayed in the corresponding
+popup message:
+
+![QBS project building message](images/qbs-project-building-popup.png)
+
+## Clean a project
+
+To clean the build, from the VS Code command pallette run the
+**QBS: Clean** command.
+
+The progress of this operation is displayed in the corresponding
+popup message:
+
+![QBS project cleaning message](images/qbs-project-cleaning-popup.png)
+
+## Watch for output
+
+The progress of operations such as `resolving`, `building`, and
+`cleaning' is also displayed as text messages reported from QBS.
+
+The KBS extension provides two output panels for displaying
+these messages:
+
+* **QBS Compile Output** - displays the progress of the main build,
+cleanup and resolve processes:
+
+![QBS compile output pane](images/qbs-compile-output-pane.png)
+
+* **QBS Message Output** - displays the internal service QBS
+messages (e.g. comes from the JS engine of QBS):
+
+![QBS message output pane](images/qbs-message-output-pane.png)
 
 ## Next steps
 

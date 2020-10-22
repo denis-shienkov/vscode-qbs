@@ -6,7 +6,7 @@
     "qbs-tools.command.qbs.stop.session.title": "Stop Session",
     "qbs-tools.command.qbs.select.project.title": "Select Project",
     "qbs-tools.command.qbs.select.profile.title": "Select Profile",
-    "qbs-tools.command.qbs.select.configuration.title": "Select Configuration",
+    "qbs-tools.command.qbs.select.configuration.title": "Select Build Configuration",
     "qbs-tools.command.qbs.select.build.title": "Select Build Product",
     "qbs-tools.command.qbs.select.run.title": "Select Run Product",
     "qbs-tools.command.qbs.select.debugger.title": "Select Debugger",
