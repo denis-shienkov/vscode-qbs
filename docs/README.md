@@ -19,6 +19,10 @@ QBS is an extension designed to make it easy to work with QBS-based projects.
 * [QBS settings](qbs-settings.md#qbs-settings)
 * [Variable substitution](qbs-settings.md#variable-substitution)
 
+[Build](build.md)
+* [Select a project](build.md#select-a-project)
+* [Resolve a project](build.md#resolve-a-project)
+
 [Debug and run](debug-run.md)
 * [Configure debuggers](debug-run.md#configure-debuggers)
 * [Run with debugging](debug-run.md#run-with-debugging)
