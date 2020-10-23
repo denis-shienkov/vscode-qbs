@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import {QbsProject} from './qbsproject';
 
 export class QbsProfile {
     constructor(readonly _name: string = '') {}
@@ -43,6 +44,8 @@ export class QbsBuildStep implements vscode.Disposable {
 
     readonly onChanged: vscode.Event<void> = this._onChanged.event;
 
+    constructor (readonly _project: QbsProject) {}
+
     dispose() {}
 
     setProfile(profile?: QbsProfile) {
@@ -66,6 +69,7 @@ export class QbsBuildStep implements vscode.Disposable {
         }
     }
 
+    project(): QbsProject { return this._project; }
     profileName(): string { return this._profile.name(); }
     configurationName(): string { return this._config.name(); }
     productName(): string { return this._product.fullDisplayName(); }
@@ -79,12 +83,9 @@ export class QbsRunStep implements vscode.Disposable {
 
     readonly onChanged: vscode.Event<void> = this._onChanged.event;
 
-    dispose() {}
+    constructor(readonly _project: QbsProject) {}
 
-    cleanup() {
-        this._product = undefined;
-        this._onChanged.fire();
-    }
+    dispose() {}
 
     setProduct(product?: QbsProduct) {
         this._product = product;
@@ -103,6 +104,7 @@ export class QbsRunStep implements vscode.Disposable {
         this._onChanged.fire();
     }
 
+    project(): QbsProject { return this._project; }
     productName(): string { return this._product?.fullDisplayName() || ''; }
     targetExecutable(): string { return this._product?.targetExecutable() || ''; }
     debugger(): QbsDebugger | undefined { return this._gdb; }
