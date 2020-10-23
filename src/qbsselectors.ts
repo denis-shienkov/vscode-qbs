@@ -46,14 +46,25 @@ export async function displayConfigurationSelector(session: QbsSession) {
     }
     const items: QbsConfigQuickPickItem[] = configurations.map(configuration => {
         return {
-            label: configuration.name(),
+            label: configuration.displayName() || 'oops',
+            description: configuration.description(),
             configuration: configuration
         };
     });
     const selectedConfiguration = await vscode.window.showQuickPick(items).then(item => {
         return item?.configuration;
     });
-    session.project()?.buildStep().setConfiguration(selectedConfiguration);
+    if (selectedConfiguration?.name() !== 'custom') {
+        session.project()?.buildStep().setConfiguration(selectedConfiguration);
+    } else {
+        const customConfigurationName = await vscode.window.showInputBox({
+            value: 'custom',
+            placeHolder: 'Enter custom configuration name',
+        });
+        const selectedCustomConfiguration = customConfigurationName
+            ? new QbsConfig(customConfigurationName) : undefined;
+        session.project()?.buildStep().setConfiguration(selectedCustomConfiguration);
+    }
 }
 
 export async function displayBuildProductSelector(session: QbsSession) {

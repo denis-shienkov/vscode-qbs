@@ -222,8 +222,21 @@ export class QbsSettings implements vscode.Disposable {
      */
     async enumerateConfigurations(): Promise<QbsConfig[]> {
         let configurations = [];
-        configurations.push(new QbsConfig('debug'));
-        configurations.push(new QbsConfig('release'));
+        configurations.push(new QbsConfig(
+            'debug',
+            localize('qbs.configuration.debug.label', 'Debug'),
+            localize('qbs.configuration.debug.description', 'Disable optimizations.'))
+        );
+        configurations.push(new QbsConfig(
+            'release',
+            localize('qbs.configuration.release.label', 'Release'),
+            localize('qbs.configuration.release.description', 'Enable optimizations.'))
+        );
+        configurations.push(new QbsConfig(
+            'custom',
+            localize('qbs.configuration.custom.label', '[Custom]'),
+            localize('qbs.configuration.custom.description', 'Custom configuration.'))
+        );
         return configurations;
     }
 

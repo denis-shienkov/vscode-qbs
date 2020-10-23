@@ -6,8 +6,10 @@ export class QbsProfile {
 }
 
 export class QbsConfig {
-    constructor(readonly _name: string) {}
+    constructor(readonly _name: string, readonly _displayName?: string, readonly _description?: string) {}
     name(): string { return this._name; }
+    displayName(): string | undefined { return this._displayName; }
+    description(): string | undefined { return this._description; }
 }
 
 export class QbsProduct {
