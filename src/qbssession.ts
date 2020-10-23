@@ -228,7 +228,7 @@ export class QbsSession implements vscode.Disposable {
         const _uri = this.project()?.uri();
         if (uri?.path !== _uri?.path) {
             this._project?.dispose();
-            this._project = new QbsProject(uri);
+            this._project = new QbsProject(this, uri);
             this._onProjectActivated.fire(this._project);
 
             this._autoResolveRequired = true;
@@ -238,7 +238,8 @@ export class QbsSession implements vscode.Disposable {
                 this.autoResolveProject();
             });
 
-            await this.extensionContext().workspaceState.update('activeProject', this._project.uri());
+            await this.extensionContext().workspaceState.update(
+                'activeProject', this._project.uri());
         }
     }
 

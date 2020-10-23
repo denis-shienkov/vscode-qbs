@@ -3,20 +3,22 @@ import {basename} from 'path';
 
 import * as QbsUtils from './qbsutils';
 
+import {QbsSession} from './qbssession';
 import {QbsBuildStep, QbsRunStep, QbsProduct, QbsRunEnvironment} from './qbssteps';
 
 export class QbsProject implements vscode.Disposable {
     private _data?: any;
-    private _buildStep: QbsBuildStep = new QbsBuildStep();
-    private _runStep: QbsRunStep = new QbsRunStep();
+    private _buildStep: QbsBuildStep = new QbsBuildStep(this);
+    private _runStep: QbsRunStep = new QbsRunStep(this);
 
-    constructor(readonly _uri?: vscode.Uri) {}
+    constructor(readonly _session: QbsSession, readonly _uri?: vscode.Uri) {}
 
     dispose() {
         this._buildStep.dispose();
         this._runStep.dispose();
     }
 
+    session(): QbsSession { return this._session; }
     uri(): vscode.Uri | undefined { return this._uri; }
     name(): string { return this._uri ? basename(this._uri.fsPath) : ''; }
     filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
