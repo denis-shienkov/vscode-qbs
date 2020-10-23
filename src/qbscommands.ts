@@ -9,6 +9,26 @@ import {QbsSession, QbsSessionStatus} from './qbssession';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
+async function onDetectProfilesCommand(session: QbsSession) {
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.detect.profiles.progress.title', 'Detecting profiles...')
+    }, async (p) => {
+        const success = await session.settings().detectProfiles();
+        return new Promise(resolve => {
+            p.report({
+                increment: success ? 100 : 0,
+                message: localize('qbs.detect.profiles.progress.message',
+                                  success ? 'Completed' : 'Failed')
+            });
+
+            setTimeout(() => {
+                resolve();
+            }, 3000);
+        });
+    });
+}
+
 async function onRestoreProjectCommand(session: QbsSession) {
     await session.restoreProject();
 }
@@ -461,6 +481,9 @@ async function onDebugProductCommand(session: QbsSession) {
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.detectProfiles', () => {
+        onDetectProfilesCommand(session);
+    }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.restoreProject', () => {
         onRestoreProjectCommand(session);
     }));

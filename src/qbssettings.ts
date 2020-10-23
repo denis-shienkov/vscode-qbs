@@ -173,6 +173,28 @@ export class QbsSettings implements vscode.Disposable {
         return true;
     }
 
+    async detectProfiles(): Promise<boolean> {
+        return new Promise<boolean> ((resolve, reject) => {
+            const qbsPath = this.executablePath();
+            if (qbsPath.length === 0) {
+                reject(undefined);
+            } else {
+                let qbsShell = `"${qbsPath}" setup-toolchains --detect`;
+                const qbsSettingsDirectory = this.settingsDirectory();
+                if (qbsSettingsDirectory.length > 0) {
+                    qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
+                }
+                cp.exec(qbsShell, (error, stdout, stderr) => {
+                    if (error) {
+                        reject(undefined);
+                    } else {
+                        resolve(true);
+                    }
+                });
+            }
+        });
+    }
+
     /**
      * Returns the list of all available QBS build profile names.
      *

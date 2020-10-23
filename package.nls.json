@@ -1,4 +1,5 @@
 {
+    "qbs-tools.command.qbs.detect.profiles.title": "Detect Profiles",
     "qbs-tools.command.qbs.restore.project.title": "Restore Project",
     "qbs-tools.command.qbs.autorestart.session.title": "Auto Restart Session",
     "qbs-tools.command.qbs.start.session.title": "Start Session",

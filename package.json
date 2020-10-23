@@ -66,6 +66,11 @@
         ],
         "commands": [
             {
+                "command": "qbs.detectProfiles",
+                "title": "%qbs-tools.command.qbs.detect.profiles.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.restoreProject",
                 "title": "%qbs-tools.command.qbs.restore.project.title%",
                 "category": "QBS"
