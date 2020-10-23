@@ -12,9 +12,14 @@ import {QbsProduct} from './qbssteps';
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 async function onSetupDefaultProjectCommand(session: QbsSession) {
-    const projects = await QbsProject.enumerateWorkspaceProjects();
-    if (projects.length > 0) {
-        session.setActiveProject(projects[0]);
+    const activeProject = session.extensionContext().workspaceState.get<vscode.Uri>('activeProject');
+    if (activeProject) {
+        session.setActiveProject(activeProject);
+    } else {
+        const projects = await QbsProject.enumerateWorkspaceProjects();
+        if (projects.length > 0) {
+            session.setActiveProject(projects[0]);
+        }
     }
 }
 

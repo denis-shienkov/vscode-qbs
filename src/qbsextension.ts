@@ -10,7 +10,7 @@ import {QbsCpp} from './qbscpp';
 let manager: QbsExtensionManager;
 
 class QbsExtensionManager implements vscode.Disposable {
-    private _session: QbsSession = new QbsSession();
+    private _session: QbsSession = new QbsSession(this.ctx);
     private _statusBar: QbsStatusBar = new QbsStatusBar(this._session);
     private _logger: QbsSessionLogger = new QbsSessionLogger(this._session);
     private _cpp: QbsCpp = new QbsCpp(this._session);

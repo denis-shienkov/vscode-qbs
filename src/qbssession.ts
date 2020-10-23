@@ -70,7 +70,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsSessionMessageResult> = this._onRunEnvironmentResultReceived.event;
 
-    constructor() {
+    constructor(readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
         this._protocol.onStatusChanged(protocolStatus => {
             switch (protocolStatus) {
@@ -107,6 +107,7 @@ export class QbsSession implements vscode.Disposable {
         this._settings?.dispose();
     }
 
+    extensionContext() { return this._ctx; }
     project(): QbsProject | undefined { return this._project; }
     settings(): QbsSettings { return this._settings; }
 
@@ -236,6 +237,8 @@ export class QbsSession implements vscode.Disposable {
                 this._autoResolveRequired = true;
                 this.autoResolveProject();
             });
+
+            await this.extensionContext().workspaceState.update('activeProject', this._project.uri());
         }
     }
 
