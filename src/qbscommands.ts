@@ -457,6 +457,15 @@ async function onRunProductCommand(session: QbsSession) {
             env: env,
             cwd: path.dirname(executable)
         });
+        if (process.platform === 'darwin') {
+            // workaround for macOS system integrity protection
+            let specialEnvs: string[] = ['DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH'];
+            for (let specialEnv of specialEnvs) {
+                if (env[specialEnv]) {
+                    terminal.sendText('export ' + specialEnv + '=' + QbsUtils.escapeShell(env[specialEnv]));    
+                }
+            }
+        }
         terminal.sendText(escaped);
         terminal.show();
     }
