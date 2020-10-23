@@ -17,8 +17,6 @@ class QbsExtensionManager implements vscode.Disposable {
 
     constructor(readonly ctx: vscode.ExtensionContext) {
         QbsCommands.subscribeCommands(ctx, this._session);
-        vscode.commands.executeCommand('qbs.setupDefaultProject');
-        vscode.commands.executeCommand('qbs.autoRestartSession');
     }
 
     dispose() {
@@ -32,6 +30,9 @@ class QbsExtensionManager implements vscode.Disposable {
 export async function activate(ctx: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
     manager = new QbsExtensionManager(ctx);
+
+    await vscode.commands.executeCommand('qbs.autoRestartSession');
+    await vscode.commands.executeCommand('qbs.restoreProject');
 }
 
 export async function deactivate() {

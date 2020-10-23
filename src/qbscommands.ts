@@ -6,63 +6,11 @@ import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession, QbsSessionStatus} from './qbssession';
-import {QbsProject} from './qbsproject';
-import {QbsProduct} from './qbssteps';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-async function onSetupDefaultProjectCommand(session: QbsSession) {
-    const activeProject = session.extensionContext()
-        .workspaceState.get<vscode.Uri>('activeProject');
-    if (activeProject) {
-        session.setActiveProject(activeProject);
-    } else {
-        const projects = await QbsProject.enumerateWorkspaceProjects();
-        if (projects.length > 0) {
-            session.setActiveProject(projects[0]);
-        }
-    }
-}
-
-async function onSetupRunProductCommand(session: QbsSession) {
-    const runStep = session.project()?.runStep();
-    if (!runStep) {
-        return;
-    }
-
-    const products = (await session.project()?.enumerateProducts() || [])
-        .filter(product => product.isRunnable());
-    if (products.length === 0) {
-        // Let's reset the runnable product to an empty one.
-        const empty = new QbsProduct('');
-        runStep.setProduct(empty);
-        return;
-    }
-
-    const oldName = runStep.productName();
-    if (!oldName) {
-        // If we don't have any runnable product, we'll install
-        // the first product we come across.
-        runStep.setProduct(products[0]);
-    } else {
-        // If we have a runnable product, then we must check its
-        // executable path, and if it does not match, then we must
-        // replace the product with a new one.
-        const oldExe = runStep.targetExecutable();
-        for (const product of products) {
-            const newName = product.fullDisplayName();
-            const newExe = product.targetExecutable();
-            if (oldName !== newName) {
-                continue;
-            } else if (oldExe === newExe) {
-                // We do nothing, because the products are the same.
-                return;
-            } else {
-                // We need to replace with a new product.
-                runStep.setProduct(product);
-            }
-        }
-    }
+async function onRestoreProjectCommand(session: QbsSession) {
+    await session.restoreProject();
 }
 
 async function onAutoRestartSessionCommand(session: QbsSession) {
@@ -442,7 +390,7 @@ async function onRunProductCommand(session: QbsSession) {
     }
 
     // Retrieve the run environment for the selected product.
-    const success = await session.ensureEvnUpdated();
+    const success = await session.ensureRunEnvironmentUpdated();
     if (!success) {
         vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
                                                 'Run environment missing, please select the runnable product.'));
@@ -487,7 +435,7 @@ async function onDebugProductCommand(session: QbsSession) {
     }
 
     // Retrieve the run environment for the selected product.
-    const success = await session.ensureEvnUpdated();
+    const success = await session.ensureRunEnvironmentUpdated();
     if (!success) {
         vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
                                                 'Run environment missing, please select the runnable product.'));
@@ -513,11 +461,8 @@ async function onDebugProductCommand(session: QbsSession) {
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupDefaultProject', () => {
-        onSetupDefaultProjectCommand(session);
-    }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.setupRunProduct', () => {
-        onSetupRunProductCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.restoreProject', () => {
+        onRestoreProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
         onAutoRestartSessionCommand(session);

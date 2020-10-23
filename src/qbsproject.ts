@@ -20,7 +20,7 @@ export class QbsProject implements vscode.Disposable {
 
     session(): QbsSession { return this._session; }
     uri(): vscode.Uri | undefined { return this._uri; }
-    name(): string { return this._uri ? basename(this._uri.fsPath) : ''; }
+    name(): string { return this._uri ? basename(this._uri.fsPath) : 'unknown'; }
     filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
 
     setData(response: any, withBuildSystemFiles: boolean) {
@@ -38,7 +38,7 @@ export class QbsProject implements vscode.Disposable {
     }
 
     data(): any | undefined { return this._data; }
-    setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setRunEnvironment(env); }
+    setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setup(undefined, undefined, env); }
     buildStep(): QbsBuildStep { return this._buildStep; }
     runStep(): QbsRunStep { return this._runStep; }
     isEmpty(): boolean { return this._data; }
@@ -46,19 +46,31 @@ export class QbsProject implements vscode.Disposable {
     async enumerateProducts(): Promise<QbsProduct[]> {
         let products: QbsProduct[] = [];
         const parseProject = (project: any) => {
-            const datas = project['products'] || [];
+            const datas = project ? (project['products'] || []) : [];
             for (const data of datas) {
                 const product = new QbsProduct(data);
                 products.push(product);
             }
 
-            const subProjects = project['sub-projects'] || [];
+            const subProjects = project ? (project['sub-projects'] || []) : [];
             for (const subProject of subProjects) {
                 parseProject(subProject);
             }
         };
         parseProject(this._data);
         return products;
+    }
+
+    async restore() {
+        await this._buildStep.restore();
+        await new Promise<void>(resolve => {
+            this.session().onProjectResolved(result => {
+                this._buildStep.restore();
+                this._runStep.restore();
+                resolve();
+            });
+            this.session().autoResolve(200);
+        });
     }
 
     /**

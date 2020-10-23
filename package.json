@@ -66,13 +66,8 @@
         ],
         "commands": [
             {
-                "command": "qbs.setupDefaultProject",
-                "title": "%qbs-tools.command.qbs.setup.default.project.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.setupRunProduct",
-                "title": "%qbs-tools.command.qbs.setup.run.product.title%",
+                "command": "qbs.restoreProject",
+                "title": "%qbs-tools.command.qbs.restore.project.title%",
                 "category": "QBS"
             },
             {

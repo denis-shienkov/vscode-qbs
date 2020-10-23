@@ -5,32 +5,19 @@ import * as fs from 'fs';
 import {QbsProject} from './qbsproject';
 import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
-
+import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {
-    QbsSessionProtocol,
-    QbsSessionProtocolStatus
-} from './qbssessionprotocol';
-
-import {
-    QbsSessionHelloResult,
-    QbsSessionProcessResult,
-    QbsSessionTaskStartedResult,
-    QbsSessionTaskProgressResult,
-    QbsSessionTaskMaxProgressResult,
-    QbsSessionMessageResult
+    QbsSessionHelloResult, QbsSessionProcessResult,
+    QbsSessionTaskStartedResult, QbsSessionTaskProgressResult,
+    QbsSessionTaskMaxProgressResult, QbsSessionMessageResult
 } from './qbssessionresults';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-export enum QbsSessionStatus {
-    Stopped,
-    Started,
-    Stopping,
-    Starting
-}
+export enum QbsSessionStatus { Stopped, Started, Stopping, Starting }
 
 export class QbsSession implements vscode.Disposable {
-    private _autoResolveRequired: boolean = true;
+    private _timer?: NodeJS.Timeout;
     private _settings: QbsSettings = new QbsSettings(this);
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
@@ -88,15 +75,16 @@ export class QbsSession implements vscode.Disposable {
                 break;
             }
         });
-        this._protocol.onResponseReceived(response => this.parseResponse(response));
+        this._protocol.onResponseReceived(async (response) => await this.parseResponse(response));
 
         // Handle the events from the settings object.
-        this._settings.onChanged(event => {
+        this._settings.onChanged(async (event) => {
             if (event === QbsSettingsEvent.ProjectResolveRequired) {
-                this._autoResolveRequired = true;
-                this.autoResolveProject();
+                if (this._project) {
+                    await this.autoResolve(0);
+                }
             } else if (event === QbsSettingsEvent.SessionRestartRequired) {
-                // restart session
+                await vscode.commands.executeCommand('qbs.autoRestartSession');
             }
         });
     }
@@ -110,6 +98,7 @@ export class QbsSession implements vscode.Disposable {
     extensionContext() { return this._ctx; }
     project(): QbsProject | undefined { return this._project; }
     settings(): QbsSettings { return this._settings; }
+    status(): QbsSessionStatus { return this._status; }
 
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
@@ -217,34 +206,57 @@ export class QbsSession implements vscode.Disposable {
         await this.sendRequest(request);
     }
 
-    async ensureEvnUpdated() {
+    async ensureRunEnvironmentUpdated() {
         return new Promise<boolean>((resolve, reject) => {
             this.onRunEnvironmentResultReceived(result => { resolve(result.isEmpty()); });
             this.getRunEnvironment();
         });
     }
 
-    async setActiveProject(uri?: vscode.Uri) {
+    async setupProject(uri?: vscode.Uri) {
         const _uri = this.project()?.uri();
-        if (uri?.path !== _uri?.path) {
-            this._project?.dispose();
-            this._project = new QbsProject(this, uri);
-            this._onProjectActivated.fire(this._project);
+        if (uri?.path === _uri?.path) {
+            return;
+        }
 
-            this._autoResolveRequired = true;
-            this.autoResolveProject();
-            this._project.buildStep().onChanged(x => {
-                this._autoResolveRequired = true;
-                this.autoResolveProject();
-            });
+        this._project?.dispose();
+        this._project = new QbsProject(this, uri);
+        await this._project.restore();
+        await this.saveProject();
+        this._onProjectActivated.fire(this._project);
 
-            await this.extensionContext().workspaceState.update(
-                'activeProject', this._project.uri());
+        this._project.buildStep().onChanged(async (autoResolveRequired) => {
+            if (autoResolveRequired) {
+                await this.autoResolve(200);
+            }
+        })
+    }
+
+    async restoreProject() {
+        const project = this.extensionContext().workspaceState.get<vscode.Uri>('ActiveProject');
+        if (project) {
+            await this.setupProject(project);
+        } else {
+            const projects = await QbsProject.enumerateWorkspaceProjects();
+            if (projects && projects.length > 0) {
+                await this.setupProject(projects[0]);
+            }
         }
     }
 
-    activeProject(): QbsProject | undefined { return this._project; }
-    status(): QbsSessionStatus { return this._status; }
+    async saveProject() {
+        await this.extensionContext().workspaceState.update('ActiveProject', this._project?.uri());
+    }
+
+    async autoResolve(interval: number) {
+        if (this._timer) {
+            clearTimeout(this._timer);
+        }
+        this._timer = setTimeout(() => {
+            vscode.commands.executeCommand('qbs.resolve');
+            this._timer = undefined;
+        }, interval);
+    }
 
     /**
      * Returns the localized QBS session @c status name.
@@ -264,14 +276,7 @@ export class QbsSession implements vscode.Disposable {
 
     private async sendRequest(request: any) { await this._protocol.sendRequest(request); }
 
-    private async autoResolveProject() {
-        if (this._autoResolveRequired && this._status === QbsSessionStatus.Started && this._project) {
-            this._autoResolveRequired = false;
-            vscode.commands.executeCommand('qbs.resolve');
-        }
-    }
-
-    private parseResponse(response: any) {
+    private async parseResponse(response: any) {
         const type = response['type'];
         if (type === 'hello') {
             const result = new QbsSessionHelloResult(response)
@@ -332,8 +337,9 @@ export class QbsSession implements vscode.Disposable {
             this._onStatusChanged.fire(this._status);
 
             if (status === QbsSessionStatus.Started) {
-                this._autoResolveRequired = true;
-                this.autoResolveProject();
+                if (this._project) {
+                    this.autoResolve(200);
+                }
             }
         }
     }

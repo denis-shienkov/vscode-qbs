@@ -19,7 +19,7 @@ export async function displayWorkspaceProjectSelector(session: QbsSession) {
     const uri = await vscode.window.showQuickPick(items).then(item => {
         return item?.uri;
     });
-    await session.setActiveProject(uri);
+    await session.setupProject(uri);
 }
 
 export async function displayProfileSelector(session: QbsSession) {
@@ -36,7 +36,7 @@ export async function displayProfileSelector(session: QbsSession) {
     const selectedProfile = await vscode.window.showQuickPick(items).then(item => {
         return item?.profile;
     });
-    session.project()?.buildStep().setProfile(selectedProfile);
+    session.project()?.buildStep().setup(selectedProfile, undefined, undefined);
 }
 
 export async function displayConfigurationSelector(session: QbsSession) {
@@ -55,7 +55,7 @@ export async function displayConfigurationSelector(session: QbsSession) {
         return item?.configuration;
     });
     if (selectedConfiguration?.name() !== 'custom') {
-        session.project()?.buildStep().setConfiguration(selectedConfiguration);
+        session.project()?.buildStep().setup(undefined, selectedConfiguration, undefined);
     } else {
         const customConfigurationName = await vscode.window.showInputBox({
             value: 'custom',
@@ -63,7 +63,7 @@ export async function displayConfigurationSelector(session: QbsSession) {
         });
         const selectedCustomConfiguration = customConfigurationName
             ? new QbsConfig(customConfigurationName) : undefined;
-        session.project()?.buildStep().setConfiguration(selectedCustomConfiguration);
+        session.project()?.buildStep().setup(undefined, selectedCustomConfiguration, undefined);
     }
 }
 
@@ -83,7 +83,7 @@ export async function displayBuildProductSelector(session: QbsSession) {
     const selectedProduct = await vscode.window.showQuickPick(items).then(item => {
         return item?.product;
     });
-    session.project()?.buildStep().setProduct(selectedProduct);
+    session.project()?.buildStep().setup(undefined, undefined, selectedProduct);
 }
 
 export async function displayRunProductSelector(session: QbsSession) {
@@ -101,7 +101,7 @@ export async function displayRunProductSelector(session: QbsSession) {
     const selectedProduct = await vscode.window.showQuickPick(items).then(item => {
         return item?.product;
     });
-    session.project()?.runStep().setProduct(selectedProduct);
+    session.project()?.runStep().setup(selectedProduct, undefined, undefined);
 }
 
 export async function displayDebuggerSelector(session: QbsSession) {
@@ -118,5 +118,5 @@ export async function displayDebuggerSelector(session: QbsSession) {
     const selectedDbg = await vscode.window.showQuickPick(items).then(item => {
         return item?.dbg;
     });
-    session.project()?.runStep().setDebugger(selectedDbg);
+    session.project()?.runStep().setup(undefined, selectedDbg, undefined);
 }

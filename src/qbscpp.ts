@@ -37,7 +37,9 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
 
     constructor(readonly session: QbsSession) {
         session.onProjectResolved(result => {
-            this.setup(session.activeProject()?.data());
+            if (result.isEmpty()) {
+                this.setup(session.project()?.data());
+            }
         });
     }
 
