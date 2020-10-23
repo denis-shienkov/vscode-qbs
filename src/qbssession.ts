@@ -283,16 +283,16 @@ export class QbsSession implements vscode.Disposable {
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             this._project?.setData(response, true);
-            this._project?.setupRunProduct();
+            this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
             this._project?.setData(response, false);
-            this._project?.setupRunProduct();
+            this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            this._project?.setupRunProduct();
+            this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {

@@ -33,10 +33,6 @@ export class QbsProject implements vscode.Disposable {
         }
     }
 
-    setupRunProduct() {
-        vscode.commands.executeCommand('qbs.setupRunProduct');
-    }
-
     data(): any | undefined { return this._data; }
     setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setup(undefined, undefined, env); }
     buildStep(): QbsBuildStep { return this._buildStep; }
@@ -61,12 +57,16 @@ export class QbsProject implements vscode.Disposable {
         return products;
     }
 
+    async updateSteps() {
+        await this._buildStep.restore();
+        await this._runStep.restore();
+    }
+
     async restore() {
         await this._buildStep.restore();
         await new Promise<void>(resolve => {
             this.session().onProjectResolved(result => {
-                this._buildStep.restore();
-                this._runStep.restore();
+                this.updateSteps();
                 resolve();
             });
             this.session().autoResolve(200);
