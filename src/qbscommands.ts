@@ -12,7 +12,8 @@ import {QbsProduct} from './qbssteps';
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 async function onSetupDefaultProjectCommand(session: QbsSession) {
-    const activeProject = session.extensionContext().workspaceState.get<vscode.Uri>('activeProject');
+    const activeProject = session.extensionContext()
+        .workspaceState.get<vscode.Uri>('activeProject');
     if (activeProject) {
         session.setActiveProject(activeProject);
     } else {
@@ -467,7 +468,7 @@ async function onRunProductCommand(session: QbsSession) {
             let specialEnvs: string[] = ['DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH'];
             for (let specialEnv of specialEnvs) {
                 if (env[specialEnv]) {
-                    terminal.sendText('export ' + specialEnv + '=' + QbsUtils.escapeShell(env[specialEnv]));    
+                    terminal.sendText('export ' + specialEnv + '=' + QbsUtils.escapeShell(env[specialEnv]));
                 }
             }
         }
