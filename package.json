@@ -53,17 +53,6 @@
     ],
     "main": "./out/qbsextension.js",
     "contributes": {
-        "languages": [
-            {
-                "id": "typescript",
-                "extensions": [
-                    ".qbs"
-                ],
-                "aliases": [
-                    "QBS"
-                ]
-            }
-        ],
         "commands": [
             {
                 "command": "qbs.detectProfiles",
