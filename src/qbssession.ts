@@ -215,7 +215,10 @@ export class QbsSession implements vscode.Disposable {
 
     async ensureRunEnvironmentUpdated() {
         return new Promise<boolean>((resolve, reject) => {
-            this.onRunEnvironmentResultReceived(result => { resolve(result.isEmpty()); });
+            const runEnvironmentResultReceivedSubscription = this.onRunEnvironmentResultReceived(result => {
+                runEnvironmentResultReceivedSubscription.dispose();
+                resolve(result.isEmpty());
+            });
             this.getRunEnvironment();
         });
     }

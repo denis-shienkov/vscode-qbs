@@ -43,11 +43,12 @@ async function onAutoRestartSessionCommand(session: QbsSession) {
         }
 
         let autoRestartRequired: boolean = false;
-        session.onStatusChanged(sessionStatus => {
+        const statusChangedSubscription = session.onStatusChanged(sessionStatus => {
             if (sessionStatus === QbsSessionStatus.Stopped) {
                 if (autoRestartRequired) {
                     autoRestartRequired = false;
                     vscode.commands.executeCommand('qbs.startSession');
+                    statusChangedSubscription.dispose();
                     resolve();
                 }
             }
@@ -58,11 +59,13 @@ async function onAutoRestartSessionCommand(session: QbsSession) {
             || sessionStatus === QbsSessionStatus.Starting) {
             autoRestartRequired = true;
             vscode.commands.executeCommand('qbs.stopSession');
+            statusChangedSubscription.dispose();
             resolve();
         } else if (sessionStatus === QbsSessionStatus.Stopping) {
             autoRestartRequired = true;
         } else if (sessionStatus === QbsSessionStatus.Stopped) {
             vscode.commands.executeCommand('qbs.startSession');
+            statusChangedSubscription.dispose();
             resolve();
         }
     });
@@ -75,7 +78,7 @@ async function onStartSessionCommand(session: QbsSession) {
     }, async (p) => {
         await session.start();
         return new Promise(resolve => {
-            session.onStatusChanged((status => {
+            const statusChangedSubscription = session.onStatusChanged((status => {
                 if (status === QbsSessionStatus.Starting) {
                     p.report({
                         increment: 50,
@@ -88,6 +91,7 @@ async function onStartSessionCommand(session: QbsSession) {
                         message: localize('qbs.session.successfully.started.progress.message',
                                           'Session successfully started.')
                     });
+                    statusChangedSubscription.dispose();
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -99,6 +103,7 @@ async function onStartSessionCommand(session: QbsSession) {
                     message: localize('qbs.session.starting.timeout.progress.message',
                                       'Session starting timeout...')
                 });
+                statusChangedSubscription.dispose();
                 resolve();
             }, 5000);
         });
@@ -112,7 +117,7 @@ async function onStopSessionCommand(session: QbsSession) {
     }, async (p) => {
         await session.stop();
         return new Promise(resolve => {
-            session.onStatusChanged((sessionStatus => {
+            const statusChangedSubscription = session.onStatusChanged((sessionStatus => {
                 if (sessionStatus === QbsSessionStatus.Stopping) {
                     p.report({
                         increment: 50,
@@ -125,6 +130,7 @@ async function onStopSessionCommand(session: QbsSession) {
                         message: localize('qbs.session.successfully.stopped.progress.message',
                                           'Session successfully stopped.')
                     });
+                    statusChangedSubscription.dispose();
                     setTimeout(() => {
                         resolve();
                     }, 2000);
@@ -136,6 +142,7 @@ async function onStopSessionCommand(session: QbsSession) {
                     message: localize('qbs.session.stopping.timeout.progress.message',
                                       'Session stopping timeout...')
                 });
+                statusChangedSubscription.dispose();
                 resolve();
             }, 5000);
         });

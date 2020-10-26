@@ -65,8 +65,9 @@ export class QbsProject implements vscode.Disposable {
     async restore() {
         await this._buildStep.restore();
         await new Promise<void>(resolve => {
-            this.session().onProjectResolved(result => {
+            const projectResolvedSubscription = this.session().onProjectResolved(result => {
                 this.updateSteps();
+                projectResolvedSubscription.dispose();
                 resolve();
             });
             this.session().autoResolve(200);
