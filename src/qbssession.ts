@@ -7,6 +7,7 @@ import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
 import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {
+    QbsOperation,
     QbsSessionHelloResult, QbsSessionProcessResult,
     QbsSessionTaskStartedResult, QbsSessionTaskProgressResult,
     QbsSessionTaskMaxProgressResult, QbsSessionMessageResult
@@ -23,6 +24,7 @@ export class QbsSession implements vscode.Disposable {
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _project?: QbsProject;
 
+    private _onOperationChanged: vscode.EventEmitter<QbsOperation> = new vscode.EventEmitter<QbsOperation>();
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectActivated: vscode.EventEmitter<QbsProject> = new vscode.EventEmitter<QbsProject>();
 
@@ -40,6 +42,7 @@ export class QbsSession implements vscode.Disposable {
     private _onProcessResultReceived: vscode.EventEmitter<QbsSessionProcessResult> = new vscode.EventEmitter<QbsSessionProcessResult>();
     private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsSessionMessageResult> = new vscode.EventEmitter<QbsSessionMessageResult>();
 
+    readonly onOperationChanged: vscode.Event<QbsOperation> = this._onOperationChanged.event;
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectActivated: vscode.Event<QbsProject> = this._onProjectActivated.event;
 
@@ -113,6 +116,10 @@ export class QbsSession implements vscode.Disposable {
         if (this._status === QbsSessionStatus.Started) {
             await this._protocol.stop();
         }
+    }
+
+    async emitOperation(operation: QbsOperation) {
+        this._onOperationChanged.fire(operation);
     }
 
     async resolveProject() {

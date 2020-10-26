@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import {QbsSession} from './qbssession';
-import {QbsSessionMessageResult} from './qbssessionresults';
+import {QbsOperationStatus, QbsOperationType, QbsSessionMessageResult} from './qbssessionresults';
 
 export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
@@ -60,6 +60,42 @@ export class QbsSessionLogger implements vscode.Disposable {
             if (!result.isEmpty()) {
                 const text = `[qbs] ${result.toString()}`;
                 appendMessageText(text);
+            }
+        });
+
+        session.onOperationChanged(operation => {
+            if (operation._type === QbsOperationType.Resolve) {
+                if (operation._status === QbsOperationStatus.Started) {
+                    appendCompileText('Resolving project...');
+                } else if (operation._status === QbsOperationStatus.Completed) {
+                    appendCompileText(`Project successfully resolved, elapsed time: ${operation._elapsed} msecs.`);
+                } else if (operation._status === QbsOperationStatus.Failed) {
+                    appendCompileText(`Error resolving project, elapsed time: ${operation._elapsed} msecs.`);
+                }
+            } else if (operation._type === QbsOperationType.Build) {
+                if (operation._status === QbsOperationStatus.Started) {
+                    appendCompileText('Building project...');
+                } else if (operation._status === QbsOperationStatus.Completed) {
+                    appendCompileText(`Project successfully built, elapsed time: ${operation._elapsed} msecs.`);
+                } else if (operation._status === QbsOperationStatus.Failed) {
+                    appendCompileText(`Error building project, elapsed time: ${operation._elapsed} msecs.`);
+                }
+            } else if (operation._type === QbsOperationType.Clean) {
+                if (operation._status === QbsOperationStatus.Started) {
+                    appendCompileText('Cleaning project...');
+                } else if (operation._status === QbsOperationStatus.Completed) {
+                    appendCompileText(`Project successfully cleaned, elapsed time: ${operation._elapsed} msecs.`);
+                } else if (operation._status === QbsOperationStatus.Failed) {
+                    appendCompileText(`Error cleaning project, elapsed time: ${operation._elapsed} msecs.`);
+                }
+            } else if (operation._type === QbsOperationType.Install) {
+                if (operation._status === QbsOperationStatus.Started) {
+                    appendCompileText('Installing project...');
+                } else if (operation._status === QbsOperationStatus.Completed) {
+                    appendCompileText(`Project successfully installed, elapsed time: ${operation._elapsed} msecs.`);
+                } else if (operation._status === QbsOperationStatus.Failed) {
+                    appendCompileText(`Error installing project, elapsed time: ${operation._elapsed} msecs.`);
+                }
             }
         });
     }

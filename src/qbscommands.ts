@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 import * as path from 'path';
+import {performance} from 'perf_hooks';
 
 import * as QbsSelectors from './qbsselectors';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession, QbsSessionStatus} from './qbssession';
+import {QbsOperation, QbsOperationStatus, QbsOperationType} from './qbssessionresults';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -171,6 +173,8 @@ async function onResolveProjectCommand(session: QbsSession) {
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        const timestamp = performance.now();
+        session.emitOperation(new QbsOperation(QbsOperationType.Resolve, QbsOperationStatus.Started, -1));
         await session.resolveProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -210,6 +214,11 @@ async function onResolveProjectCommand(session: QbsSession) {
                 updateReport();
             });
             session.onProjectResolved(errors => {
+                const elapsed = performance.now() - timestamp;
+                session.emitOperation(new QbsOperation(
+                    QbsOperationType.Resolve,
+                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    elapsed));
                 description = errors.isEmpty() ? 'Project successfully resolved'
                                                : 'Project resolving failed';
                 updateReport(false);
@@ -228,6 +237,8 @@ async function onBuildProjectCommand(session: QbsSession) {
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        const timestamp = performance.now();
+        session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
         await session.buildProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -267,6 +278,11 @@ async function onBuildProjectCommand(session: QbsSession) {
                 updateReport();
             });
             session.onProjectBuilt(errors => {
+                const elapsed = performance.now() - timestamp;
+                session.emitOperation(new QbsOperation(
+                    QbsOperationType.Build,
+                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    elapsed));
                 maxProgress = progress = oldPercentage = 0;
                 description = errors.isEmpty() ? 'Project successfully built'
                                                : 'Project building failed';
@@ -286,6 +302,8 @@ async function onCleanProjectCommand(session: QbsSession) {
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        const timestamp = performance.now();
+        session.emitOperation(new QbsOperation(QbsOperationType.Clean, QbsOperationStatus.Started, -1));
         await session.cleanProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -325,6 +343,11 @@ async function onCleanProjectCommand(session: QbsSession) {
                 updateReport();
             });
             session.onProjectCleaned(errors => {
+                const elapsed = performance.now() - timestamp;
+                session.emitOperation(new QbsOperation(
+                    QbsOperationType.Clean,
+                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    elapsed));
                 description = errors.isEmpty() ? 'Project successfully cleaned'
                                                : 'Project cleaning failed';
                 updateReport(false);
@@ -343,6 +366,8 @@ async function onInstallProjectCommand(session: QbsSession) {
         cancellable: true
     }, async (p, c) => {
         c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        const timestamp = performance.now();
+        session.emitOperation(new QbsOperation(QbsOperationType.Install, QbsOperationStatus.Started, -1));
         await session.installProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -382,6 +407,11 @@ async function onInstallProjectCommand(session: QbsSession) {
                 updateReport();
             });
             session.onProjectInstalled(errors => {
+                const elapsed = performance.now() - timestamp;
+                session.emitOperation(new QbsOperation(
+                    QbsOperationType.Install,
+                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    elapsed));
                 description = errors.isEmpty() ? 'Project successfully installed'
                                                : 'Project installing failed';
                 updateReport(false);
