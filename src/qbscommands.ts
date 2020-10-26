@@ -72,81 +72,11 @@ async function onAutoRestartSessionCommand(session: QbsSession) {
 }
 
 async function onStartSessionCommand(session: QbsSession) {
-    await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.status.progress.title', 'QBS session status')
-    }, async (p) => {
-        await session.start();
-        return new Promise(resolve => {
-            const statusChangedSubscription = session.onStatusChanged((status => {
-                if (status === QbsSessionStatus.Starting) {
-                    p.report({
-                        increment: 50,
-                        message: localize('qbs.session.starting.progress.message',
-                                          'Session starting...')
-                    });
-                } else if (status === QbsSessionStatus.Started) {
-                    p.report({
-                        increment: 100,
-                        message: localize('qbs.session.successfully.started.progress.message',
-                                          'Session successfully started.')
-                    });
-                    statusChangedSubscription.dispose();
-                    setTimeout(() => {
-                        resolve();
-                    }, 2000);
-                }
-            }));
-
-            setTimeout(() => {
-                p.report({
-                    message: localize('qbs.session.starting.timeout.progress.message',
-                                      'Session starting timeout...')
-                });
-                statusChangedSubscription.dispose();
-                resolve();
-            }, 5000);
-        });
-    });
+    await session.start();
 }
 
 async function onStopSessionCommand(session: QbsSession) {
-    await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: localize('qbs.session.status.progress.title', 'QBS session status')
-    }, async (p) => {
-        await session.stop();
-        return new Promise(resolve => {
-            const statusChangedSubscription = session.onStatusChanged((sessionStatus => {
-                if (sessionStatus === QbsSessionStatus.Stopping) {
-                    p.report({
-                        increment: 50,
-                        message: localize('qbs.session.stopping.progress.message',
-                                          'Session stopping...')
-                    });
-                } else if (sessionStatus === QbsSessionStatus.Stopped) {
-                    p.report({
-                        increment: 100,
-                        message: localize('qbs.session.successfully.stopped.progress.message',
-                                          'Session successfully stopped.')
-                    });
-                    statusChangedSubscription.dispose();
-                    setTimeout(() => {
-                        resolve();
-                    }, 2000);
-                }
-            }));
-
-            setTimeout(() => {
-                p.report({
-                    message: localize('qbs.session.stopping.timeout.progress.message',
-                                      'Session stopping timeout...')
-                });
-                statusChangedSubscription.dispose();
-                resolve();
-            }, 5000);
-        });
-    });
+    await session.stop();
 }
 
 async function onSelectProjectCommand(session: QbsSession) {
