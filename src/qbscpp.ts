@@ -32,7 +32,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
     readonly extensionId = 'ms-vscode.qbs-tools';
 
     private _api?: cpt.CppToolsApi;
-    private _registered?: Promise<void>;
+    private _registered: boolean = false;
     private _sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
 
     constructor(readonly session: QbsSession) {
@@ -111,6 +111,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         // Ensure that the provider is already registered.
         if (!this._registered) {
             this._api.registerCustomConfigurationProvider(this);
+            this._registered = true;
         }
 
         if (this._api.notifyReady) {
