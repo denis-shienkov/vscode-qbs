@@ -199,21 +199,21 @@ async function onResolveProjectCommand(session: QbsSession) {
                 }
             };
 
-            session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(result => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
                 updateReport();
             });
-            session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
                 maxProgress = result._maxProgress;
                 updateReport();
             });
-            session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
                 progress = result._progress;
                 updateReport();
             });
-            session.onProjectResolved(errors => {
+            const projectResolvedSubscription = session.onProjectResolved(errors => {
                 const elapsed = performance.now() - timestamp;
                 session.emitOperation(new QbsOperation(
                     QbsOperationType.Resolve,
@@ -222,6 +222,10 @@ async function onResolveProjectCommand(session: QbsSession) {
                 description = errors.isEmpty() ? 'Project successfully resolved'
                                                : 'Project resolving failed';
                 updateReport(false);
+                taskStartedSubscription.dispose();
+                taskMaxProgressChangedSubscription.dispose();
+                taskProgressUpdatedSubscription.dispose();
+                projectResolvedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -263,21 +267,21 @@ async function onBuildProjectCommand(session: QbsSession) {
                 }
             };
 
-            session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(result => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
                 updateReport();
             });
-            session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
                 maxProgress = result._maxProgress;
                 updateReport();
             });
-            session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
                 progress = result._progress;
                 updateReport();
             });
-            session.onProjectBuilt(errors => {
+            const projectBuiltSubscription = session.onProjectBuilt(errors => {
                 const elapsed = performance.now() - timestamp;
                 session.emitOperation(new QbsOperation(
                     QbsOperationType.Build,
@@ -287,6 +291,10 @@ async function onBuildProjectCommand(session: QbsSession) {
                 description = errors.isEmpty() ? 'Project successfully built'
                                                : 'Project building failed';
                 updateReport(false);
+                taskStartedSubscription.dispose();
+                taskMaxProgressChangedSubscription.dispose();
+                taskProgressUpdatedSubscription.dispose();
+                projectBuiltSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -328,21 +336,21 @@ async function onCleanProjectCommand(session: QbsSession) {
                 }
             };
 
-            session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(result => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
                 updateReport();
             });
-            session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
                 maxProgress = result._maxProgress;
                 updateReport();
             });
-            session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
                 progress = result._progress;
                 updateReport();
             });
-            session.onProjectCleaned(errors => {
+            const projectCleanedSubscription = session.onProjectCleaned(errors => {
                 const elapsed = performance.now() - timestamp;
                 session.emitOperation(new QbsOperation(
                     QbsOperationType.Clean,
@@ -351,6 +359,10 @@ async function onCleanProjectCommand(session: QbsSession) {
                 description = errors.isEmpty() ? 'Project successfully cleaned'
                                                : 'Project cleaning failed';
                 updateReport(false);
+                taskStartedSubscription.dispose();
+                taskMaxProgressChangedSubscription.dispose();
+                taskProgressUpdatedSubscription.dispose();
+                projectCleanedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -392,21 +404,21 @@ async function onInstallProjectCommand(session: QbsSession) {
                 }
             };
 
-            session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(result => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
                 updateReport();
             });
-            session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
                 maxProgress = result._maxProgress;
                 updateReport();
             });
-            session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
                 progress = result._progress;
                 updateReport();
             });
-            session.onProjectInstalled(errors => {
+            const projectInstalledSubscription = session.onProjectInstalled(errors => {
                 const elapsed = performance.now() - timestamp;
                 session.emitOperation(new QbsOperation(
                     QbsOperationType.Install,
@@ -415,6 +427,10 @@ async function onInstallProjectCommand(session: QbsSession) {
                 description = errors.isEmpty() ? 'Project successfully installed'
                                                : 'Project installing failed';
                 updateReport(false);
+                taskStartedSubscription.dispose();
+                taskMaxProgressChangedSubscription.dispose();
+                taskProgressUpdatedSubscription.dispose();
+                projectInstalledSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
