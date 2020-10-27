@@ -113,14 +113,18 @@
                 "command": "qbs.resolve",
                 "title": "%qbs-tools.command.qbs.resolve.title%",
                 "icon": {
-                    "dark": "res/dark/resolve.svg",
-                    "light": "res/light/resolve.svg"
+                    "dark": "res/dark/resolve-icon.svg",
+                    "light": "res/light/resolve-icon.svg"
                 },
                 "category": "QBS"
             },
             {
                 "command": "qbs.build",
                 "title": "%qbs-tools.command.qbs.build.title%",
+                "icon": {
+                    "dark": "res/dark/build-icon.svg",
+                    "light": "res/light/build-icon.svg"
+                },
                 "category": "QBS"
             },
             {
@@ -160,6 +164,11 @@
                     "command": "qbs.resolve",
                     "when": "view == qbs-project",
                     "group": "navigation@1"
+                },
+                {
+                    "command": "qbs.build",
+                    "when": "view == qbs-project",
+                    "group": "navigation@2"
                 }
             ]
         },
