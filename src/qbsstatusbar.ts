@@ -83,11 +83,11 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectDebuggerButton.command = 'qbs.selectDebugger';
         this._selectDebuggerButton.show();
 
-        _session.onStatusChanged(x => this.updateControls());
-        _session.onProjectActivated(project => {
-            this.updateControls();
-            project.buildStep().onChanged(x => this.updateControls());
-            project.runStep().onChanged(x => this.updateControls());
+        _session.onStatusChanged(async () => await this.updateControls());
+        _session.onProjectActivated(async (project) => {
+            await this.updateControls();
+            project.buildStep().onChanged(async () => await this.updateControls());
+            project.runStep().onChanged(async () => await this.updateControls());
         });
 
         this.updateControls();

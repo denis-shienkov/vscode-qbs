@@ -23,7 +23,7 @@ export class QbsProject implements vscode.Disposable {
     name(): string { return this._uri ? basename(this._uri.fsPath) : 'unknown'; }
     filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
 
-    setData(response: any, withBuildSystemFiles: boolean) {
+    async setData(response: any, withBuildSystemFiles: boolean) {
         const data = response['project-data'];
         if (data) {
             this._data = data;
@@ -41,7 +41,7 @@ export class QbsProject implements vscode.Disposable {
 
     async enumerateProducts(): Promise<QbsProduct[]> {
         let products: QbsProduct[] = [];
-        const parseProject = (project: any) => {
+        const parseProject = async (project: any) => {
             const datas = project ? (project['products'] || []) : [];
             for (const data of datas) {
                 const product = new QbsProduct(data);
@@ -50,10 +50,10 @@ export class QbsProject implements vscode.Disposable {
 
             const subProjects = project ? (project['sub-projects'] || []) : [];
             for (const subProject of subProjects) {
-                parseProject(subProject);
+                await parseProject(subProject);
             }
         };
-        parseProject(this._data);
+        await parseProject(this._data);
         return products;
     }
 
@@ -65,9 +65,9 @@ export class QbsProject implements vscode.Disposable {
     async restore() {
         await this._buildStep.restore();
         await new Promise<void>(resolve => {
-            const projectResolvedSubscription = this.session().onProjectResolved(result => {
-                this.updateSteps();
-                projectResolvedSubscription.dispose();
+            const projectResolvedSubscription = this.session().onProjectResolved(async () => {
+                await this.updateSteps();
+                await projectResolvedSubscription.dispose();
                 resolve();
             });
             this.session().autoResolve(200);

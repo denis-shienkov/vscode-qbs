@@ -25,39 +25,32 @@ export class QbsSessionProtocol implements vscode.Disposable {
 
     dispose() {}
 
-    set status(st: QbsSessionProtocolStatus) {
-        if (st === this._status)
-            return;
-        this._status = st;
-        this._onStatusChanged.fire(this._status);
-    }
-
-    get status(): QbsSessionProtocolStatus { return this._status; }
+    status(): QbsSessionProtocolStatus { return this._status; }
 
     async start(qbsPath: string) {
         this._input = '';
         this._expectedLength = -1;
-        this.status = QbsSessionProtocolStatus.Starting;
+        await this.setStatus(QbsSessionProtocolStatus.Starting);
         this._process = cp.spawn(qbsPath, ['session']);
 
-        this._process.stdout?.on('data', (data) => {
-            this.status = QbsSessionProtocolStatus.Started;
+        this._process.stdout?.on('data', async (data) => {
+            await  this.setStatus(QbsSessionProtocolStatus.Started);
             this._input += data;
-            this.parseStdOutput();
+            await this.parseStdOutput();
         });
 
-        this._process.stderr?.on('data', (data) => {
+        this._process.stderr?.on('data', async (data) => {
             // TODO: Implement me.
         });
 
-        this._process.on('close', (code) => {
+        this._process.on('close', async (code) => {
             // TODO: Implement me.
-            this.status = QbsSessionProtocolStatus.Stopped;
+            await this.setStatus(QbsSessionProtocolStatus.Stopped);
         });
     }
 
     async stop() {
-        this.status = QbsSessionProtocolStatus.Stopping;
+        await this.setStatus(QbsSessionProtocolStatus.Stopping);
         this._process?.kill();
     }
 
@@ -68,7 +61,14 @@ export class QbsSessionProtocol implements vscode.Disposable {
         this._process?.stdin?.write(output);
     }
 
-    private parseStdOutput() {
+    private async setStatus(status: QbsSessionProtocolStatus) {
+        if (status === this._status)
+            return;
+        this._status = status;
+        this._onStatusChanged.fire(this._status);
+    }
+
+    private async parseStdOutput() {
         for (;;) {
             if (this._expectedLength === -1) {
                 const preambleIndex = this._input.indexOf(PACKET_PREAMBLE);

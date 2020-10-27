@@ -27,7 +27,7 @@ export class QbsSettings implements vscode.Disposable {
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
     constructor(readonly _session: QbsSession) {
-        vscode.workspace.onDidChangeConfiguration(e => {
+        vscode.workspace.onDidChangeConfiguration(async (e) => {
             if (e.affectsConfiguration('qbs.qbsPath')) {
                 this._onChanged.fire(QbsSettingsEvent.SessionRestartRequired);
             }
@@ -45,8 +45,7 @@ export class QbsSettings implements vscode.Disposable {
         });
     }
 
-    dispose() {
-    }
+    dispose() {}
 
     /**
      * Returns the path to the QBS executable obtained
@@ -160,16 +159,16 @@ export class QbsSettings implements vscode.Disposable {
         }
 
         if (qbsPath.length === 0) {
-            vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
-                                                    'QBS executable not set in configuration.'));
+            await vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
+                                                          'QBS executable not set in configuration.'));
             return false;
         } else if (!fs.existsSync(qbsPath)) {
-            vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
-                                                    `QBS executable ${qbsPath} not found.`));
+            await vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
+                                                          `QBS executable ${qbsPath} not found.`));
             return false;
         }
-        vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
-                                                      `QBS executable found in ${qbsPath}.`));
+        await vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
+                                                            `QBS executable found in ${qbsPath}.`));
         return true;
     }
 

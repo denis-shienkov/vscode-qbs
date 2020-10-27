@@ -43,20 +43,19 @@ async function onAutoRestartSessionCommand(session: QbsSession) {
         }
 
         let autoRestartRequired: boolean = false;
-        const statusChangedSubscription = session.onStatusChanged(sessionStatus => {
+        const statusChangedSubscription = session.onStatusChanged(async (sessionStatus) => {
             if (sessionStatus === QbsSessionStatus.Stopped) {
                 if (autoRestartRequired) {
                     autoRestartRequired = false;
-                    vscode.commands.executeCommand('qbs.startSession');
-                    statusChangedSubscription.dispose();
+                    await vscode.commands.executeCommand('qbs.startSession');
+                    await statusChangedSubscription.dispose();
                     resolve();
                 }
             }
         });
 
         const sessionStatus = session.status();
-        if (sessionStatus === QbsSessionStatus.Started
-            || sessionStatus === QbsSessionStatus.Starting) {
+        if (sessionStatus === QbsSessionStatus.Started || sessionStatus === QbsSessionStatus.Starting) {
             autoRestartRequired = true;
             vscode.commands.executeCommand('qbs.stopSession');
             statusChangedSubscription.dispose();
@@ -109,9 +108,9 @@ async function onResolveProjectCommand(session: QbsSession) {
         title: localize('qbs.session.resolve.progress.title', 'Project resolving'),
         cancellable: true
     }, async (p, c) => {
-        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        c.onCancellationRequested(async () => await vscode.commands.executeCommand('qbs.cancel'));
         const timestamp = performance.now();
-        session.emitOperation(new QbsOperation(QbsOperationType.Resolve, QbsOperationStatus.Started, -1));
+        await session.emitOperation(new QbsOperation(QbsOperationType.Resolve, QbsOperationStatus.Started, -1));
         await session.resolveProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -119,7 +118,7 @@ async function onResolveProjectCommand(session: QbsSession) {
             let description: string = '';
             let oldPercentage: number = 0;
 
-            const updateReport = (showPercentage: boolean = true) => {
+            const updateReport = async (showPercentage: boolean = true) => {
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
@@ -136,33 +135,33 @@ async function onResolveProjectCommand(session: QbsSession) {
                 }
             };
 
-            const taskStartedSubscription = session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(async (result) => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
-                updateReport();
+                await updateReport();
             });
-            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(async (result) => {
                 maxProgress = result._maxProgress;
-                updateReport();
+                await updateReport();
             });
-            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(async (result) => {
                 progress = result._progress;
-                updateReport();
+                await updateReport();
             });
-            const projectResolvedSubscription = session.onProjectResolved(errors => {
+            const projectResolvedSubscription = session.onProjectResolved(async (errors) => {
                 const elapsed = performance.now() - timestamp;
-                session.emitOperation(new QbsOperation(
+                await session.emitOperation(new QbsOperation(
                     QbsOperationType.Resolve,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 description = errors.isEmpty() ? 'Project successfully resolved'
                                                : 'Project resolving failed';
-                updateReport(false);
-                taskStartedSubscription.dispose();
-                taskMaxProgressChangedSubscription.dispose();
-                taskProgressUpdatedSubscription.dispose();
-                projectResolvedSubscription.dispose();
+                await updateReport(false);
+                await taskStartedSubscription.dispose();
+                await taskMaxProgressChangedSubscription.dispose();
+                await taskProgressUpdatedSubscription.dispose();
+                await projectResolvedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -177,9 +176,9 @@ async function onBuildProjectCommand(session: QbsSession) {
         title: localize('qbs.session.build.progress.title', 'Project building'),
         cancellable: true
     }, async (p, c) => {
-        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        c.onCancellationRequested(async () => await vscode.commands.executeCommand('qbs.cancel'));
         const timestamp = performance.now();
-        session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
+        await session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
         await session.buildProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -187,7 +186,7 @@ async function onBuildProjectCommand(session: QbsSession) {
             let description: string = '';
             let oldPercentage: number = 0;
 
-            const updateReport = (showPercentage: boolean = true) => {
+            const updateReport = async (showPercentage: boolean = true) => {
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
@@ -204,34 +203,34 @@ async function onBuildProjectCommand(session: QbsSession) {
                 }
             };
 
-            const taskStartedSubscription = session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(async (result) => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
-                updateReport();
+                await updateReport();
             });
-            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(async (result) => {
                 maxProgress = result._maxProgress;
-                updateReport();
+                await updateReport();
             });
-            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(async (result) => {
                 progress = result._progress;
-                updateReport();
+                await updateReport();
             });
-            const projectBuiltSubscription = session.onProjectBuilt(errors => {
+            const projectBuiltSubscription = session.onProjectBuilt(async (errors) => {
                 const elapsed = performance.now() - timestamp;
-                session.emitOperation(new QbsOperation(
+                await session.emitOperation(new QbsOperation(
                     QbsOperationType.Build,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 maxProgress = progress = oldPercentage = 0;
                 description = errors.isEmpty() ? 'Project successfully built'
                                                : 'Project building failed';
-                updateReport(false);
-                taskStartedSubscription.dispose();
-                taskMaxProgressChangedSubscription.dispose();
-                taskProgressUpdatedSubscription.dispose();
-                projectBuiltSubscription.dispose();
+                await updateReport(false);
+                await taskStartedSubscription.dispose();
+                await taskMaxProgressChangedSubscription.dispose();
+                await taskProgressUpdatedSubscription.dispose();
+                await projectBuiltSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -246,9 +245,9 @@ async function onCleanProjectCommand(session: QbsSession) {
         title: localize('qbs.session.clean.progress.title', 'Project cleaning'),
         cancellable: true
     }, async (p, c) => {
-        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        c.onCancellationRequested(async () => await vscode.commands.executeCommand('qbs.cancel'));
         const timestamp = performance.now();
-        session.emitOperation(new QbsOperation(QbsOperationType.Clean, QbsOperationStatus.Started, -1));
+        await session.emitOperation(new QbsOperation(QbsOperationType.Clean, QbsOperationStatus.Started, -1));
         await session.cleanProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -256,7 +255,7 @@ async function onCleanProjectCommand(session: QbsSession) {
             let description: string = '';
             let oldPercentage: number = 0;
 
-            const updateReport = (showPercentage: boolean = true) => {
+            const updateReport = async (showPercentage: boolean = true) => {
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
@@ -273,33 +272,33 @@ async function onCleanProjectCommand(session: QbsSession) {
                 }
             };
 
-            const taskStartedSubscription = session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(async (result) => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
-                updateReport();
+                await updateReport();
             });
-            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(async (result) => {
                 maxProgress = result._maxProgress;
-                updateReport();
+                await updateReport();
             });
-            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(async (result) => {
                 progress = result._progress;
-                updateReport();
+                await updateReport();
             });
-            const projectCleanedSubscription = session.onProjectCleaned(errors => {
+            const projectCleanedSubscription = session.onProjectCleaned(async (errors) => {
                 const elapsed = performance.now() - timestamp;
-                session.emitOperation(new QbsOperation(
+                await session.emitOperation(new QbsOperation(
                     QbsOperationType.Clean,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 description = errors.isEmpty() ? 'Project successfully cleaned'
                                                : 'Project cleaning failed';
-                updateReport(false);
-                taskStartedSubscription.dispose();
-                taskMaxProgressChangedSubscription.dispose();
-                taskProgressUpdatedSubscription.dispose();
-                projectCleanedSubscription.dispose();
+                await updateReport(false);
+                await taskStartedSubscription.dispose();
+                await taskMaxProgressChangedSubscription.dispose();
+                await taskProgressUpdatedSubscription.dispose();
+                await projectCleanedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -314,9 +313,9 @@ async function onInstallProjectCommand(session: QbsSession) {
         title: localize('qbs.session.install.progress.title', 'Project installing'),
         cancellable: true
     }, async (p, c) => {
-        c.onCancellationRequested(() => vscode.commands.executeCommand('qbs.cancel'));
+        c.onCancellationRequested(async () => await vscode.commands.executeCommand('qbs.cancel'));
         const timestamp = performance.now();
-        session.emitOperation(new QbsOperation(QbsOperationType.Install, QbsOperationStatus.Started, -1));
+        await session.emitOperation(new QbsOperation(QbsOperationType.Install, QbsOperationStatus.Started, -1));
         await session.installProject();
         return new Promise(resolve => {
             let maxProgress: number = 0;
@@ -324,7 +323,7 @@ async function onInstallProjectCommand(session: QbsSession) {
             let description: string = '';
             let oldPercentage: number = 0;
 
-            const updateReport = (showPercentage: boolean = true) => {
+            const updateReport = async (showPercentage: boolean = true) => {
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
@@ -341,33 +340,33 @@ async function onInstallProjectCommand(session: QbsSession) {
                 }
             };
 
-            const taskStartedSubscription = session.onTaskStarted(result => {
+            const taskStartedSubscription = session.onTaskStarted(async (result) => {
                 description = result._description;
                 maxProgress = result._maxProgress;
                 progress = 0;
-                updateReport();
+                await updateReport();
             });
-            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(result => {
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(async (result) => {
                 maxProgress = result._maxProgress;
-                updateReport();
+                await updateReport();
             });
-            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(result => {
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(async (result) => {
                 progress = result._progress;
-                updateReport();
+                await updateReport();
             });
-            const projectInstalledSubscription = session.onProjectInstalled(errors => {
+            const projectInstalledSubscription = session.onProjectInstalled(async (errors) => {
                 const elapsed = performance.now() - timestamp;
-                session.emitOperation(new QbsOperation(
+                await session.emitOperation(new QbsOperation(
                     QbsOperationType.Install,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 description = errors.isEmpty() ? 'Project successfully installed'
                                                : 'Project installing failed';
-                updateReport(false);
-                taskStartedSubscription.dispose();
-                taskMaxProgressChangedSubscription.dispose();
-                taskProgressUpdatedSubscription.dispose();
-                projectInstalledSubscription.dispose();
+                await updateReport(false);
+                await taskStartedSubscription.dispose();
+                await taskMaxProgressChangedSubscription.dispose();
+                await taskProgressUpdatedSubscription.dispose();
+                await projectInstalledSubscription.dispose();
                 setTimeout(() => {
                     resolve();
                 }, 5000);
@@ -464,61 +463,61 @@ async function onDebugProductCommand(session: QbsSession) {
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.detectProfiles', () => {
-        onDetectProfilesCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.detectProfiles', async () => {
+        await onDetectProfilesCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.restoreProject', () => {
-        onRestoreProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.restoreProject', async () => {
+        await onRestoreProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', () => {
-        onAutoRestartSessionCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.autoRestartSession', async () => {
+        await onAutoRestartSessionCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.startSession', () => {
-        onStartSessionCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.startSession', async () => {
+        await onStartSessionCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.stopSession', () => {
-        onStopSessionCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.stopSession', async () => {
+        await onStopSessionCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProject', () => {
-        onSelectProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProject', async () => {
+        await onSelectProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProfile', () => {
-        onSelectProfileCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectProfile', async () => {
+        await onSelectProfileCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectConfiguration', () => {
-        onSelectConfigurationCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectConfiguration', async () => {
+        await onSelectConfigurationCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectBuild', () => {
-        onSelectBuildProductCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectBuild', async () => {
+        await onSelectBuildProductCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectRun', () => {
-        onSelectRunProductCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectRun', async () => {
+        await onSelectRunProductCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectDebugger', () => {
-        onSelectDebuggerCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectDebugger', async () => {
+        await onSelectDebuggerCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', () => {
-        onResolveProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', async () => {
+        await onResolveProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.build', () => {
-        onBuildProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.build', async () => {
+        await onBuildProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.clean', () => {
-        onCleanProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.clean', async () => {
+        await onCleanProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', () => {
-        onInstallProjectCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', async () => {
+        await onInstallProjectCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', () => {
-        onCancelJobCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', async () => {
+        await onCancelJobCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.getRunEnvironment', () => {
-        onGetRunEnvironmentCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.getRunEnvironment', async () => {
+        await onGetRunEnvironmentCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.run', () => {
-        onRunProductCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.run', async () => {
+        await onRunProductCommand(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.debug', () => {
-        onDebugProductCommand(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.debug', async () => {
+        await onDebugProductCommand(session);
     }));
 }

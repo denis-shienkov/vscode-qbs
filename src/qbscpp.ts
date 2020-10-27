@@ -35,10 +35,10 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
     private _registered: boolean = false;
     private _sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
 
-    constructor(readonly session: QbsSession) {
-        session.onProjectResolved(result => {
+    constructor(session: QbsSession) {
+        session.onProjectResolved(async (result) => {
             if (result.isEmpty()) {
-                this.setup(session.project()?.data());
+                await this.setup(session.project()?.data());
             }
         });
     }
@@ -129,7 +129,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
     private async buildSourceFileConfigurations(data: any) {
         // Where the map is <source file path, configuration>.
         this._sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
-        const parseProject = (project: any) => {
+        const parseProject = async (project: any) => {
             const products = project['products'] || [];
             for (const product of products) {
                 const moduleProperties = product['module-properties'];
@@ -160,11 +160,11 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
 
             const subProjects = project['sub-projects'] || [];
             for (const subProject of subProjects) {
-                parseProject(subProject);
+                await parseProject(subProject);
             }
         };
 
-        parseProject(data);
+        await parseProject(data);
     }
 
     /**

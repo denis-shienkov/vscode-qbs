@@ -62,19 +62,19 @@ export class QbsSession implements vscode.Disposable {
 
     constructor(readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
-        this._protocol.onStatusChanged(protocolStatus => {
+        this._protocol.onStatusChanged(async (protocolStatus) => {
             switch (protocolStatus) {
             case QbsSessionProtocolStatus.Started:
-                this.setStatus(QbsSessionStatus.Started);
+                await this.setStatus(QbsSessionStatus.Started);
                 break;
             case QbsSessionProtocolStatus.Starting:
-                this.setStatus(QbsSessionStatus.Starting);
+                await this.setStatus(QbsSessionStatus.Starting);
                 break;
             case QbsSessionProtocolStatus.Stopped:
-                this.setStatus(QbsSessionStatus.Stopped);
+                await this.setStatus(QbsSessionStatus.Stopped);
                 break;
             case QbsSessionProtocolStatus.Stopping:
-                this.setStatus(QbsSessionStatus.Stopping);
+                await this.setStatus(QbsSessionStatus.Stopping);
                 break;
             }
         });
@@ -214,7 +214,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     async ensureRunEnvironmentUpdated() {
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>(resolve => {
             const runEnvironmentResultReceivedSubscription = this.onRunEnvironmentResultReceived(result => {
                 runEnvironmentResultReceivedSubscription.dispose();
                 resolve(result.isEmpty());
@@ -262,8 +262,8 @@ export class QbsSession implements vscode.Disposable {
         if (this._timer) {
             clearTimeout(this._timer);
         }
-        this._timer = setTimeout(() => {
-            vscode.commands.executeCommand('qbs.resolve');
+        this._timer = setTimeout(async () => {
+            await vscode.commands.executeCommand('qbs.resolve');
             this._timer = undefined;
         }, interval);
     }
@@ -276,11 +276,11 @@ export class QbsSession implements vscode.Disposable {
         case QbsSessionStatus.Started:
             return localize('qbs.session.status.started', "started");
         case QbsSessionStatus.Starting:
-            return localize('qbs.session.status.started', "starting");
+            return localize('qbs.session.status.starting', "starting");
         case QbsSessionStatus.Stopped:
-            return localize('qbs.session.status.started', "stopped");
+            return localize('qbs.session.status.stopped', "stopped");
         case QbsSessionStatus.Stopping:
-            return localize('qbs.session.status.started', "stopping");
+            return localize('qbs.session.status.stopping', "stopping");
         }
     }
 
@@ -292,17 +292,17 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsSessionHelloResult(response)
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
-            this._project?.setData(response, true);
-            this._project?.updateSteps();
+            await this._project?.setData(response, true);
+            await this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
-            this._project?.setData(response, false);
-            this._project?.updateSteps();
+            await this._project?.setData(response, false);
+            await this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
-            this._project?.updateSteps();
+            await this._project?.updateSteps();
             const result = new QbsSessionMessageResult(response['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
@@ -341,13 +341,13 @@ export class QbsSession implements vscode.Disposable {
         }
     }
 
-    private setStatus(status: QbsSessionStatus) {
+    private async setStatus(status: QbsSessionStatus) {
         if (status !== this._status) {
             this._status = status;
             this._onStatusChanged.fire(this._status);
 
             if (status === QbsSessionStatus.Started) {
-                vscode.commands.executeCommand('qbs.restoreProject');
+                await vscode.commands.executeCommand('qbs.restoreProject');
             }
         }
     }
