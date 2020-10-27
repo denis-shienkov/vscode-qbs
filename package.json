@@ -168,7 +168,7 @@
                 {
                     "command": "qbs.build",
                     "when": "view == qbs-project",
-                    "group": "navigation@2"
+                    "group": "navigation@1"
                 }
             ]
         },
