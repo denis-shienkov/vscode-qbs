@@ -347,9 +347,7 @@ export class QbsSession implements vscode.Disposable {
             this._onStatusChanged.fire(this._status);
 
             if (status === QbsSessionStatus.Started) {
-                if (this._project) {
-                    this.autoResolve(200);
-                }
+                vscode.commands.executeCommand('qbs.restoreProject');
             }
         }
     }

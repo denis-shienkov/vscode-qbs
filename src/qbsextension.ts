@@ -32,7 +32,6 @@ export async function activate(ctx: vscode.ExtensionContext) {
     manager = new QbsExtensionManager(ctx);
 
     await vscode.commands.executeCommand('qbs.autoRestartSession');
-    await vscode.commands.executeCommand('qbs.restoreProject');
 }
 
 export async function deactivate() {
