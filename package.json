@@ -112,6 +112,10 @@
             {
                 "command": "qbs.resolve",
                 "title": "%qbs-tools.command.qbs.resolve.title%",
+                "icon": {
+                    "dark": "res/dark/resolve.svg",
+                    "light": "res/light/resolve.svg"
+                },
                 "category": "QBS"
             },
             {
@@ -150,6 +154,15 @@
                 "category": "QBS"
             }
         ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "qbs.resolve",
+                    "when": "view == qbs-project",
+                    "group": "navigation@1"
+                }
+            ]
+        },
         "configuration": {
             "type": "object",
             "title": "QBS configuration",
