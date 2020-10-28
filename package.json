@@ -259,7 +259,7 @@
                 {
                     "id": "qbs-sidebar",
                     "title": "QBS",
-                    "icon": "res/cubes.png"
+                    "icon": "res/qbs-view-icon.svg"
                 }
             ]
         },
