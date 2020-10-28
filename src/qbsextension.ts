@@ -15,7 +15,7 @@ class QbsExtensionManager implements vscode.Disposable {
     private _statusBar: QbsStatusBar = new QbsStatusBar(this._session);
     private _logger: QbsSessionLogger = new QbsSessionLogger(this._session);
     private _cpp: QbsCpp = new QbsCpp(this._session);
-    private _explorer: QbsProjectExplorer = new QbsProjectExplorer();
+    private _explorer: QbsProjectExplorer = new QbsProjectExplorer(this._session);
 
     constructor(readonly ctx: vscode.ExtensionContext) {
         QbsCommands.subscribeCommands(ctx, this._session);
