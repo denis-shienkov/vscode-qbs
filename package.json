@@ -53,6 +53,14 @@
     ],
     "main": "./out/qbsextension.js",
     "contributes": {
+        "languages": [
+            {
+                "id": "xml",
+                "extensions": [
+                    ".ts"
+                ]
+            }
+        ],
         "commands": [
             {
                 "command": "qbs.detectProfiles",
