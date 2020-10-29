@@ -6,14 +6,8 @@ import {QbsSession} from './qbssession';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
-abstract class BaseNode {
-    constructor(public readonly id: string) {}
-    abstract getChildren(): BaseNode[];
-    abstract getTreeItem(): vscode.TreeItem;
-}
-
-class QbsLocation {
-    constructor(private _data: any) {}
+class QbsLocationData {
+    constructor(private readonly _data: any) {}
     filePath(): string { return this._data['file-path']; }
     fileName(): string { return basename(this.filePath()); }
     line(): number { return this._data['line']; }
@@ -21,15 +15,96 @@ class QbsLocation {
     id(): string { return this.filePath() + ':' + this.line() + ':' + this.column(); }
 }
 
-class QbsSourceArtifact {
-    constructor(private _data: any) {}
+class QbsProjectData {
+    constructor(private readonly _data: any) {}
+    id(): string { return this.buildDirectory(); }
+    name(): string { return this._data['name']; }
+    buildDirectory(): string { return this._data['build-directory']; }
+    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+
+    products(): QbsProductData[] {
+        let products: QbsProductData[] = [];
+        const datas = this._data['products'] || [];
+        for (const data of datas) {
+            const product = new QbsProductData(data);
+            products.push(product);
+        }
+        return products;
+    }
+
+    subProjects(): QbsProjectData[] {
+        let projects: QbsProjectData[] = [];
+        const datas = this._data['sub-projects'] || [];
+        for (const data of datas) {
+            const project = new QbsProjectData(data);
+            projects.push(project);
+        }
+        return projects;
+    }
+}
+
+class QbsProductData {
+    constructor(private readonly _data: any) {}
+    id(): string { return this.buildDirectory(); }
+    name(): string { return this._data['name']; }
+    buildDirectory(): string { return this._data['build-directory']; }
+    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+
+    groups(): QbsGroupData[] {
+        let groups: QbsGroupData[] = [];
+        const datas = this._data['groups'] || [];
+        for (const data of datas) {
+            const group = new QbsGroupData(data);
+            groups.push(group);
+        }
+        return groups;
+    }
+}
+
+class QbsGroupData {
+    constructor(private readonly _data: any) {}
+    id(): string { return this.name(); }
+    name(): string { return this._data['name']; }
+    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+
+    sourceArtifacts(): QbsSourceArtifactData[] {
+        let artifacts: QbsSourceArtifactData[] = [];
+        const datas = this._data['source-artifacts'] || [];
+        for (const data of datas) {
+            artifacts.push(new QbsSourceArtifactData(data));
+        }
+        return artifacts;
+    }
+
+    sourceWildcardsArtifacts(): QbsSourceArtifactData[] {
+        let artifacts: QbsSourceArtifactData[] = [];
+        const datas = this._data['source-artifacts-from-wildcards'] || [];
+        for (const data of datas) {
+            artifacts.push(new QbsSourceArtifactData(data));
+        }
+        return artifacts;
+    }
+
+    isEmpty(): boolean {
+        return this.sourceArtifacts().length === 0 && this.sourceWildcardsArtifacts().length === 0;
+    }
+}
+
+class QbsSourceArtifactData {
+    constructor(private readonly _data: any) {}
     filePath(): string { return this._data['file-path']; }
     fileName(): string { return basename(this.filePath()); }
     id(): string { return this.filePath(); }
 }
 
+abstract class BaseNode {
+    constructor(public readonly id: string) {}
+    abstract getChildren(): BaseNode[];
+    abstract getTreeItem(): vscode.TreeItem;
+}
+
 class QbsSourceArtifactNode extends BaseNode {
-    constructor(private readonly _artifact: QbsSourceArtifact) {
+    constructor(private readonly _artifact: QbsSourceArtifactData) {
         super(_artifact.id());
     }
 
@@ -48,7 +123,7 @@ class QbsSourceArtifactNode extends BaseNode {
 }
 
 class QbsLocationNode extends BaseNode {
-    constructor(private readonly _location: QbsLocation, private readonly _isQbsFile: boolean) {
+    constructor(private readonly _location: QbsLocationData, private readonly _isQbsFile: boolean) {
         super(_location.id());
     }
 
@@ -71,93 +146,83 @@ class QbsLocationNode extends BaseNode {
 }
 
 class QbsGroupNode extends BaseNode {
-    constructor(private readonly _data: any) {
-        super(_data['name']);
+    constructor(private readonly _group: QbsGroupData) {
+        super(_group.id());
     }
 
     getTreeItem(): vscode.TreeItem {
-        const item = new vscode.TreeItem(this.name(), vscode.TreeItemCollapsibleState.Collapsed);
+        const item = new vscode.TreeItem(this._group.name(), vscode.TreeItemCollapsibleState.Collapsed);
         item.iconPath = new vscode.ThemeIcon('group-by-ref-type');
         return item;
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [new QbsLocationNode(this.location(), true)];
-        const sources = this._data['source-artifacts'] || [];
+        let nodes: BaseNode[] = [ new QbsLocationNode(this._group.location(), true) ];
+        const sources = this._group.sourceArtifacts();
         for (const source of sources) {
-            const artifact = new QbsSourceArtifact(source);
-            const node = new QbsSourceArtifactNode(artifact);
+            const node = new QbsSourceArtifactNode(source);
             nodes.push(node);
         }
-        const wildcards = this._data['source-artifacts-from-wildcards'] || [];
+        const wildcards = this._group.sourceWildcardsArtifacts();
         for (const wildcard of wildcards) {
-            const artifact = new QbsSourceArtifact(wildcard);
-            const node = new QbsSourceArtifactNode(artifact);
+            const node = new QbsSourceArtifactNode(wildcard);
             nodes.push(node);
         }
         return nodes;
     }
-
-    private name(): string { return this._data['name']; }
-    private location(): QbsLocation { return new QbsLocation(this._data['location']); }
 }
 
 class QbsProductNode extends BaseNode {
-    constructor(private readonly _data: any) {
-        super(_data['build-directory']);
+    constructor(private readonly _product: QbsProductData) {
+        super(_product.id());
     }
 
     getTreeItem(): vscode.TreeItem {
-        const item = new vscode.TreeItem(this.name(), vscode.TreeItemCollapsibleState.Collapsed);
+        const item = new vscode.TreeItem(this._product.name(), vscode.TreeItemCollapsibleState.Collapsed);
         item.iconPath = new vscode.ThemeIcon('gift');
         return item;
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [new QbsLocationNode(this.location(), true)];
-        const groups = this._data['groups'] || [];
+        let nodes: BaseNode[] = [ new QbsLocationNode(this._product.location(), true) ];
+        const groups = this._product.groups();
         for (const group of groups) {
-            const node = new QbsGroupNode(group);
-            nodes.push(node);
+            if (!group.isEmpty()) {
+                const node = new QbsGroupNode(group);
+                nodes.push(node);
+            }
         }
         return nodes;
     }
-
-    private name(): string { return this._data['name']; }
-    private location(): QbsLocation { return new QbsLocation(this._data['location']); }
 }
 
 class QbsProjectNode extends BaseNode {
-    constructor(private readonly _data: any, private readonly _isRoot: boolean) {
-        super(_data['build-directory']);
+    constructor(private readonly _project: QbsProjectData, private readonly _isRoot: boolean) {
+        super(_project.id());
     }
 
     getTreeItem(): vscode.TreeItem {
         const collapsible = this._isRoot ? vscode.TreeItemCollapsibleState.Expanded
                                          : vscode.TreeItemCollapsibleState.Collapsed;
-        const item = new vscode.TreeItem(this.name(), collapsible);
+        const item = new vscode.TreeItem(this._project.name(), collapsible);
         item.iconPath = new vscode.ThemeIcon('project');
         return item;
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [new QbsLocationNode(this.location(), true)];
-        const products = this._data['products'] || [];
+        let nodes: BaseNode[] = [ new QbsLocationNode(this._project.location(), true) ];
+        const products = this._project.products();
         for (const product of products) {
             const node = new QbsProductNode(product);
             nodes.push(node);
         }
-        const projects = this._data['sub-projects'] || [];
+        const projects = this._project.subProjects();
         for (const project of projects) {
             const node = new QbsProjectNode(project, false);
             nodes.push(node);
         }
-
         return nodes;
     }
-
-    private name(): string { return this._data['name']; }
-    private location(): QbsLocation { return new QbsLocation(this._data['location']); }
 }
 
 class QbsProjectDataProvider implements vscode.TreeDataProvider<BaseNode> {
@@ -176,7 +241,8 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<BaseNode> {
         }
         const data = this._session.project()?.data();
         if (data) {
-            return [ new QbsProjectNode(data, true) ];
+            const project = new QbsProjectData(data);
+            return [ new QbsProjectNode(project, true) ];
         }
         return [];
     }
