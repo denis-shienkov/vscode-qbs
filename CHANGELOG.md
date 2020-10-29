@@ -1,5 +1,14 @@
 # What's New?
 
+## 0.0.6
+
+- Next developer preview release.
+- Implemented the project explorer tree view.
+- Added new 'Detect Profiles' command.
+- Implemented saving user selection (such as project, profile,
+configuration and product).
+- Removed the progress bar indicating the session status.
+
 ## 0.0.5
 
 - Initial developer preview release.
