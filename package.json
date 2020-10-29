@@ -152,6 +152,11 @@
                 "category": "QBS"
             },
             {
+                "command": "qbs.rebuild",
+                "title": "%qbs-tools.command.qbs.rebuild.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.cancel",
                 "title": "%qbs-tools.command.qbs.cancel.title%",
                 "category": "QBS"
@@ -191,6 +196,11 @@
                 },
                 {
                     "command": "qbs.resolveWithForceProbesExecution",
+                    "when": "view == qbs-project",
+                    "group": "1_outline"
+                },
+                {
+                    "command": "qbs.rebuild",
                     "when": "view == qbs-project",
                     "group": "1_outline"
                 }

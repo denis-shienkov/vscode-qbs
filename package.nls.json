@@ -15,6 +15,7 @@
     "qbs-tools.command.qbs.build.title": "Build",
     "qbs-tools.command.qbs.clean.title": "Clean",
     "qbs-tools.command.qbs.install.title": "Install",
+    "qbs-tools.command.qbs.rebuild.title": "Rebuild",
     "qbs-tools.command.qbs.cancel.title": "Cancel",
     "qbs-tools.command.qbs.getrunenv.title": "Get Run Environment",
     "qbs-tools.command.qbs.run.title": "Run",

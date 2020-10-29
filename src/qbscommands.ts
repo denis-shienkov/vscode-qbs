@@ -443,6 +443,11 @@ async function onInstallProjectCommand(session: QbsSession) {
     });
 }
 
+async function onRebuildProjectCommand(session: QbsSession) {
+    await onCleanProjectCommand(session);
+    await onBuildProjectCommand(session);
+}
+
 async function onCancelJobCommand(session: QbsSession) {
     await session.cancelJob();
 }
@@ -578,6 +583,9 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', async () => {
         await onInstallProjectCommand(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.rebuild', async () => {
+        await onRebuildProjectCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cancel', async () => {
         await onCancelJobCommand(session);
