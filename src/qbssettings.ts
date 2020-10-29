@@ -167,8 +167,6 @@ export class QbsSettings implements vscode.Disposable {
                                                           `QBS executable ${qbsPath} not found.`));
             return false;
         }
-        await vscode.window.showInformationMessage(localize('qbs.executable.found.info.message',
-                                                            `QBS executable found in ${qbsPath}.`));
         return true;
     }
 
