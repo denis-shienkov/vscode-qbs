@@ -41,6 +41,7 @@
         "onCommand:qbs.selectBuild",
         "onCommand:qbs.selectDebugger",
         "onCommand:qbs.selectRun",
+        "onCommand:qbs.resolveWithForceProbesExecution",
         "onCommand:qbs.resolve",
         "onCommand:qbs.build",
         "onCommand:qbs.clean",
@@ -118,6 +119,11 @@
                 "category": "QBS"
             },
             {
+                "command": "qbs.resolveWithForceProbesExecution",
+                "title": "%qbs-tools.command.qbs.resolveforceprobes.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.resolve",
                 "title": "%qbs-tools.command.qbs.resolve.title%",
                 "icon": {
@@ -180,6 +186,11 @@
                 },
                 {
                     "command": "qbs.clean",
+                    "when": "view == qbs-project",
+                    "group": "1_outline"
+                },
+                {
+                    "command": "qbs.resolveWithForceProbesExecution",
                     "when": "view == qbs-project",
                     "group": "1_outline"
                 }

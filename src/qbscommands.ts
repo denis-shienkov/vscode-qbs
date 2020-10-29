@@ -102,6 +102,74 @@ async function onSelectDebuggerCommand(session: QbsSession) {
     await QbsSelectors.displayDebuggerSelector(session);
 }
 
+async function  onResolveProjectWithForceProbesExecutionCommand(session: QbsSession) {
+    await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: localize('qbs.session.resolve.progress.title', 'Project resolving'),
+        cancellable: true
+    }, async (p, c) => {
+        c.onCancellationRequested(async () => await vscode.commands.executeCommand('qbs.cancel'));
+        const timestamp = performance.now();
+        await session.emitOperation(new QbsOperation(QbsOperationType.Resolve, QbsOperationStatus.Started, -1));
+        await session.resolveProjectWithForceProbesExecution();
+        return new Promise(resolve => {
+            let maxProgress: number = 0;
+            let progress: number = 0;
+            let description: string = '';
+            let oldPercentage: number = 0;
+
+            const updateReport = async (showPercentage: boolean = true) => {
+                if (showPercentage) {
+                    const newPercentage = (progress > 0)
+                        ? Math.round((100 * progress) / maxProgress) : 0;
+                    const delta = newPercentage - oldPercentage;
+                    if (delta > 0) {
+                        oldPercentage = newPercentage;
+                        p.report({increment: delta});
+                    }
+                    const message = `${description} ${newPercentage} %`;
+                    p.report({message: message});
+                } else {
+                    const message = description;
+                    p.report({ message: message});
+                }
+            };
+
+            const taskStartedSubscription = session.onTaskStarted(async (result) => {
+                description = result._description;
+                maxProgress = result._maxProgress;
+                progress = 0;
+                await updateReport();
+            });
+            const taskMaxProgressChangedSubscription = session.onTaskMaxProgressChanged(async (result) => {
+                maxProgress = result._maxProgress;
+                await updateReport();
+            });
+            const taskProgressUpdatedSubscription = session.onTaskProgressUpdated(async (result) => {
+                progress = result._progress;
+                await updateReport();
+            });
+            const projectResolvedSubscription = session.onProjectResolved(async (errors) => {
+                const elapsed = performance.now() - timestamp;
+                await session.emitOperation(new QbsOperation(
+                    QbsOperationType.Resolve,
+                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    elapsed));
+                description = errors.isEmpty() ? 'Project successfully resolved'
+                                               : 'Project resolving failed';
+                await updateReport(false);
+                await taskStartedSubscription.dispose();
+                await taskMaxProgressChangedSubscription.dispose();
+                await taskProgressUpdatedSubscription.dispose();
+                await projectResolvedSubscription.dispose();
+                setTimeout(() => {
+                    resolve();
+                }, 5000);
+            });
+        });
+    });
+}
+
 async function onResolveProjectCommand(session: QbsSession) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -495,6 +563,9 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.selectDebugger', async () => {
         await onSelectDebuggerCommand(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolveWithForceProbesExecution', async () => {
+        await onResolveProjectWithForceProbesExecutionCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', async () => {
         await onResolveProjectCommand(session);

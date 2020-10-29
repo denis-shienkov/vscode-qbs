@@ -122,6 +122,49 @@ export class QbsSession implements vscode.Disposable {
         this._onOperationChanged.fire(operation);
     }
 
+    async resolveProjectWithForceProbesExecution() {
+        let request: any = {};
+        request['type'] = 'resolve-project';
+        request['environment'] = process.env;
+        request['data-mode'] = 'only-if-changed';
+        request['module-properties'] = [
+            'cpp.compilerVersionMajor',
+            'cpp.compilerVersionMinor',
+            'cpp.compilerVersionPatch',
+            'cpp.compilerIncludePaths',
+            'cpp.distributionIncludePaths',
+            'cpp.systemIncludePaths',
+            'cpp.includePaths',
+            'cpp.frameworkPaths',
+            'cpp.systemFrameworkPaths',
+            'cpp.compilerDefinesByLanguage',
+            'cpp.defines',
+            'cpp.compilerName',
+            'cpp.compilerPath',
+            'cpp.compilerPathByLanguage',
+            'cpp.cLanguageVersion',
+            'cpp.cxxLanguageVersion',
+            'cpp.prefixHeaders',
+            'qbs.architecture',
+            'qbs.toolchain'
+        ];
+        request['project-file-path'] = this._project?.filePath();
+        request['configuration-name'] = this._project?.buildStep().configurationName();
+        request['top-level-profile'] = this._project?.buildStep().profileName();
+        const buildDirectory = this._settings.buildDirectory();
+        request['build-root'] = buildDirectory;
+        // Do not store the build graph if the build directory does not exist yet.
+        request['dry-run'] = !fs.existsSync(buildDirectory);
+        const settingsDirectory = this._settings.settingsDirectory();
+        if (settingsDirectory.length > 0) {
+            request['settings-directory'] = settingsDirectory;
+        }
+        request['force-probe-execution'] = true;
+        request['error-handling-mode'] = this._settings.errorHandlingMode();
+        request['log-level'] = this._settings.logLevel();
+        await this.sendRequest(request);
+    }
+
     async resolveProject() {
         let request: any = {};
         request['type'] = 'resolve-project';
