@@ -30,3 +30,9 @@ running using the status bar button.
 - Implemented a basic set of QBS properties as the extension settings.
 - Implemented the intelli sense highlighting of the source code.
 - Added minimal basic documentation set.
+- Implemented the progress bars indicating the `resolve`, `build`,
+`clean`, and `install` operations.
+- Implemented the progress bar indicating the session status.
+- Added two output panes for the QBS compile and trace outputs.
+- Implemented the run terminal.
+- Implemented the debugger engine support.
