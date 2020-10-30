@@ -99,7 +99,7 @@ export class QbsSessionMessageResult {
     isEmpty(): boolean { return this._messages.length === 0; }
 
     toString(): string {
-        let list: string[] = [];
+        const list: string[] = [];
         for (const item of this._messages) {
             const s = item.toString();
             list.push(s);

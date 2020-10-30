@@ -40,7 +40,7 @@ export class QbsProject implements vscode.Disposable {
     isEmpty(): boolean { return this._data; }
 
     async enumerateProducts(): Promise<QbsProduct[]> {
-        let products: QbsProduct[] = [];
+        const products: QbsProduct[] = [];
         const parseProject = async (project: any) => {
             const datas = project ? (project['products'] || []) : [];
             for (const data of datas) {

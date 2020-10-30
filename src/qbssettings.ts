@@ -212,7 +212,7 @@ export class QbsSettings implements vscode.Disposable {
                     if (error) {
                         reject(undefined);
                     } else {
-                        let profiles: QbsProfile[] = [];
+                        const profiles: QbsProfile[] = [];
                         stdout.split('\n').map(function (line) {
                             if (!line.startsWith('profiles'))
                                 return;
@@ -240,7 +240,7 @@ export class QbsSettings implements vscode.Disposable {
      * @c debug and @c release.
      */
     async enumerateConfigurations(): Promise<QbsConfig[]> {
-        let configurations = [];
+        const configurations = [];
         configurations.push(new QbsConfig(
             'debug',
             localize('qbs.configuration.debug.label', 'Debug'),
@@ -267,7 +267,7 @@ export class QbsSettings implements vscode.Disposable {
         return new Promise<QbsDebugger[]>((resolve, reject) => {
             const settingsPath = this.debuggerSettingsPath();
             fs.readFile(settingsPath, (error, data) => {
-                let debuggers: QbsDebugger[] = [];
+                const debuggers: QbsDebugger[] = [];
                 try {
                     const json = JSON.parse(data.toString());
                     const configurations = (json['configurations'] || []);

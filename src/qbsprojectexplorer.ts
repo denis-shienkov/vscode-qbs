@@ -23,7 +23,7 @@ class QbsProjectData {
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
 
     products(): QbsProductData[] {
-        let products: QbsProductData[] = [];
+        const products: QbsProductData[] = [];
         const datas = this._data['products'] || [];
         for (const data of datas) {
             const product = new QbsProductData(data);
@@ -33,7 +33,7 @@ class QbsProjectData {
     }
 
     subProjects(): QbsProjectData[] {
-        let projects: QbsProjectData[] = [];
+        const projects: QbsProjectData[] = [];
         const datas = this._data['sub-projects'] || [];
         for (const data of datas) {
             const project = new QbsProjectData(data);
@@ -52,7 +52,7 @@ class QbsProductData {
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
 
     groups(): QbsGroupData[] {
-        let groups: QbsGroupData[] = [];
+        const groups: QbsGroupData[] = [];
         const datas = this._data['groups'] || [];
         for (const data of datas) {
             const group = new QbsGroupData(data);
@@ -69,7 +69,7 @@ class QbsGroupData {
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
 
     sourceArtifacts(): QbsSourceArtifactData[] {
-        let artifacts: QbsSourceArtifactData[] = [];
+        const artifacts: QbsSourceArtifactData[] = [];
         const datas = this._data['source-artifacts'] || [];
         for (const data of datas) {
             artifacts.push(new QbsSourceArtifactData(data));
@@ -78,7 +78,7 @@ class QbsGroupData {
     }
 
     sourceWildcardsArtifacts(): QbsSourceArtifactData[] {
-        let artifacts: QbsSourceArtifactData[] = [];
+        const artifacts: QbsSourceArtifactData[] = [];
         const datas = this._data['source-artifacts-from-wildcards'] || [];
         for (const data of datas) {
             artifacts.push(new QbsSourceArtifactData(data));
@@ -158,7 +158,7 @@ export class QbsGroupNode extends BaseNode {
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [ new QbsLocationNode(this._group.location(), true) ];
+        const nodes: BaseNode[] = [ new QbsLocationNode(this._group.location(), true) ];
         const sources = this._group.sourceArtifacts();
         for (const source of sources) {
             const node = new QbsSourceArtifactNode(source);
@@ -188,7 +188,7 @@ export class QbsProductNode extends BaseNode {
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [ new QbsLocationNode(this._product.location(), true) ];
+        const nodes: BaseNode[] = [ new QbsLocationNode(this._product.location(), true) ];
         const groups = this._product.groups();
         for (const group of groups) {
             if (!group.isEmpty()) {
@@ -215,7 +215,7 @@ export class QbsProjectNode extends BaseNode {
     }
 
     getChildren(): BaseNode[] {
-        let nodes: BaseNode[] = [ new QbsLocationNode(this._project.location(), true) ];
+        const nodes: BaseNode[] = [ new QbsLocationNode(this._project.location(), true) ];
         const products = this._project.products();
         for (const product of products) {
             const node = new QbsProductNode(product);

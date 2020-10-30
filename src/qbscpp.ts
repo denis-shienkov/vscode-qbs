@@ -55,7 +55,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
      * @note From the cpt.CustomConfigurationProvider interface.
      */
     async provideConfigurations(uris: vscode.Uri[]): Promise<cpt.SourceFileConfigurationItem[]> {
-        let items: cpt.SourceFileConfigurationItem[] = [];
+        const items: cpt.SourceFileConfigurationItem[] = [];
         for (const uri of uris) {
             const configuration = this._sourceFileConfigurations.get(uri.toString());
             if (configuration) {
