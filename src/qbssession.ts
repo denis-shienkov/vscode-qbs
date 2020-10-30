@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
-import * as fs from 'fs';
 
 import {QbsProject} from './qbsproject';
 import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
-import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
+import {QbsGetRunEnvironmentRequest, QbsRequest, QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {
     QbsOperation,
     QbsSessionHelloResult, QbsSessionProcessResult,
     QbsSessionTaskStartedResult, QbsSessionTaskProgressResult,
     QbsSessionTaskMaxProgressResult, QbsSessionMessageResult
 } from './qbssessionresults';
+import { env } from 'process';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -103,6 +103,14 @@ export class QbsSession implements vscode.Disposable {
     settings(): QbsSettings { return this._settings; }
     status(): QbsSessionStatus { return this._status; }
 
+    async emitOperation(operation: QbsOperation) { this._onOperationChanged.fire(operation); }
+    async resolve(request: QbsRequest) { await this.sendRequest(request); }
+    async build(request: QbsRequest) { await this.sendRequest(request); }
+    async clean(request: QbsRequest) { await this.sendRequest(request); }
+    async install(request: QbsRequest) { await this.sendRequest(request); }
+    async cancel(request: QbsRequest) { await this.sendRequest(request); }
+    async getRunEnvironment(request: QbsRequest) { await this.sendRequest(request); }
+
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
             const qbsPath = this._settings.executablePath();
@@ -118,177 +126,15 @@ export class QbsSession implements vscode.Disposable {
         }
     }
 
-    async emitOperation(operation: QbsOperation) {
-        this._onOperationChanged.fire(operation);
-    }
-
-    async resolveProjectWithForceProbesExecution() {
-        let request: any = {};
-        request['type'] = 'resolve-project';
-        request['environment'] = process.env;
-        request['data-mode'] = 'only-if-changed';
-        request['module-properties'] = [
-            'cpp.compilerVersionMajor',
-            'cpp.compilerVersionMinor',
-            'cpp.compilerVersionPatch',
-            'cpp.compilerIncludePaths',
-            'cpp.distributionIncludePaths',
-            'cpp.systemIncludePaths',
-            'cpp.includePaths',
-            'cpp.frameworkPaths',
-            'cpp.systemFrameworkPaths',
-            'cpp.compilerDefinesByLanguage',
-            'cpp.defines',
-            'cpp.compilerName',
-            'cpp.compilerPath',
-            'cpp.compilerPathByLanguage',
-            'cpp.cLanguageVersion',
-            'cpp.cxxLanguageVersion',
-            'cpp.prefixHeaders',
-            'qbs.architecture',
-            'qbs.toolchain'
-        ];
-        request['project-file-path'] = this._project?.filePath();
-        request['configuration-name'] = this._project?.buildStep().configurationName();
-        request['top-level-profile'] = this._project?.buildStep().profileName();
-        const buildDirectory = this._settings.buildDirectory();
-        request['build-root'] = buildDirectory;
-        // Do not store the build graph if the build directory does not exist yet.
-        request['dry-run'] = !fs.existsSync(buildDirectory);
-        const settingsDirectory = this._settings.settingsDirectory();
-        if (settingsDirectory.length > 0) {
-            request['settings-directory'] = settingsDirectory;
-        }
-        request['force-probe-execution'] = true;
-        request['error-handling-mode'] = this._settings.errorHandlingMode();
-        request['log-level'] = this._settings.logLevel();
-        await this.sendRequest(request);
-    }
-
-    async resolveProject() {
-        let request: any = {};
-        request['type'] = 'resolve-project';
-        request['environment'] = process.env;
-        request['data-mode'] = 'only-if-changed';
-        request['module-properties'] = [
-            'cpp.compilerVersionMajor',
-            'cpp.compilerVersionMinor',
-            'cpp.compilerVersionPatch',
-            'cpp.compilerIncludePaths',
-            'cpp.distributionIncludePaths',
-            'cpp.systemIncludePaths',
-            'cpp.includePaths',
-            'cpp.frameworkPaths',
-            'cpp.systemFrameworkPaths',
-            'cpp.compilerDefinesByLanguage',
-            'cpp.defines',
-            'cpp.compilerName',
-            'cpp.compilerPath',
-            'cpp.compilerPathByLanguage',
-            'cpp.cLanguageVersion',
-            'cpp.cxxLanguageVersion',
-            'cpp.prefixHeaders',
-            'qbs.architecture',
-            'qbs.toolchain'
-        ];
-        request['project-file-path'] = this._project?.filePath();
-        request['configuration-name'] = this._project?.buildStep().configurationName();
-        request['top-level-profile'] = this._project?.buildStep().profileName();
-        const buildDirectory = this._settings.buildDirectory();
-        request['build-root'] = buildDirectory;
-        // Do not store the build graph if the build directory does not exist yet.
-        request['dry-run'] = !fs.existsSync(buildDirectory);
-        const settingsDirectory = this._settings.settingsDirectory();
-        if (settingsDirectory.length > 0) {
-            request['settings-directory'] = settingsDirectory;
-        }
-        request['force-probe-execution'] = this._settings.forceProbes();
-        request['error-handling-mode'] = this._settings.errorHandlingMode();
-        request['log-level'] = this._settings.logLevel();
-        await this.sendRequest(request);
-    }
-
-    async buildProject() {
-        let request: any = {};
-        request['type'] = 'build-project';
-        request['data-mode'] = 'only-if-changed';
-        request['install'] = true;
-        request['products'] = [this._project?.buildStep().productName()];
-        const maxJobs = this._settings.maxJobs();
-        if (maxJobs > 0) {
-            request['max-job-count'] = maxJobs;
-        }
-        request['keep-going'] = this._settings.keepGoing();
-        request['command-echo-mode'] = this._settings.showCommandLines() ? 'command-line' : 'summary';
-        request['log-level'] = this._settings.logLevel();
-        request['clean-install-root'] = this._settings.cleanInstallRoot();
-        await this.sendRequest(request);
-    }
-
-    async cleanProject() {
-        let request: any = {};
-        request['type'] = 'clean-project';
-        request['products'] = [this._project?.buildStep().productName()];
-        request['keep-going'] = this._settings.keepGoing();
-        request['log-level'] = this._settings.logLevel();
-        await this.sendRequest(request);
-    }
-
-    async installProject() {
-        let request: any = {};
-        request['type'] = 'install-project';
-        request['keep-going'] = this._settings.keepGoing();
-        request['log-level'] = this._settings.logLevel();
-        await this.sendRequest(request);
-    }
-
-    async cancelJob() {
-        let request: any = {};
-        request['type'] = 'cancel-job';
-
-        await this.sendRequest(request);
-    }
-
-    async getRunEnvironment() {
-        let request: any = {};
-        request['type'] = 'get-run-environment';
-        request['product'] = this._project?.runStep().productName();
-        await this.sendRequest(request);
-    }
-
-    async buildProducts(productNames: string[]) {
-        let request: any = {};
-        request['type'] = 'build-project';
-        request['data-mode'] = 'only-if-changed';
-        request['install'] = true;
-        request['products'] = productNames;
-        const maxJobs = this._settings.maxJobs();
-        if (maxJobs > 0) {
-            request['max-job-count'] = maxJobs;
-        }
-        request['keep-going'] = this._settings.keepGoing();
-        request['command-echo-mode'] = this._settings.showCommandLines() ? 'command-line' : 'summary';
-        request['log-level'] = this._settings.logLevel();
-        request['clean-install-root'] = this._settings.cleanInstallRoot();
-        await this.sendRequest(request);
-    }
-
-    async cleanProducts(productNames: string[]) {
-        let request: any = {};
-        request['type'] = 'clean-project';
-        request['products'] = productNames;
-        request['keep-going'] = this._settings.keepGoing();
-        request['log-level'] = this._settings.logLevel();
-        await this.sendRequest(request);
-    }
-
     async ensureRunEnvironmentUpdated() {
         return new Promise<boolean>(resolve => {
             const runEnvironmentResultReceivedSubscription = this.onRunEnvironmentResultReceived(result => {
                 runEnvironmentResultReceivedSubscription.dispose();
                 resolve(result.isEmpty());
             });
-            this.getRunEnvironment();
+            const envRequest = new QbsGetRunEnvironmentRequest(this.settings());
+            envRequest.setProductName(this._project?.runStep().productName() || '');
+            this.getRunEnvironment(envRequest);
         });
     }
 
@@ -414,7 +260,6 @@ export class QbsSession implements vscode.Disposable {
         if (status !== this._status) {
             this._status = status;
             this._onStatusChanged.fire(this._status);
-
             if (status === QbsSessionStatus.Started) {
                 await vscode.commands.executeCommand('qbs.restoreProject');
             }
