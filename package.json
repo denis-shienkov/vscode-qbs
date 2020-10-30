@@ -186,6 +186,16 @@
                 "command": "qbs.cleanProduct",
                 "title": "%qbs-tools.command.qbs.clean.title%",
                 "category": "QBS"
+            },
+            {
+                "command": "qbs.buildSubProject",
+                "title": "%qbs-tools.command.qbs.build.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.cleanSubProject",
+                "title": "%qbs-tools.command.qbs.clean.title%",
+                "category": "QBS"
             }
         ],
         "menus": {
@@ -196,6 +206,14 @@
                 },
                 {
                     "command": "qbs.cleanProduct",
+                    "when": "never"
+                },
+                {
+                    "command": "qbs.buildSubProject",
+                    "when": "never"
+                },
+                {
+                    "command": "qbs.cleanSubProject",
                     "when": "never"
                 }
             ],
@@ -236,6 +254,16 @@
                     "command": "qbs.buildProduct",
                     "when": "viewItem == product-node",
                     "group": "product_context@2"
+                },
+                {
+                    "command": "qbs.cleanSubProject",
+                    "when": "viewItem == sub-project-node",
+                    "group": "project_context@1"
+                },
+                {
+                    "command": "qbs.buildSubProject",
+                    "when": "viewItem == sub-project-node",
+                    "group": "project_context@2"
                 }
             ]
         },

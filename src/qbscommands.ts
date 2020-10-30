@@ -11,7 +11,7 @@ import {
     QbsResolveRequest, QbsBuildRequest, QbsCleanRequest,
     QbsInstallRequest, QbsCancelRequest, QbsGetRunEnvironmentRequest} from './qbssessionprotocol';
 import {QbsOperation, QbsOperationStatus, QbsOperationType} from './qbssessionresults';
-import {QbsProductNode} from './qbsprojectexplorer';
+import {QbsProductNode, QbsProjectNode} from './qbsprojectexplorer';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -564,6 +564,16 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cleanProduct', async (productNode: QbsProductNode) => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProductNames([ productNode.name() ]);
+        await onCleanCommand(session, cleanRequest);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.buildSubProject', async (projectNode: QbsProjectNode) => {
+        const buildRequest = new QbsBuildRequest(session.settings());
+        buildRequest.setProductNames(projectNode.dependentProductNames());
+        await onBuildCommand(session, buildRequest);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cleanSubProject', async (projectNode: QbsProjectNode) => {
+        const cleanRequest = new QbsCleanRequest(session.settings());
+        cleanRequest.setProductNames(projectNode.dependentProductNames());
         await onCleanCommand(session, cleanRequest);
     }));
 }

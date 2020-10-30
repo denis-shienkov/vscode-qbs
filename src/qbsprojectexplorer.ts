@@ -210,6 +210,7 @@ export class QbsProjectNode extends BaseNode {
                                          : vscode.TreeItemCollapsibleState.Collapsed;
         const item = new vscode.TreeItem(this._project.name(), collapsible);
         item.iconPath = new vscode.ThemeIcon('project');
+        item.contextValue = this._isRoot ? 'root-project-node' : 'sub-project-node';
         return item;
     }
 
@@ -226,6 +227,22 @@ export class QbsProjectNode extends BaseNode {
             nodes.push(node);
         }
         return nodes;
+    }
+
+    dependentProductNames(): string[] {
+        const productNames: string[] = [];
+        const extractProductNames = (project: QbsProjectData) => {
+            const products = project.products();
+            for (const product of products) {
+                productNames.push(product.fullDisplayName());
+            }
+            const projects = project.subProjects();
+            for (const project of projects) {
+                extractProductNames(project);
+            }
+        }
+        extractProductNames(this._project);
+        return productNames;
     }
 }
 
