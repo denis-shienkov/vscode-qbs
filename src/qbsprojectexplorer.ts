@@ -47,6 +47,7 @@ class QbsProductData {
     constructor(private readonly _data: any) {}
     id(): string { return this.buildDirectory(); }
     name(): string { return this._data['name']; }
+    fullDisplayName() { return this._data['full-display-name']; }
     buildDirectory(): string { return this._data['build-directory']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
 
@@ -103,7 +104,7 @@ abstract class BaseNode {
     abstract getTreeItem(): vscode.TreeItem;
 }
 
-class QbsSourceArtifactNode extends BaseNode {
+export class QbsSourceArtifactNode extends BaseNode {
     constructor(private readonly _artifact: QbsSourceArtifactData) {
         super(_artifact.id());
     }
@@ -122,7 +123,7 @@ class QbsSourceArtifactNode extends BaseNode {
     getChildren(): BaseNode[] { return []; }
 }
 
-class QbsLocationNode extends BaseNode {
+export class QbsLocationNode extends BaseNode {
     constructor(private readonly _location: QbsLocationData, private readonly _isQbsFile: boolean) {
         super(_location.id());
     }
@@ -145,7 +146,7 @@ class QbsLocationNode extends BaseNode {
     getChildren(): BaseNode[] { return []; }
 }
 
-class QbsGroupNode extends BaseNode {
+export class QbsGroupNode extends BaseNode {
     constructor(private readonly _group: QbsGroupData) {
         super(_group.id());
     }
@@ -172,14 +173,17 @@ class QbsGroupNode extends BaseNode {
     }
 }
 
-class QbsProductNode extends BaseNode {
+export class QbsProductNode extends BaseNode {
     constructor(private readonly _product: QbsProductData) {
         super(_product.id());
     }
 
+    name(): string { return this._product.fullDisplayName(); }
+
     getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this._product.name(), vscode.TreeItemCollapsibleState.Collapsed);
         item.iconPath = new vscode.ThemeIcon('gift');
+        item.contextValue = 'product-node'
         return item;
     }
 
@@ -196,7 +200,7 @@ class QbsProductNode extends BaseNode {
     }
 }
 
-class QbsProjectNode extends BaseNode {
+export class QbsProjectNode extends BaseNode {
     constructor(private readonly _project: QbsProjectData, private readonly _isRoot: boolean) {
         super(_project.id());
     }

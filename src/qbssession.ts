@@ -256,6 +256,32 @@ export class QbsSession implements vscode.Disposable {
         await this.sendRequest(request);
     }
 
+    async buildProducts(productNames: string[]) {
+        let request: any = {};
+        request['type'] = 'build-project';
+        request['data-mode'] = 'only-if-changed';
+        request['install'] = true;
+        request['products'] = productNames;
+        const maxJobs = this._settings.maxJobs();
+        if (maxJobs > 0) {
+            request['max-job-count'] = maxJobs;
+        }
+        request['keep-going'] = this._settings.keepGoing();
+        request['command-echo-mode'] = this._settings.showCommandLines() ? 'command-line' : 'summary';
+        request['log-level'] = this._settings.logLevel();
+        request['clean-install-root'] = this._settings.cleanInstallRoot();
+        await this.sendRequest(request);
+    }
+
+    async cleanProducts(productNames: string[]) {
+        let request: any = {};
+        request['type'] = 'clean-project';
+        request['products'] = productNames;
+        request['keep-going'] = this._settings.keepGoing();
+        request['log-level'] = this._settings.logLevel();
+        await this.sendRequest(request);
+    }
+
     async ensureRunEnvironmentUpdated() {
         return new Promise<boolean>(resolve => {
             const runEnvironmentResultReceivedSubscription = this.onRunEnvironmentResultReceived(result => {

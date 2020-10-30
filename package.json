@@ -44,6 +44,7 @@
         "onCommand:qbs.resolveWithForceProbesExecution",
         "onCommand:qbs.resolve",
         "onCommand:qbs.build",
+        "onCommand:qbs.buildProduct",
         "onCommand:qbs.clean",
         "onCommand:qbs.install",
         "onCommand:qbs.cancel",
@@ -175,9 +176,29 @@
                 "command": "qbs.debug",
                 "title": "%qbs-tools.command.qbs.debug.title%",
                 "category": "QBS"
+            },
+            {
+                "command": "qbs.buildProduct",
+                "title": "%qbs-tools.command.qbs.build.title%",
+                "category": "QBS"
+            },
+            {
+                "command": "qbs.cleanProduct",
+                "title": "%qbs-tools.command.qbs.clean.title%",
+                "category": "QBS"
             }
         ],
         "menus": {
+            "commandPalette": [
+                {
+                    "command": "qbs.buildProduct",
+                    "when": "never"
+                },
+                {
+                    "command": "qbs.cleanProduct",
+                    "when": "never"
+                }
+            ],
             "view/title": [
                 {
                     "command": "qbs.resolve",
@@ -203,6 +224,18 @@
                     "command": "qbs.rebuild",
                     "when": "view == qbs-project",
                     "group": "1_outline"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "qbs.cleanProduct",
+                    "when": "viewItem == product-node",
+                    "group": "product_context@1"
+                },
+                {
+                    "command": "qbs.buildProduct",
+                    "when": "viewItem == product-node",
+                    "group": "product_context@2"
                 }
             ]
         },
