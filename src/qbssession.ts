@@ -5,11 +5,13 @@ import {QbsProject} from './qbsproject';
 import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
 import {
-    QbsGetRunEnvironmentRequest, QbsRequest,
     QbsSessionProtocol, QbsSessionProtocolStatus
 } from './qbssessionprotocol';
 import {
     QbsOperation,
+    // Protocol requests.
+    QbsGetRunEnvironmentRequest, QbsRequest,
+    // Protocol responses.
     QbsHelloResponse, QbsProcessResponse,
     QbsTaskStartedResponse, QbsTaskProgressResponse,
     QbsTaskMaxProgressResponse, QbsMessageResponse

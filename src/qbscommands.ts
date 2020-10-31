@@ -8,9 +8,12 @@ import * as QbsUtils from './qbsutils';
 
 import {QbsSession, QbsSessionStatus} from './qbssession';
 import {
+    QbsOperation, QbsOperationStatus, QbsOperationType,
+    // Protocol requests.
     QbsResolveRequest, QbsBuildRequest, QbsCleanRequest,
-    QbsInstallRequest, QbsCancelRequest, QbsGetRunEnvironmentRequest} from './qbssessionprotocol';
-import {QbsOperation, QbsOperationStatus, QbsOperationType} from './qbstypes';
+    QbsInstallRequest, QbsCancelRequest, QbsGetRunEnvironmentRequest
+
+} from './qbstypes';
 import {QbsProductNode, QbsProjectNode} from './qbsprojectexplorer';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
