@@ -1,4 +1,4 @@
-export class QbsHelloData {
+export class QbsHelloResponse {
     readonly _apiLevel: number = 0;
     readonly _apiCompatibilityLevel: number = 0;
 
@@ -8,7 +8,7 @@ export class QbsHelloData {
     }
 }
 
-export class QbsProcessData {
+export class QbsProcessResponse {
     readonly _executable: string;
     readonly _arguments: string[];
     readonly _workingDirectory: string;
@@ -26,7 +26,7 @@ export class QbsProcessData {
     }
 }
 
-export class QbsTaskStartedData {
+export class QbsTaskStartedResponse {
     readonly _description: string;
     readonly _maxProgress: number;
 
@@ -36,7 +36,7 @@ export class QbsTaskStartedData {
     }
 }
 
-export class QbsTaskProgressData {
+export class QbsTaskProgressResponse {
     readonly _progress: number;
 
     constructor(response: any) {
@@ -44,7 +44,7 @@ export class QbsTaskProgressData {
     }
 }
 
-export class QbsTaskMaxProgressData {
+export class QbsTaskMaxProgressResponse {
     readonly _maxProgress: number;
 
     constructor(response: any) {
@@ -52,7 +52,7 @@ export class QbsTaskMaxProgressData {
     }
 }
 
-export class QbsMessageItemData {
+export class QbsMessageItemResponse {
     readonly _description: string = '';
     readonly _filePath: string = '';
     readonly _line: number = -1;
@@ -80,17 +80,17 @@ export class QbsMessageItemData {
     }
 }
 
-export class QbsMessageData {
-    readonly _messages: QbsMessageItemData[] = [];
+export class QbsMessageResponse {
+    readonly _messages: QbsMessageItemResponse[] = [];
 
     constructor(obj: any) {
         if (typeof obj === 'string') {
-            const message = new QbsMessageItemData(obj);
+            const message = new QbsMessageItemResponse(obj);
             this._messages.push(message);
         } else if (obj) {
             const items = obj['items'] || [];
             for (const item of items) {
-                const message = new QbsMessageItemData(item);
+                const message = new QbsMessageItemResponse(item);
                 this._messages.push(message);
             }
         }

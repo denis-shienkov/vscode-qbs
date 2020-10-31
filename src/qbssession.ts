@@ -10,9 +10,9 @@ import {
 } from './qbssessionprotocol';
 import {
     QbsOperation,
-    QbsHelloData, QbsProcessData,
-    QbsTaskStartedData, QbsTaskProgressData,
-    QbsTaskMaxProgressData, QbsMessageData
+    QbsHelloResponse, QbsProcessResponse,
+    QbsTaskStartedResponse, QbsTaskProgressResponse,
+    QbsTaskMaxProgressResponse, QbsMessageResponse
 } from './qbstypes';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
@@ -30,37 +30,37 @@ export class QbsSession implements vscode.Disposable {
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
     private _onProjectActivated: vscode.EventEmitter<QbsProject> = new vscode.EventEmitter<QbsProject>();
 
-    private _onHelloReceived: vscode.EventEmitter<QbsHelloData> = new vscode.EventEmitter<QbsHelloData>();
-    private _onProjectResolved: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onProjectBuilt: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onProjectCleaned: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onProjectInstalled: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onWarningMessageReceived: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onLogMessageReceived: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onTaskStarted: vscode.EventEmitter<QbsTaskStartedData> = new vscode.EventEmitter<QbsTaskStartedData>();
-    private _onTaskProgressUpdated: vscode.EventEmitter<QbsTaskProgressData> = new vscode.EventEmitter<QbsTaskProgressData>();
-    private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsTaskMaxProgressData> = new vscode.EventEmitter<QbsTaskMaxProgressData>();
-    private _onCommandDescriptionReceived: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
-    private _onProcessResultReceived: vscode.EventEmitter<QbsProcessData> = new vscode.EventEmitter<QbsProcessData>();
-    private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsMessageData> = new vscode.EventEmitter<QbsMessageData>();
+    private _onHelloReceived: vscode.EventEmitter<QbsHelloResponse> = new vscode.EventEmitter<QbsHelloResponse>();
+    private _onProjectResolved: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onProjectBuilt: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onProjectCleaned: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onProjectInstalled: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onWarningMessageReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onLogMessageReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onTaskStarted: vscode.EventEmitter<QbsTaskStartedResponse> = new vscode.EventEmitter<QbsTaskStartedResponse>();
+    private _onTaskProgressUpdated: vscode.EventEmitter<QbsTaskProgressResponse> = new vscode.EventEmitter<QbsTaskProgressResponse>();
+    private _onTaskMaxProgressChanged: vscode.EventEmitter<QbsTaskMaxProgressResponse> = new vscode.EventEmitter<QbsTaskMaxProgressResponse>();
+    private _onCommandDescriptionReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onProcessResultReceived: vscode.EventEmitter<QbsProcessResponse> = new vscode.EventEmitter<QbsProcessResponse>();
+    private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
 
     readonly onOperationChanged: vscode.Event<QbsOperation> = this._onOperationChanged.event;
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
     readonly onProjectActivated: vscode.Event<QbsProject> = this._onProjectActivated.event;
 
-    readonly onHelloReceived: vscode.Event<QbsHelloData> = this._onHelloReceived.event;
-    readonly onProjectResolved: vscode.Event<QbsMessageData> = this._onProjectResolved.event;
-    readonly onProjectBuilt: vscode.Event<QbsMessageData> = this._onProjectBuilt.event;
-    readonly onProjectCleaned: vscode.Event<QbsMessageData> = this._onProjectCleaned.event;
-    readonly onProjectInstalled: vscode.Event<QbsMessageData> = this._onProjectInstalled.event;
-    readonly onWarningMessageReceived: vscode.Event<QbsMessageData> = this._onWarningMessageReceived.event;
-    readonly onLogMessageReceived: vscode.Event<QbsMessageData> = this._onLogMessageReceived.event;
-    readonly onTaskStarted: vscode.Event<QbsTaskStartedData> = this._onTaskStarted.event;
-    readonly onTaskProgressUpdated: vscode.Event<QbsTaskProgressData> = this._onTaskProgressUpdated.event;
-    readonly onTaskMaxProgressChanged: vscode.Event<QbsTaskMaxProgressData> = this._onTaskMaxProgressChanged.event;
-    readonly onCommandDescriptionReceived: vscode.Event<QbsMessageData> = this._onCommandDescriptionReceived.event;
-    readonly onProcessResultReceived: vscode.Event<QbsProcessData> = this._onProcessResultReceived.event;
-    readonly onRunEnvironmentResultReceived: vscode.Event<QbsMessageData> = this._onRunEnvironmentResultReceived.event;
+    readonly onHelloReceived: vscode.Event<QbsHelloResponse> = this._onHelloReceived.event;
+    readonly onProjectResolved: vscode.Event<QbsMessageResponse> = this._onProjectResolved.event;
+    readonly onProjectBuilt: vscode.Event<QbsMessageResponse> = this._onProjectBuilt.event;
+    readonly onProjectCleaned: vscode.Event<QbsMessageResponse> = this._onProjectCleaned.event;
+    readonly onProjectInstalled: vscode.Event<QbsMessageResponse> = this._onProjectInstalled.event;
+    readonly onWarningMessageReceived: vscode.Event<QbsMessageResponse> = this._onWarningMessageReceived.event;
+    readonly onLogMessageReceived: vscode.Event<QbsMessageResponse> = this._onLogMessageReceived.event;
+    readonly onTaskStarted: vscode.Event<QbsTaskStartedResponse> = this._onTaskStarted.event;
+    readonly onTaskProgressUpdated: vscode.Event<QbsTaskProgressResponse> = this._onTaskProgressUpdated.event;
+    readonly onTaskMaxProgressChanged: vscode.Event<QbsTaskMaxProgressResponse> = this._onTaskMaxProgressChanged.event;
+    readonly onCommandDescriptionReceived: vscode.Event<QbsMessageResponse> = this._onCommandDescriptionReceived.event;
+    readonly onProcessResultReceived: vscode.Event<QbsProcessResponse> = this._onProcessResultReceived.event;
+    readonly onRunEnvironmentResultReceived: vscode.Event<QbsMessageResponse> = this._onRunEnvironmentResultReceived.event;
 
     constructor(private readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
@@ -206,54 +206,54 @@ export class QbsSession implements vscode.Disposable {
     private async parseResponse(response: any) {
         const type = response['type'];
         if (type === 'hello') {
-            const result = new QbsHelloData(response)
+            const result = new QbsHelloResponse(response)
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             await this._project?.setData(response, true);
             await this._project?.updateSteps();
-            const result = new QbsMessageData(response['error']);
+            const result = new QbsMessageResponse(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
             await this._project?.setData(response, false);
             await this._project?.updateSteps();
-            const result = new QbsMessageData(response['error']);
+            const result = new QbsMessageResponse(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
             await this._project?.updateSteps();
-            const result = new QbsMessageData(response['error']);
+            const result = new QbsMessageResponse(response['error']);
             this._onProjectCleaned.fire(result);
         } else if (type === 'install-done') {
-            const result = new QbsMessageData(response['error']);
+            const result = new QbsMessageResponse(response['error']);
             this._onProjectInstalled.fire(result);
         } else if (type === 'log-data') {
-            const result = new QbsMessageData(response['message']);
+            const result = new QbsMessageResponse(response['message']);
             this._onLogMessageReceived.fire(result);
         } else if (type === 'warning') {
-            const result = new QbsMessageData(response['warning']);
+            const result = new QbsMessageResponse(response['warning']);
             this._onWarningMessageReceived.fire(result);
         } else if (type === 'task-started') {
-            const result = new QbsTaskStartedData(response);
+            const result = new QbsTaskStartedResponse(response);
             this._onTaskStarted.fire(result);
         } else if (type === 'task-progress') {
-            const result = new QbsTaskProgressData(response);
+            const result = new QbsTaskProgressResponse(response);
             this._onTaskProgressUpdated.fire(result);
         } else if (type === 'new-max-progress') {
-            const result = new QbsTaskMaxProgressData(response);
+            const result = new QbsTaskMaxProgressResponse(response);
             this._onTaskMaxProgressChanged.fire(result);
         } else if (type === 'generated-files-for-source') {
             // TODO: Implement me.
         } else if (type === 'command-description') {
-            const result = new QbsMessageData(response['message']);
+            const result = new QbsMessageResponse(response['message']);
             this._onCommandDescriptionReceived.fire(result);
         } else if (type === 'files-added' || type === 'files-removed') {
             // TODO: Implement me.
         } else if (type === 'process-result') {
-            const result = new QbsProcessData(response);
+            const result = new QbsProcessResponse(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
             const env = new QbsRunEnvironment(response['full-environment']);
             this._project?.setRunEnvironment(env);
-            const result = new QbsMessageData(response['error']);
+            const result = new QbsMessageResponse(response['error']);
             this._onRunEnvironmentResultReceived.fire(result);
         }
     }
