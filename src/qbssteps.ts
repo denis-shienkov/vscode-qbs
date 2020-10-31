@@ -2,19 +2,19 @@ import * as vscode from 'vscode';
 import {QbsProject} from './qbsproject';
 
 export class QbsProfile {
-    constructor(readonly _name: string = '') {}
+    constructor(private readonly _name: string = '') {}
     name(): string { return this._name; }
 }
 
 export class QbsConfig {
-    constructor(readonly _name: string, readonly _displayName?: string, readonly _description?: string) {}
+    constructor(private readonly _name: string, private readonly _displayName?: string, private readonly _description?: string) {}
     name(): string { return this._name; }
     displayName(): string | undefined { return this._displayName; }
     description(): string | undefined { return this._description; }
 }
 
 export class QbsProduct {
-    constructor(readonly _data: any) {}
+    constructor(private readonly _data: any) {}
 
     fullDisplayName(): string { return (typeof this._data === 'string')
         ? this._data.toString() : this._data['full-display-name']; }
@@ -26,13 +26,13 @@ export class QbsProduct {
 }
 
 export class QbsDebugger {
-    constructor(readonly _data: any) {}
+    constructor(private readonly _data: any) {}
     name(): string { return this._data['name']; }
     data(): vscode.DebugConfiguration { return this._data; }
 }
 
 export class QbsRunEnvironment {
-    constructor(readonly _data: any) {}
+    constructor(private readonly _data: any) {}
     data(): any { return this._data; }
 }
 
@@ -44,7 +44,7 @@ export class QbsBuildStep implements vscode.Disposable {
 
     readonly onChanged: vscode.Event<boolean> = this._onChanged.event;
 
-    constructor (readonly _project: QbsProject) {}
+    constructor (private readonly _project: QbsProject) {}
 
     dispose() {}
 
@@ -151,7 +151,7 @@ export class QbsRunStep implements vscode.Disposable {
 
     readonly onChanged: vscode.Event<boolean> = this._onChanged.event;
 
-    constructor(readonly _project: QbsProject) {}
+    constructor(private readonly _project: QbsProject) {}
 
     dispose() {}
 

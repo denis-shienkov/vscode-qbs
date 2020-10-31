@@ -26,7 +26,7 @@ export class QbsSettings implements vscode.Disposable {
     private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
-    constructor(readonly _session: QbsSession) {
+    constructor(private readonly _session: QbsSession) {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
             if (e.affectsConfiguration('qbs.qbsPath')) {
                 this._onChanged.fire(QbsSettingsEvent.SessionRestartRequired);

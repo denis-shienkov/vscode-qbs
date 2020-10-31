@@ -7,7 +7,7 @@ export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
     private _messageOutput: vscode.OutputChannel;
 
-    constructor(readonly session: QbsSession) {
+    constructor(session: QbsSession) {
         this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
         this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
 

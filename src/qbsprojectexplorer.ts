@@ -250,7 +250,7 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<BaseNode> {
     private _onDidChangeTreeData = new vscode.EventEmitter<void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-    constructor(readonly _session: QbsSession) {
+    constructor(private readonly _session: QbsSession) {
         _session.onProjectResolved(async () => this._onDidChangeTreeData.fire());
     }
 

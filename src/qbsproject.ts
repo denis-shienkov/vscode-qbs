@@ -11,7 +11,7 @@ export class QbsProject implements vscode.Disposable {
     private _buildStep: QbsBuildStep = new QbsBuildStep(this);
     private _runStep: QbsRunStep = new QbsRunStep(this);
 
-    constructor(readonly _session: QbsSession, readonly _uri?: vscode.Uri) {}
+    constructor(private readonly _session: QbsSession, readonly _uri?: vscode.Uri) {}
 
     dispose() {
         this._buildStep.dispose();

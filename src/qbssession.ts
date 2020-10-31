@@ -4,14 +4,16 @@ import * as nls from 'vscode-nls';
 import {QbsProject} from './qbsproject';
 import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
-import {QbsGetRunEnvironmentRequest, QbsRequest, QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
+import {
+    QbsGetRunEnvironmentRequest, QbsRequest,
+    QbsSessionProtocol, QbsSessionProtocolStatus
+} from './qbssessionprotocol';
 import {
     QbsOperation,
     QbsSessionHelloResult, QbsSessionProcessResult,
     QbsSessionTaskStartedResult, QbsSessionTaskProgressResult,
     QbsSessionTaskMaxProgressResult, QbsSessionMessageResult
 } from './qbssessionresults';
-import { env } from 'process';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -60,7 +62,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onProcessResultReceived: vscode.Event<QbsSessionProcessResult> = this._onProcessResultReceived.event;
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsSessionMessageResult> = this._onRunEnvironmentResultReceived.event;
 
-    constructor(readonly _ctx: vscode.ExtensionContext) {
+    constructor(private readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
         this._protocol.onStatusChanged(async (protocolStatus) => {
             switch (protocolStatus) {
