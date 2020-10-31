@@ -158,7 +158,7 @@ export class QbsSettings implements vscode.Disposable {
             qbsPath = which.sync(qbsPath);
         }
 
-        if (qbsPath.length === 0) {
+        if (!qbsPath) {
             await vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
                                                           'QBS executable not set in configuration.'));
             return false;
@@ -173,12 +173,12 @@ export class QbsSettings implements vscode.Disposable {
     async detectProfiles(): Promise<boolean> {
         return new Promise<boolean> ((resolve, reject) => {
             const qbsPath = this.executablePath();
-            if (qbsPath.length === 0) {
+            if (!qbsPath) {
                 reject(undefined);
             } else {
                 let qbsShell = `"${qbsPath}" setup-toolchains --detect`;
                 const qbsSettingsDirectory = this.settingsDirectory();
-                if (qbsSettingsDirectory.length > 0) {
+                if (qbsSettingsDirectory) {
                     qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
                 }
                 cp.exec(qbsShell, (error, stdout, stderr) => {
@@ -200,12 +200,12 @@ export class QbsSettings implements vscode.Disposable {
     async enumerateProfiles(): Promise<QbsProfile[]> {
         return new Promise<QbsProfile[]>((resolve, reject) => {
             const qbsPath = this.executablePath();
-            if (qbsPath.length === 0) {
+            if (!qbsPath) {
                 reject(undefined);
             } else {
                 let qbsShell = `"${qbsPath}" config --list`;
                 const qbsSettingsDirectory = this.settingsDirectory();
-                if (qbsSettingsDirectory.length > 0) {
+                if (qbsSettingsDirectory) {
                     qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
                 }
                 cp.exec(qbsShell, (error, stdout, stderr) => {

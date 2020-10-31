@@ -114,7 +114,7 @@ export class QbsSession implements vscode.Disposable {
     async start() {
         if (this._status === QbsSessionStatus.Stopped) {
             const qbsPath = this._settings.executablePath();
-            if (qbsPath.length > 0) {
+            if (qbsPath.length) {
                 await this._protocol.start(qbsPath);
             }
         }
@@ -163,7 +163,7 @@ export class QbsSession implements vscode.Disposable {
             await this.setupProject(project);
         } else {
             const projects = await QbsProject.enumerateWorkspaceProjects();
-            if (projects && projects.length > 0) {
+            if (projects && projects.length) {
                 await this.setupProject(projects[0]);
             }
         }

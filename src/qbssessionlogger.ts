@@ -35,23 +35,23 @@ export class QbsSessionLogger implements vscode.Disposable {
         session.onWarningMessageReceived(async (result) => await appendCompileOutput(result))
 
         session.onTaskStarted(async (result) => {
-            if (result._description.length > 0) {
+            if (result._description) {
                 await appendCompileText(result._description);
             }
         });
 
         session.onProcessResultReceived(async (result) => {
-            const hasOutput = result._stdOutput.length > 0 || result._stdError.length > 0;
+            const hasOutput = result._stdOutput.length || result._stdError.length;
             if (result._success && !hasOutput) {
                 return;
             }
             const exe = `${result._executable} ${result._arguments.join(' ')}`;
             await appendCompileText(exe);
-            if (result._stdError.length > 0) {
+            if (result._stdError.length) {
                 const text = result._stdError.join('\n');
                 await appendCompileText(text);
             }
-            if (result._stdOutput.length > 0) {
+            if (result._stdOutput.length) {
                 const text = result._stdOutput.join('\n');
                 await appendCompileText(text);
             }

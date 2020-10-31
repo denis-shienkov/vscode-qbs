@@ -71,9 +71,9 @@ export class QbsSessionMessageItemResult {
 
     toString(): string {
         let s: string = this._filePath || '';
-        if (s.length > 0 && !isNaN(this._line) && (this._line != -1))
+        if (s && !isNaN(this._line) && (this._line != -1))
             s += ':' + this._line;
-        if (s.length > 0)
+        if (s)
             s += ':';
         s += this._description;
         return s;

@@ -176,7 +176,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         if (properties && tags) {
             if (tags.indexOf('cpp') !== -1) {
                 const languageVersion = properties['cpp.cxxLanguageVersion'];
-                if (languageVersion && languageVersion.length > 0) {
+                if (languageVersion && languageVersion.length) {
                     return languageVersion[0];
                 } else {
                     // FIXME: We need to determine the correct version
@@ -225,7 +225,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                 }
             } else if (tags.indexOf('c') !== -1) {
                 const languageVersion = properties['cpp.cLanguageVersion'];
-                if (languageVersion && languageVersion.length > 0) {
+                if (languageVersion && languageVersion.length) {
                     return languageVersion[0];
                 } else {
                     // FIXME: We need to determine the correct version
@@ -327,7 +327,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         if (properties) {
             const architecture = properties['qbs.architecture'];
             const toolchain = properties['qbs.toolchain'];
-            if (architecture && toolchain && toolchain.length > 0) {
+            if (architecture && toolchain && toolchain.length) {
                 if (toolchain.indexOf('msvc') !== -1) {
                     if (architecture === 'x86') {
                         return 'msvc-x86';
