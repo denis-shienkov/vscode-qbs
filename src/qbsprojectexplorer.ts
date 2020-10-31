@@ -171,9 +171,8 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<BaseNode> {
         if (node) {
             return node.getChildren();
         }
-        const data = this._session.project()?.data();
-        if (data) {
-            const project = new QbsProjectData(data);
+        const project = this._session.project()?.data();
+        if (project) {
             return [ new QbsProjectNode(project, true) ];
         }
         return [];

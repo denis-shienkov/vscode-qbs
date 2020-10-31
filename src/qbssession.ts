@@ -2,19 +2,18 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
 import {QbsProject} from './qbsproject';
-import {QbsRunEnvironment} from './qbssteps';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
 import {
     QbsSessionProtocol, QbsSessionProtocolStatus
 } from './qbssessionprotocol';
 import {
-    QbsOperation,
+    QbsOperation, QbsRunEnvironmentData,
     // Protocol requests.
     QbsGetRunEnvironmentRequest, QbsRequest,
     // Protocol responses.
     QbsHelloResponse, QbsProcessResponse,
     QbsTaskStartedResponse, QbsTaskProgressResponse,
-    QbsTaskMaxProgressResponse, QbsMessageResponse
+    QbsTaskMaxProgressResponse, QbsMessageResponse, QbsProjectData
 } from './qbstypes';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
@@ -211,12 +210,14 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsHelloResponse(response)
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
-            await this._project?.setData(response, true);
+            const data = new QbsProjectData(response['project-data']);
+            await this._project?.setData(data, true);
             await this._project?.updateSteps();
             const result = new QbsMessageResponse(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
-            await this._project?.setData(response, false);
+            const data = new QbsProjectData(response['project-data']);
+            await this._project?.setData(data, false);
             await this._project?.updateSteps();
             const result = new QbsMessageResponse(response['error']);
             this._onProjectBuilt.fire(result);
@@ -253,7 +254,7 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsProcessResponse(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
-            const env = new QbsRunEnvironment(response['full-environment']);
+            const env = new QbsRunEnvironmentData(response['full-environment']);
             this._project?.setRunEnvironment(env);
             const result = new QbsMessageResponse(response['error']);
             this._onRunEnvironmentResultReceived.fire(result);

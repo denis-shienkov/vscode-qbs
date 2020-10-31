@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import {basename} from 'path';
 
@@ -262,6 +263,7 @@ export class QbsProjectData {
     name(): string { return this._data['name']; }
     buildDirectory(): string { return this._data['build-directory']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+    isEmpty():boolean { return this._data === undefined; }
 
     products(): QbsProductData[] {
         const products: QbsProductData[] = [];
@@ -282,15 +284,23 @@ export class QbsProjectData {
         }
         return projects;
     }
+
+    setBuildSystemFiles(files: any) { this._data['build-system-files'] = files; }
+    buildSystemFiles(): any { return this._data['build-system-files']; }
 }
 
 export class QbsProductData {
     constructor(private readonly _data: any) {}
     id(): string { return this.buildDirectory(); }
     name(): string { return this._data['name']; }
-    fullDisplayName() { return this._data['full-display-name']; }
+    fullDisplayName(): string { return (typeof this._data === 'string')
+        ? this._data.toString() : this._data['full-display-name']; }
     buildDirectory(): string { return this._data['build-directory']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+    targetExecutable(): string { return this._data['target-executable']; }
+    isRunnable(): boolean { return this._data['is-runnable']; }
+    isEnabled(): boolean { return this._data['is-enabled']; }
+    isEmpty(): boolean { return typeof this._data === 'string'; }
 
     groups(): QbsGroupData[] {
         const groups: QbsGroupData[] = [];
@@ -337,4 +347,29 @@ export class QbsSourceArtifactData {
     filePath(): string { return this._data['file-path']; }
     fileName(): string { return basename(this.filePath()); }
     id(): string { return this.filePath(); }
+}
+
+// QBS project configurations.
+
+export class QbsProfileData {
+    constructor(private readonly _name: string = '') {}
+    name(): string { return this._name; }
+}
+
+export class QbsConfigData {
+    constructor(private readonly _name: string, private readonly _displayName?: string, private readonly _description?: string) {}
+    name(): string { return this._name; }
+    displayName(): string | undefined { return this._displayName; }
+    description(): string | undefined { return this._description; }
+}
+
+export class QbsDebuggerData {
+    constructor(private readonly _data: any) {}
+    name(): string { return this._data['name']; }
+    data(): vscode.DebugConfiguration { return this._data; }
+}
+
+export class QbsRunEnvironmentData {
+    constructor(private readonly _data: any) {}
+    data(): any { return this._data; }
 }

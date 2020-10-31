@@ -12,7 +12,7 @@ import * as cp from 'child_process';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
-import {QbsProfile, QbsConfig, QbsDebugger} from './qbssteps';
+import {QbsProfileData, QbsConfigData, QbsDebuggerData} from './qbstypes';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -197,8 +197,8 @@ export class QbsSettings implements vscode.Disposable {
      *
      * @note This function calls the Qbs executable and parses the output.
      */
-    async enumerateProfiles(): Promise<QbsProfile[]> {
-        return new Promise<QbsProfile[]>((resolve, reject) => {
+    async enumerateProfiles(): Promise<QbsProfileData[]> {
+        return new Promise<QbsProfileData[]>((resolve, reject) => {
             const qbsPath = this.executablePath();
             if (!qbsPath) {
                 reject(undefined);
@@ -212,7 +212,7 @@ export class QbsSettings implements vscode.Disposable {
                     if (error) {
                         reject(undefined);
                     } else {
-                        const profiles: QbsProfile[] = [];
+                        const profiles: QbsProfileData[] = [];
                         stdout.split('\n').map(function (line) {
                             if (!line.startsWith('profiles'))
                                 return;
@@ -220,7 +220,7 @@ export class QbsSettings implements vscode.Disposable {
                             if (startIndex !== -1) {
                                 const endIndex = line.indexOf('.', startIndex + 1);
                                 if (endIndex != -1) {
-                                    const profile = new QbsProfile(line.substring(startIndex + 1, endIndex));
+                                    const profile = new QbsProfileData(line.substring(startIndex + 1, endIndex));
                                     if (profiles.map(profile => profile.name()).indexOf(profile.name()) === -1)
                                         profiles.push(profile);
                                 }
@@ -239,19 +239,19 @@ export class QbsSettings implements vscode.Disposable {
      * @note Right now these are just two hardcoded configurations
      * @c debug and @c release.
      */
-    async enumerateConfigurations(): Promise<QbsConfig[]> {
+    async enumerateConfigurations(): Promise<QbsConfigData[]> {
         const configurations = [];
-        configurations.push(new QbsConfig(
+        configurations.push(new QbsConfigData(
             'debug',
             localize('qbs.configuration.debug.label', 'Debug'),
             localize('qbs.configuration.debug.description', 'Disable optimizations.'))
         );
-        configurations.push(new QbsConfig(
+        configurations.push(new QbsConfigData(
             'release',
             localize('qbs.configuration.release.label', 'Release'),
             localize('qbs.configuration.release.description', 'Enable optimizations.'))
         );
-        configurations.push(new QbsConfig(
+        configurations.push(new QbsConfigData(
             'custom',
             localize('qbs.configuration.custom.label', '[Custom]'),
             localize('qbs.configuration.custom.description', 'Custom configuration.'))
@@ -263,16 +263,16 @@ export class QbsSettings implements vscode.Disposable {
      * Returns the list of all available debug configurations
      * stored in the 'launch.json' files.
      */
-    async enumerateDebuggers(): Promise<QbsDebugger[]> {
-        return new Promise<QbsDebugger[]>((resolve, reject) => {
+    async enumerateDebuggers(): Promise<QbsDebuggerData[]> {
+        return new Promise<QbsDebuggerData[]>((resolve, reject) => {
             const settingsPath = this.debuggerSettingsPath();
             fs.readFile(settingsPath, (error, data) => {
-                const debuggers: QbsDebugger[] = [];
+                const debuggers: QbsDebuggerData[] = [];
                 try {
                     const json = JSON.parse(data.toString());
                     const configurations = (json['configurations'] || []);
                     for (const configuration of configurations) {
-                        debuggers.push(new QbsDebugger(configuration));
+                        debuggers.push(new QbsDebuggerData(configuration));
                     }
                 } catch (e) {
                 }

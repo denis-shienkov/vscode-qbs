@@ -4,10 +4,11 @@ import {basename} from 'path';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
-import {QbsBuildStep, QbsRunStep, QbsProduct, QbsRunEnvironment} from './qbssteps';
+import {QbsBuildStep, QbsRunStep} from './qbssteps';
+import {QbsProjectData, QbsProductData, QbsRunEnvironmentData} from './qbstypes';
 
 export class QbsProject implements vscode.Disposable {
-    private _data?: any;
+    private _data?: QbsProjectData;
     private _buildStep: QbsBuildStep = new QbsBuildStep(this);
     private _runStep: QbsRunStep = new QbsRunStep(this);
 
@@ -23,39 +24,22 @@ export class QbsProject implements vscode.Disposable {
     name(): string { return this._uri ? basename(this._uri.fsPath) : 'unknown'; }
     filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
 
-    async setData(response: any, withBuildSystemFiles: boolean) {
-        const data = response['project-data'];
-        if (data) {
-            this._data = data;
+    async setData(data: QbsProjectData, withBuildSystemFiles: boolean) {
+        if (!data.isEmpty()) {
+            const buildSystemFiles = this._data?.buildSystemFiles();
             if (!withBuildSystemFiles) {
-                this._data['build-system-files'] = data['build-system-files'];
+                data.setBuildSystemFiles(buildSystemFiles);
             }
+            this._data = data;
         }
     }
 
-    data(): any | undefined { return this._data; }
-    setRunEnvironment(env: QbsRunEnvironment) { this._runStep.setup(undefined, undefined, env); }
+    data(): QbsProjectData | undefined { return this._data; }
+    setRunEnvironment(env: QbsRunEnvironmentData) { this._runStep.setup(undefined, undefined, env); }
     buildStep(): QbsBuildStep { return this._buildStep; }
     runStep(): QbsRunStep { return this._runStep; }
-    isEmpty(): boolean { return this._data; }
-
-    async enumerateProducts(): Promise<QbsProduct[]> {
-        const products: QbsProduct[] = [];
-        const parseProject = async (project: any) => {
-            const datas = project ? (project['products'] || []) : [];
-            for (const data of datas) {
-                const product = new QbsProduct(data);
-                products.push(product);
-            }
-
-            const subProjects = project ? (project['sub-projects'] || []) : [];
-            for (const subProject of subProjects) {
-                await parseProject(subProject);
-            }
-        };
-        await parseProject(this._data);
-        return products;
-    }
+    isEmpty(): boolean { return this._data ? true : false; }
+    products(): QbsProductData[] { return this._data?.products() || []; }
 
     async updateSteps() {
         await this._buildStep.restore();
