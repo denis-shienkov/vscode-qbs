@@ -135,7 +135,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
     private _input: string = '';
     private _expectedLength: number = -1;
     private _status: QbsSessionProtocolStatus = QbsSessionProtocolStatus.Stopped;
-    private _process: cp.ChildProcess | undefined;
+    private _process?: cp.ChildProcess;
     private _onStatusChanged: vscode.EventEmitter<QbsSessionProtocolStatus> = new vscode.EventEmitter<QbsSessionProtocolStatus>();
     private _onResponseReceived: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
 
