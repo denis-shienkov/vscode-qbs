@@ -1,102 +1,13 @@
 import * as vscode from "vscode";
 import * as nls from 'vscode-nls';
-import {basename} from 'path';
 
 import {QbsSession} from './qbssession';
+import {
+    QbsSourceArtifactData, QbsLocationData,
+    QbsGroupData, QbsProductData, QbsProjectData
+} from './qbstypes';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
-
-class QbsLocationData {
-    constructor(private readonly _data: any) {}
-    filePath(): string { return this._data['file-path']; }
-    fileName(): string { return basename(this.filePath()); }
-    line(): number { return this._data['line']; }
-    column(): number { return this._data['column']; }
-    id(): string { return this.filePath() + ':' + this.line() + ':' + this.column(); }
-}
-
-class QbsProjectData {
-    constructor(private readonly _data: any) {}
-    id(): string { return this.buildDirectory(); }
-    name(): string { return this._data['name']; }
-    buildDirectory(): string { return this._data['build-directory']; }
-    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
-
-    products(): QbsProductData[] {
-        const products: QbsProductData[] = [];
-        const datas = this._data['products'] || [];
-        for (const data of datas) {
-            const product = new QbsProductData(data);
-            products.push(product);
-        }
-        return products;
-    }
-
-    subProjects(): QbsProjectData[] {
-        const projects: QbsProjectData[] = [];
-        const datas = this._data['sub-projects'] || [];
-        for (const data of datas) {
-            const project = new QbsProjectData(data);
-            projects.push(project);
-        }
-        return projects;
-    }
-}
-
-class QbsProductData {
-    constructor(private readonly _data: any) {}
-    id(): string { return this.buildDirectory(); }
-    name(): string { return this._data['name']; }
-    fullDisplayName() { return this._data['full-display-name']; }
-    buildDirectory(): string { return this._data['build-directory']; }
-    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
-
-    groups(): QbsGroupData[] {
-        const groups: QbsGroupData[] = [];
-        const datas = this._data['groups'] || [];
-        for (const data of datas) {
-            const group = new QbsGroupData(data);
-            groups.push(group);
-        }
-        return groups;
-    }
-}
-
-class QbsGroupData {
-    constructor(private readonly _data: any) {}
-    id(): string { return this.name(); }
-    name(): string { return this._data['name']; }
-    location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
-
-    sourceArtifacts(): QbsSourceArtifactData[] {
-        const artifacts: QbsSourceArtifactData[] = [];
-        const datas = this._data['source-artifacts'] || [];
-        for (const data of datas) {
-            artifacts.push(new QbsSourceArtifactData(data));
-        }
-        return artifacts;
-    }
-
-    sourceWildcardsArtifacts(): QbsSourceArtifactData[] {
-        const artifacts: QbsSourceArtifactData[] = [];
-        const datas = this._data['source-artifacts-from-wildcards'] || [];
-        for (const data of datas) {
-            artifacts.push(new QbsSourceArtifactData(data));
-        }
-        return artifacts;
-    }
-
-    isEmpty(): boolean {
-        return this.sourceArtifacts().length === 0 && this.sourceWildcardsArtifacts().length === 0;
-    }
-}
-
-class QbsSourceArtifactData {
-    constructor(private readonly _data: any) {}
-    filePath(): string { return this._data['file-path']; }
-    fileName(): string { return basename(this.filePath()); }
-    id(): string { return this.filePath(); }
-}
 
 abstract class BaseNode {
     constructor(public readonly id: string) {}
