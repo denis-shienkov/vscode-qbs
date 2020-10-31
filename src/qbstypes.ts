@@ -1,4 +1,4 @@
-export class QbsSessionHelloResult {
+export class QbsHelloData {
     readonly _apiLevel: number = 0;
     readonly _apiCompatibilityLevel: number = 0;
 
@@ -8,7 +8,7 @@ export class QbsSessionHelloResult {
     }
 }
 
-export class QbsSessionProcessResult {
+export class QbsProcessData {
     readonly _executable: string;
     readonly _arguments: string[];
     readonly _workingDirectory: string;
@@ -26,7 +26,7 @@ export class QbsSessionProcessResult {
     }
 }
 
-export class QbsSessionTaskStartedResult {
+export class QbsTaskStartedData {
     readonly _description: string;
     readonly _maxProgress: number;
 
@@ -36,7 +36,7 @@ export class QbsSessionTaskStartedResult {
     }
 }
 
-export class QbsSessionTaskProgressResult {
+export class QbsTaskProgressData {
     readonly _progress: number;
 
     constructor(response: any) {
@@ -44,7 +44,7 @@ export class QbsSessionTaskProgressResult {
     }
 }
 
-export class QbsSessionTaskMaxProgressResult {
+export class QbsTaskMaxProgressData {
     readonly _maxProgress: number;
 
     constructor(response: any) {
@@ -52,7 +52,7 @@ export class QbsSessionTaskMaxProgressResult {
     }
 }
 
-export class QbsSessionMessageItemResult {
+export class QbsMessageItemData {
     readonly _description: string = '';
     readonly _filePath: string = '';
     readonly _line: number = -1;
@@ -80,17 +80,17 @@ export class QbsSessionMessageItemResult {
     }
 }
 
-export class QbsSessionMessageResult {
-    readonly _messages: QbsSessionMessageItemResult[] = [];
+export class QbsMessageData {
+    readonly _messages: QbsMessageItemData[] = [];
 
     constructor(obj: any) {
         if (typeof obj === 'string') {
-            const message = new QbsSessionMessageItemResult(obj);
+            const message = new QbsMessageItemData(obj);
             this._messages.push(message);
         } else if (obj) {
             const items = obj['items'] || [];
             for (const item of items) {
-                const message = new QbsSessionMessageItemResult(item);
+                const message = new QbsMessageItemData(item);
                 this._messages.push(message);
             }
         }

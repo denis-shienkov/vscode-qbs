@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import {QbsSession} from './qbssession';
-import {QbsOperationStatus, QbsOperationType, QbsSessionMessageResult} from './qbssessionresults';
+import {QbsOperationStatus, QbsOperationType, QbsMessageData} from './qbstypes';
 
 export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
@@ -20,7 +20,7 @@ export class QbsSessionLogger implements vscode.Disposable {
             this._messageOutput.appendLine(text);
         };
 
-        const appendCompileOutput = async (result: QbsSessionMessageResult) => {
+        const appendCompileOutput = async (result: QbsMessageData) => {
             if (!result.isEmpty()) {
                 await appendCompileText(result.toString());
             }
