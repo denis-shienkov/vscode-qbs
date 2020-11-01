@@ -61,6 +61,19 @@
                 "extensions": [
                     ".ts"
                 ]
+            },
+            {
+                "id": "qbs",
+                "extensions": [
+                    ".qbs"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "qbs",
+                "scopeName": "source.qbs",
+                "path": "./syntaxes/qbs.tmLanguage.json"
             }
         ],
         "commands": [

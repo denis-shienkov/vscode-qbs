@@ -1,0 +1,14 @@
+{
+    "name": "QBS",
+    "scopeName": "source.qbs",
+    "patterns": [
+		{
+			"description": "QBS block comment.",
+			"name": "comment.block.documentation.qbs",
+			"begin": "/\\*(?!/)",
+			"end": "\\*/"
+		}
+    ],
+    "repository": {
+    }
+}
