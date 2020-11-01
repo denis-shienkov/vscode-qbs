@@ -12,6 +12,17 @@
             "description": "QBS line comment.",
             "name": "comment.line.double-slash.qbs",
             "match": "//.*$"
+        },
+        {
+            "description": "QBS simple `import` statement.",
+            "name": "meta.import.qbs",
+            "begin": "\\b(import)\\s+",
+            "end": "$",
+            "beginCaptures": {
+                "1": {
+                    "name": "keyword.import.qbs"
+                }
+            }
         }
     ],
     "repository": {
