@@ -2,12 +2,17 @@
     "name": "QBS",
     "scopeName": "source.qbs",
     "patterns": [
-		{
-			"description": "QBS block comment.",
-			"name": "comment.block.documentation.qbs",
-			"begin": "/\\*(?!/)",
-			"end": "\\*/"
-		}
+        {
+            "description": "QBS block comment.",
+            "name": "comment.block.documentation.qbs",
+            "begin": "/\\*(?!/)",
+            "end": "\\*/"
+        },
+        {
+            "description": "QBS line comment.",
+            "name": "comment.line.double-slash.qbs",
+            "match": "//.*$"
+        }
     ],
     "repository": {
     }
