@@ -4,7 +4,7 @@
 
 - Next developer preview release.
 - Implemented the project explorer tree view.
-- Added new 'Detect Profiles' command.
+- Added new `Detect Profiles` command.
 - Implemented saving user selection (such as project, profile,
 configuration and product).
 - Removed the progress bar indicating the session status.
@@ -12,7 +12,7 @@ configuration and product).
 ## 0.0.5
 
 - Initial developer preview release.
-- Implemented a basic set of commands (such as `resolve`, 'build`,
+- Implemented a basic set of commands (such as `resolve`, `build`,
 `clean` and so forth).
 - Implemented selection of the available project file using the
 status bar button.
@@ -20,7 +20,7 @@ status bar button.
 status bar button.
 - Implemented selection of the build configuration using the
 status bar button (by default are supported only the `debug` and
-the `release' configurations yet).
+the `release` configurations yet).
 - Implemented selection of the target product for building (or all
 products) using the status bar button.
 - Implemented selection of the target product for debugging and
