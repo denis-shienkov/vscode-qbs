@@ -14,15 +14,49 @@
             "match": "//.*$"
         },
         {
-            "description": "QBS simple `import` statement.",
+            "description": "QBS simple statement import.",
             "name": "meta.import.qbs",
             "begin": "\\b(import)\\s+",
             "end": "$",
-            "beginCaptures": {
+            "captures": {
                 "1": {
                     "name": "keyword.import.qbs"
                 }
-            }
+            },
+            "patterns": [
+                {
+                    "description": "QBS complex statement import with double quoted JS/QBS path.",
+                    "name": "meta.import.path.js.double.qbs",
+                    "match": "(\"[^\"]+\")(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
+                    "captures": {
+                        "1": {
+                            "name": "string.quoted.double.qbs"
+                        },
+                        "2": {
+                            "name": "keyword.import.qbs"
+                        },
+                        "3": {
+                            "name": "entity.name.class.qbs"
+                        }
+                    }
+                },
+                {
+                    "description": "QBS complex statement with include single quoted JS/QBS path.",
+                    "name": "meta.import.path.js.single.qbs",
+                    "match": "('[^']+')(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
+                    "captures": {
+                        "1": {
+                            "name": "string.quoted.single.qbs"
+                        },
+                        "2": {
+                            "name": "keyword.import.qbs"
+                        },
+                        "3": {
+                            "name": "entity.name.class.qbs"
+                        }
+                    }
+                }
+            ]
         }
     ],
     "repository": {
