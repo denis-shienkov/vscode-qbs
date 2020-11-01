@@ -9,6 +9,16 @@ import {
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
+async function openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position) {
+    await vscode.workspace.openTextDocument(uri).then(async (doc) => {
+        await vscode.window.showTextDocument(doc).then(async (editor) => {
+            editor.selections = [new vscode.Selection(pos, pos)];
+            const range = new vscode.Range(pos, pos);
+            editor.revealRange(range);
+        });
+    });
+}
+
 abstract class BaseNode {
     constructor(public readonly id: string) {}
     abstract getChildren(): BaseNode[];
@@ -47,9 +57,9 @@ export class QbsLocationNode extends BaseNode {
         const item = new vscode.TreeItem(label);
         item.resourceUri = vscode.Uri.file(this._location.filePath());
         item.command = {
-            command: 'vscode.open',
+            command: 'qbs.openTextDocumentAtPosition',
             title: localize('open.file', 'Open file'),
-            arguments: [item.resourceUri]
+            arguments: [item.resourceUri, new vscode.Position(this._location.line() - 1, this._location.column() - 1)]
         };
         return item;
     }
@@ -188,6 +198,13 @@ export class QbsProjectExplorer implements vscode.Disposable {
             treeDataProvider: treeDataProvider,
             showCollapseAll: true
         });
+    }
+
+    async subscribeCommands(ctx: vscode.ExtensionContext) {
+        ctx.subscriptions.push(vscode.commands.registerCommand('qbs.openTextDocumentAtPosition',
+            async (uri: vscode.Uri, pos: vscode.Position) => {
+                await openTextDocumentAtPosition(uri, pos);
+        }));
     }
 
     dispose() { this._viewer.dispose(); }

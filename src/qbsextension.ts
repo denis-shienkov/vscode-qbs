@@ -19,6 +19,7 @@ class QbsExtensionManager implements vscode.Disposable {
 
     constructor(private readonly _ctx: vscode.ExtensionContext) {
         QbsCommands.subscribeCommands(_ctx, this._session);
+        this._explorer.subscribeCommands(_ctx);
     }
 
     dispose() {

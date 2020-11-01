@@ -1,5 +1,10 @@
 # What's New?
 
+## 0.0.7
+
+- Next developer preview release.
+- [#22] Implemented opening of QBS files with a specified line number.
+
 ## 0.0.6
 
 - Next developer preview release.
