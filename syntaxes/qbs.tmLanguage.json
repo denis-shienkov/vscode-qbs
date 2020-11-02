@@ -4,24 +4,24 @@
     "patterns": [
         {
             "description": "QBS block comment.",
-            "name": "comment.block.documentation.qbs",
+            "name": "comment.block.qbs",
             "begin": "/\\*(?!/)",
             "end": "\\*/"
         },
         {
             "description": "QBS line comment.",
-            "name": "comment.line.double-slash.qbs",
+            "name": "comment.line.qbs",
             "match": "//.*$"
         },
         {
             "description": "QBS double quoted string.",
-            "name": "string.quoted.double.qbs",
+            "name": "string.quoted.double.single-line.qbs",
             "begin": "\"",
             "end": "\""
         },
         {
             "description": "QBS single quoted string.",
-            "name": "string.quoted.single.qbs",
+            "name": "string.quoted.single.single-line.qbs",
             "begin": "'",
             "end": "'"
         },
@@ -32,20 +32,20 @@
             "end": "$",
             "captures": {
                 "1": {
-                    "name": "keyword.import.qbs"
+                    "name": "keyword.other.import.qbs"
                 }
             },
             "patterns": [
                 {
                     "description": "QBS complex statement import with double quoted JS/QBS path.",
-                    "name": "meta.import.path.js.double.qbs",
+                    "name": "meta.import.double-quoted-js-path.qbs",
                     "match": "(\"[^\"]+\")(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
                     "captures": {
                         "1": {
-                            "name": "string.quoted.double.qbs"
+                            "name": "string.double-quoted.qbs"
                         },
                         "2": {
-                            "name": "keyword.import.qbs"
+                            "name": "keyword.other.import.qbs"
                         },
                         "3": {
                             "name": "entity.name.class.qbs"
@@ -54,14 +54,14 @@
                 },
                 {
                     "description": "QBS complex statement with include single quoted JS/QBS path.",
-                    "name": "meta.import.path.js.single.qbs",
+                    "name": "meta.import.single-quoted-js-path.qbs",
                     "match": "('[^']+')(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
                     "captures": {
                         "1": {
-                            "name": "string.quoted.single.qbs"
+                            "name": "string.single-quoted.qbs"
                         },
                         "2": {
-                            "name": "keyword.import.qbs"
+                            "name": "keyword.other.import.qbs"
                         },
                         "3": {
                             "name": "entity.name.class.qbs"
@@ -71,14 +71,33 @@
             ]
         },
         {
-            "description": "QBS object (class or enum)",
+            "description": "QBS object entry",
             "name": "support.class.qbs",
             "match": "\\b[A-Z]\\w*\\b"
         },
         {
-            "description": "QBS signal handlers",
-            "name": "support.class.qbs",
+            "description": "QBS event handler (signal or property)",
+            "name": "entity.other.attribute-name.event-handler.qbs",
             "match": "(((^|\\{)\\s*)|\\b)on[A-Z]\\w*\\b"
+        },
+        {
+            "description": "QBS property definition",
+            "name": "meta.property.definition.qbs",
+            "match": "^\\s*(?:(readonly)\\s+)?(property)\\s+(?:([\\w<>]+))\\s+(\\w+)",
+            "captures": {
+                "1": {
+                    "name": "keyword.other.readonly.qbs"
+                },
+                "2": {
+                    "name": "keyword.other.property.qbs"
+                },
+                "3": {
+                    "name": "storage.type.property.qbs"
+                },
+                "4": {
+                    "name": "entity.other.attribute-name.property.qbs"
+                }
+            }
         }
     ],
     "repository": {
