@@ -7,6 +7,8 @@
 Implemented opening of QBS files with a specified line number.
 - [#14](https://github.com/denis-shienkov/vscode-qbs/issues/14)
 Implemented highlighting for QBS files.
+- [#23](https://github.com/denis-shienkov/vscode-qbs/issues/23)
+Implemented saving of the selected debugger.
 
 ## 0.0.6
 

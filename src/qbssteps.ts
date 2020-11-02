@@ -135,12 +135,14 @@ export class QbsRunStep implements vscode.Disposable {
     async restore() {
         const group = `${this._project.name()}::`;
         const product = await this.extractProduct(group);
-        await this.setup(product, undefined, undefined);
+        const dbg = await this.extractDebugger(group);
+        await this.setup(product, dbg, undefined);
     }
 
     async save() {
         const group = `${this._project.name()}::`;
         await this._project.session().extensionContext().workspaceState.update(`${group}RunProductName`, this.productName());
+        await this._project.session().extensionContext().workspaceState.update(`${group}DebuggerName`, this.debuggerName());
     }
 
     async setup(product?: QbsProductData, dbg?: QbsDebuggerData, env?: QbsRunEnvironmentData) {
@@ -167,6 +169,13 @@ export class QbsRunStep implements vscode.Disposable {
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}RunProductName`);
         const index = products.findIndex((product) => product.fullDisplayName() == name);
         return (index !== -1) ? products[index] : (products.length > 0 ? products[0] : undefined);
+    }
+
+    private async extractDebugger(group: string) {
+        const dbgs = (await this._project.session().settings().enumerateDebuggers()) || [];
+        const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}DebuggerName`);
+        const index = dbgs.findIndex((dbg) => dbg.name() == name);
+        return (index !== -1) ? dbgs[index] : (dbgs.length > 0 ? dbgs[0] : undefined);
     }
 
     private setupProduct(product?: QbsProductData): boolean {
