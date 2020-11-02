@@ -105,6 +105,11 @@
             "match": "(?:^|\\{|;)\\s*[a-z][\\w\\.]*\\s*(?=\\:)"
         },
         {
+            "description": "QBS member of variable.",
+            "name": "entity.other.attribute-name.variable-member.qbs",
+            "match": "(?<=\\.)\\b\\w*"
+        },
+        {
             "description": "QBS JS keywords.",
             "name": "meta.keyword.qbs",
             "match": "(?:\\b|\\s+)(?:(true|false|null|undefined)|(var|void)|(on|as|enum|connect|break|case|catch|continue|debugger|default|delete|do|else|finally|for|if|in|instanceof|new|return|switch|this|throw|try|typeof|while|with))\\b",
