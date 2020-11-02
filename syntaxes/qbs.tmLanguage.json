@@ -74,6 +74,11 @@
             "description": "QBS object (class or enum)",
             "name": "support.class.qbs",
             "match": "\\b[A-Z]\\w*\\b"
+        },
+        {
+            "description": "QBS signal handlers",
+            "name": "support.class.qbs",
+            "match": "(((^|\\{)\\s*)|\\b)on[A-Z]\\w*\\b"
         }
     ],
     "repository": {
