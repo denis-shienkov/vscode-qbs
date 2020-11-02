@@ -109,7 +109,7 @@ async function onSelectDebuggerCommand(session: QbsSession) {
     await QbsSelectors.displayDebuggerSelector(session);
 }
 
-async function onResolveCommand(session: QbsSession, request: QbsResolveRequest) {
+async function onResolveCommand(session: QbsSession, request: QbsResolveRequest, timeout: number) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.resolve.progress.title', 'Project resolving'),
@@ -171,13 +171,13 @@ async function onResolveCommand(session: QbsSession, request: QbsResolveRequest)
                 await projectResolvedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
-                }, 5000);
+                }, timeout);
             });
         });
     });
 }
 
-async function onBuildCommand(session: QbsSession, request: QbsBuildRequest) {
+async function onBuildCommand(session: QbsSession, request: QbsBuildRequest, timeout: number) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),
@@ -240,13 +240,13 @@ async function onBuildCommand(session: QbsSession, request: QbsBuildRequest) {
                 await projectBuiltSubscription.dispose();
                 setTimeout(() => {
                     resolve();
-                }, 5000);
+                }, timeout);
             });
         });
     });
 }
 
-async function onCleanCommand(session: QbsSession, request: QbsCleanRequest) {
+async function onCleanCommand(session: QbsSession, request: QbsCleanRequest, timeout: number) {
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.clean.progress.title', 'Project cleaning'),
@@ -308,7 +308,7 @@ async function onCleanCommand(session: QbsSession, request: QbsCleanRequest) {
                 await projectCleanedSubscription.dispose();
                 setTimeout(() => {
                     resolve();
-                }, 5000);
+                }, timeout);
             });
         });
     });
@@ -386,10 +386,10 @@ async function onRebuildCommand(session: QbsSession) {
     const productNames = [session.project()?.buildStep().productName() || ''];
     const cleanRequest = new QbsCleanRequest(session.settings());
     cleanRequest.setProductNames(productNames);
-    await onCleanCommand(session, cleanRequest);
+    await onCleanCommand(session, cleanRequest, 1000);
     const buildRequest = new QbsBuildRequest(session.settings());
     buildRequest.setProductNames(productNames);
-    await onBuildCommand(session, buildRequest);
+    await onBuildCommand(session, buildRequest, 5000);
 }
 
 async function onCancelCommand(session: QbsSession, request: QbsCancelRequest)  {
@@ -519,24 +519,24 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         resolveRequest.setConfigurationName(session.project()?.buildStep().configurationName() || '');
         resolveRequest.setTopLevelProfile(session.project()?.buildStep().profileName() || '');
         resolveRequest.setForceProbeExecution(true);
-        await onResolveCommand(session, resolveRequest);
+        await onResolveCommand(session, resolveRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.resolve', async () => {
         const resolveRequest = new QbsResolveRequest(session.settings());
         resolveRequest.setProjectFilePath(session.project()?.filePath() || '');
         resolveRequest.setConfigurationName(session.project()?.buildStep().configurationName() || '');
         resolveRequest.setTopLevelProfile(session.project()?.buildStep().profileName() || '');
-        await onResolveCommand(session, resolveRequest);
+        await onResolveCommand(session, resolveRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.build', async () => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProductNames([session.project()?.buildStep().productName() || '']);
-        await onBuildCommand(session, buildRequest);
+        await onBuildCommand(session, buildRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.clean', async () => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProductNames([session.project()?.buildStep().productName() || '']);
-        await onCleanCommand(session, cleanRequest);
+        await onCleanCommand(session, cleanRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.install', async () => {
         const installRequest = new QbsInstallRequest(session.settings());
@@ -562,21 +562,21 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.buildProduct', async (productNode: QbsProductNode) => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProductNames([ productNode.name() ]);
-        await onBuildCommand(session, buildRequest);
+        await onBuildCommand(session, buildRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cleanProduct', async (productNode: QbsProductNode) => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProductNames([ productNode.name() ]);
-        await onCleanCommand(session, cleanRequest);
+        await onCleanCommand(session, cleanRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.buildSubProject', async (projectNode: QbsProjectNode) => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProductNames(projectNode.dependentProductNames());
-        await onBuildCommand(session, buildRequest);
+        await onBuildCommand(session, buildRequest, 5000);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand('qbs.cleanSubProject', async (projectNode: QbsProjectNode) => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProductNames(projectNode.dependentProductNames());
-        await onCleanCommand(session, cleanRequest);
+        await onCleanCommand(session, cleanRequest, 5000);
     }));
 }
