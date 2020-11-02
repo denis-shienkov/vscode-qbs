@@ -102,7 +102,7 @@
         {
             "description": "QBS property.",
             "name": "entity.other.attribute-name.property.qbs",
-            "match": "(?:^|\\{|;)\\s*[a-z][\\w\\.]*\\s*(?=\\:)"
+            "match": "(?:\\w)\\s*[\\w\\.]*\\s*(?=\\:)"
         },
         {
             "description": "QBS member of variable.",
