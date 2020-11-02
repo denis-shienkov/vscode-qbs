@@ -264,6 +264,7 @@ export class QbsProjectData {
     buildDirectory(): string { return this._data['build-directory']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
     isEmpty():boolean { return this._data === undefined; }
+    data(): any { return this._data; }
 
     products(): QbsProductData[] {
         const products: QbsProductData[] = [];
@@ -301,6 +302,7 @@ export class QbsProductData {
     isRunnable(): boolean { return this._data['is-runnable']; }
     isEnabled(): boolean { return this._data['is-enabled']; }
     isEmpty(): boolean { return typeof this._data === 'string'; }
+    moduleProperties(): any { return this._data['module-properties']; }
 
     groups(): QbsGroupData[] {
         const groups: QbsGroupData[] = [];
@@ -346,6 +348,7 @@ export class QbsSourceArtifactData {
     constructor(private readonly _data: any) {}
     filePath(): string { return this._data['file-path']; }
     fileName(): string { return basename(this.filePath()); }
+    fileTags(): string[] { return this._data['file-tags']; }
     id(): string { return this.filePath(); }
 }
 

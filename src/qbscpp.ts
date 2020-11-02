@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import * as cpt from 'vscode-cpptools';
 
 import {QbsSession} from './qbssession';
+import {QbsProjectData} from './qbstypes';
 
 /**
  * Supported language standards by the intelli sense engine.
@@ -91,14 +92,10 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         }
     }
 
-    /**
-     * Re-initializes the provider configuration from the
-     * resolved QBS project @c data.
-     *
-     * @note Gets called when the QBS session resolves the new opened
-     * project.
-     */
-    private async setup(data: any) {
+    private async setup(project?: QbsProjectData) {
+        if (!project) {
+            return;
+        }
         if (!this._api) {
             this._api = await cpt.getCppToolsApi(cpt.Version.v4);
         }
@@ -106,7 +103,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
             return;
         }
 
-        await this.buildSourceFileConfigurations(data);
+        await this.buildSourceFileConfigurations(project);
 
         // Ensure that the provider is already registered.
         if (!this._registered) {
@@ -121,24 +118,19 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         }
     }
 
-    /**
-     * Enumerates all project source files and fills the information
-     * required for the intelli sense engine from the resolved QBS
-     * project @c data paroperty.
-     */
-    private async buildSourceFileConfigurations(data: any) {
+    private async buildSourceFileConfigurations(project: QbsProjectData) {
         // Where the map is <source file path, configuration>.
         this._sourceFileConfigurations = new Map<string, cpt.SourceFileConfiguration>();
-        const parseProject = async (project: any) => {
-            const products = project['products'] || [];
+        const parseProject = async (project: QbsProjectData) => {
+            const products = project.products();
             for (const product of products) {
-                const moduleProperties = product['module-properties'];
-                const groups = product['groups'] || [];
+                const moduleProperties = product.moduleProperties();
+                const groups = product.groups();
                 for (const group of groups) {
-                    const sources = group['source-artifacts'] || [];
+                    const sources = group.sourceArtifacts();
                     for (const source of sources) {
-                        const filepath = source['file-path'];
-                        const tags = source['file-tags'];
+                        const filepath = source.filePath();
+                        const tags = source.fileTags();
                         const includePath = this.extractIncludePaths(moduleProperties);
                         const defines = this.extractDefines(moduleProperties);
                         const forcedInclude = this.extractPrefixHeaders(moduleProperties);
@@ -158,13 +150,13 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                 }
             }
 
-            const subProjects = project['sub-projects'] || [];
+            const subProjects = project.subProjects();
             for (const subProject of subProjects) {
                 await parseProject(subProject);
             }
         };
 
-        await parseProject(data);
+        await parseProject(project);
     }
 
     /**
