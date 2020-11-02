@@ -71,17 +71,17 @@
             ]
         },
         {
-            "description": "QBS object entry",
+            "description": "QBS object entry.",
             "name": "support.class.qbs",
             "match": "\\b[A-Z]\\w*\\b"
         },
         {
-            "description": "QBS event handler (signal or property)",
+            "description": "QBS event handler (signal or property).",
             "name": "entity.other.attribute-name.event-handler.qbs",
             "match": "(((^|\\{)\\s*)|\\b)on[A-Z]\\w*\\b"
         },
         {
-            "description": "QBS property definition",
+            "description": "QBS property definition.",
             "name": "meta.property.definition.qbs",
             "match": "^\\s*(?:(readonly)\\s+)?(property)\\s+(?:([\\w<>]+))\\s+(\\w+)",
             "captures": {
@@ -98,8 +98,22 @@
                     "name": "entity.other.attribute-name.property.qbs"
                 }
             }
+        },
+        {
+            "description": "QBS JS keywords.",
+            "name": "meta.keyword.qbs",
+            "match": "(?:\\b|\\s+)(?:(true|false|null|undefined)|(var|void)|(on|as|enum|connect|break|case|catch|continue|debugger|default|delete|do|else|finally|for|if|in|instanceof|new|return|switch|this|throw|try|typeof|while|with))\\b",
+            "captures": {
+                "1": {
+                    "name": "constant.language.qbs"
+                },
+                "2": {
+                    "name": "storage.type.qbs"
+                },
+                "3": {
+                    "name": "keyword.control.qbs"
+                }
+            }
         }
-    ],
-    "repository": {
-    }
+    ]
 }
