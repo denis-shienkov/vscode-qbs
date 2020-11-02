@@ -114,6 +114,19 @@
                     "name": "keyword.control.qbs"
                 }
             }
+        },
+        {
+            "description": "QBS JS function definition.",
+            "name": "meta.function.qbs",
+            "match": "\\b(function)\\s+([\\w_]+)\\s*(?=\\()",
+            "captures": {
+                "1": {
+                    "name": "storage.type.qbs"
+                },
+                "2": {
+                    "name": "entity.name.function.untitled.qbs"
+                }
+            }
         }
     ]
 }
