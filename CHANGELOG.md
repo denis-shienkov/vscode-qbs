@@ -5,6 +5,8 @@
 - Next developer preview release.
 - [#22](https://github.com/denis-shienkov/vscode-qbs/issues/22)
 Implemented opening of QBS files with a specified line number.
+- [#14](https://github.com/denis-shienkov/vscode-qbs/issues/14)
+Implemented highlighting for QBS files.
 
 ## 0.0.6
 

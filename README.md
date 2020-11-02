@@ -33,5 +33,4 @@ Qbs >= 1.16 must be preinstalled in the system.
 **PLEASE**, if you experience any problems, have any questions, or have an idea
 for a new feature, create an issue on [the GitHub page](https://github.com/denis-shienkov/vscode-qbs/issues)!
 
-This extension itself *does not* provide language support for the Qbs
-scripting language yet.
+This extension provides basic code highlighting for the Qbs scripting language.
