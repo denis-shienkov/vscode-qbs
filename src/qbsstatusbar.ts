@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
+import * as fs from 'fs';
 
 import {QbsSession} from './qbssession';
 
@@ -132,13 +133,13 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectBuildProductButton.text = `[${buildProductName}]`;
         // Update the current run product name.
         const runProductName = runStep?.productName() || '---';
-        const runProductExe = runStep?.targetExecutable();
+        const runProductExe = runStep?.targetExecutable() || '';
         this._selectRunProductButton.text = `[${runProductName}]`;
-        if (runProductExe) {
+        if (fs.existsSync(runProductExe)) {
             this._runProductButton.color = 'lightgreen';
             this._debugProductButton.color = 'lightgreen';
             this._selectRunProductButton.tooltip = localize('qbs.select.run.product.tooltip',
-                                                            `Click to Select the Product to Debug or Run\n\n$(italic)${runProductExe}`);
+                                                            `Click to Select the Product to Debug or Run\n\n${runProductExe}`);
         } else {
             this._runProductButton.color = 'orange';
             this._debugProductButton.color = 'orange';
