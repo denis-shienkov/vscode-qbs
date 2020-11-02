@@ -137,6 +137,11 @@
                     "name": "entity.name.function.untitled.qbs"
                 }
             }
+        },
+        {
+            "description": "QBS JS function call.",
+            "name": "support.function.qbs",
+            "match": "\\b[\\w_]+\\s*(?=\\()"
         }
     ]
 }
