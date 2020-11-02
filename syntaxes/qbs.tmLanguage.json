@@ -100,6 +100,11 @@
             }
         },
         {
+            "description": "QBS property.",
+            "name": "entity.other.attribute-name.property.qbs",
+            "match": "(?:^|\\{|;)\\s*[a-z][\\w\\.]*\\s*(?=\\:)"
+        },
+        {
             "description": "QBS JS keywords.",
             "name": "meta.keyword.qbs",
             "match": "(?:\\b|\\s+)(?:(true|false|null|undefined)|(var|void)|(on|as|enum|connect|break|case|catch|continue|debugger|default|delete|do|else|finally|for|if|in|instanceof|new|return|switch|this|throw|try|typeof|while|with))\\b",
