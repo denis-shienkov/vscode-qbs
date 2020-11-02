@@ -1,12 +1,15 @@
 import * as vscode from 'vscode';
 
 import * as QbsCommands from './qbscommands';
+import * as QbsUtils from './qbsutils';
 
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
 import {QbsCpp} from './qbscpp';
 import {QbsProjectExplorer} from './qbsprojectexplorer'
+
+const QBS_EXTENSION_ACTIVATED = 'qbs:extension-activated';
 
 let manager: QbsExtensionManager;
 
@@ -33,8 +36,8 @@ class QbsExtensionManager implements vscode.Disposable {
 
 export async function activate(ctx: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
+    QbsUtils.setContextValue(QBS_EXTENSION_ACTIVATED, true);
     manager = new QbsExtensionManager(ctx);
-
     await vscode.commands.executeCommand('qbs.autoRestartSession');
 }
 

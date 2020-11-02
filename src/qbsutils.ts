@@ -2,6 +2,8 @@
  * @file This file contains a set of useful helper functions.
  */
 
+import * as vscode from 'vscode';
+
 export function fixPathSeparators(path: string): string {
     return path.replace(/\\/g, '/');
 }
@@ -19,4 +21,8 @@ export function escapeShell(shell: string): string {
         return `"${shell}"`;
     }
     return shell;
+}
+
+export function setContextValue(key: string, value: any): Thenable<void> {
+    return vscode.commands.executeCommand('setContext', key, value);
 }

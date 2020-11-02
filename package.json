@@ -217,32 +217,116 @@
                 {
                     "command": "qbs.cleanSubProject",
                     "when": "never"
+                },
+                {
+                    "command": "qbs.getRunEnvironment",
+                    "when": "never"
+                },
+                {
+                    "command": "qbs.detectProfiles",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.restoreProject",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.autoRestartSession",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.startSession",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.stopSession",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectProject",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectProfile",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectConfiguration",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectBuild",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectRun",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectDebugger",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.resolveWithForceProbesExecution",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.resolve",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.build",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.clean",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.install",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.rebuild",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.cancel",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.run",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.debug",
+                    "when": "qbs:extension-activated"
                 }
             ],
             "view/title": [
                 {
                     "command": "qbs.resolve",
-                    "when": "view == qbs-project",
+                    "when": "view == qbs-project && qbs:extension-activated",
                     "group": "navigation@1"
                 },
                 {
                     "command": "qbs.build",
-                    "when": "view == qbs-project",
+                    "when": "view == qbs-project && qbs:extension-activated",
                     "group": "navigation@2"
                 },
                 {
                     "command": "qbs.clean",
-                    "when": "view == qbs-project",
+                    "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 },
                 {
                     "command": "qbs.resolveWithForceProbesExecution",
-                    "when": "view == qbs-project",
+                    "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 },
                 {
                     "command": "qbs.rebuild",
-                    "when": "view == qbs-project",
+                    "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 }
             ],
