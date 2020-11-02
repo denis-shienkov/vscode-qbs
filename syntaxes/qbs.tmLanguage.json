@@ -142,6 +142,11 @@
             "description": "QBS JS function call.",
             "name": "support.function.qbs",
             "match": "\\b[\\w_]+\\s*(?=\\()"
+        },
+        {
+            "description": "QBS JS variable.",
+            "name": "variable.parameter.qbs",
+            "match": "\\b([a-z_]\\w*)\\b"
         }
     ]
 }
