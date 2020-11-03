@@ -286,6 +286,19 @@ export class QbsProjectData {
         return projects;
     }
 
+    allProducts(): QbsProductData[] {
+        const products: QbsProductData[] = [];
+        const extractProducts = (project: QbsProjectData) => {
+            products.push(...project.products());
+            const projects = project.subProjects();
+            for (const project of projects) {
+                extractProducts(project);
+            }
+        }
+        extractProducts(this);
+        return products;
+    }
+
     setBuildSystemFiles(files: any) { this._data['build-system-files'] = files; }
     buildSystemFiles(): any { return this._data['build-system-files']; }
 }

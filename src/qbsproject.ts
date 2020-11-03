@@ -39,7 +39,7 @@ export class QbsProject implements vscode.Disposable {
     buildStep(): QbsBuildStep { return this._buildStep; }
     runStep(): QbsRunStep { return this._runStep; }
     isEmpty(): boolean { return this._data ? true : false; }
-    products(): QbsProductData[] { return this._data?.products() || []; }
+    products(): QbsProductData[] { return this._data?.allProducts() || []; }
 
     async updateSteps() {
         await this._buildStep.restore();
