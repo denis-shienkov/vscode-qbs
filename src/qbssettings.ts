@@ -213,16 +213,13 @@ export class QbsSettings implements vscode.Disposable {
                         reject(undefined);
                     } else {
                         const profiles: QbsProfileData[] = [];
+                        const profile_re = /^profiles.([\w|-]+)./;
                         stdout.split('\n').map(function (line) {
-                            if (!line.startsWith('profiles'))
-                                return;
-                            const startIndex = line.indexOf('.');
-                            if (startIndex !== -1) {
-                                const endIndex = line.indexOf('.', startIndex + 1);
-                                if (endIndex != -1) {
-                                    const profile = new QbsProfileData(line.substring(startIndex + 1, endIndex));
-                                    if (profiles.map(profile => profile.name()).indexOf(profile.name()) === -1)
-                                        profiles.push(profile);
+                            const matches = profile_re.exec(line);
+                            if (matches) {
+                                const profile = new QbsProfileData(matches[1]);
+                                if (profiles.map(profile => profile.name()).indexOf(profile.name()) === -1) {
+                                    profiles.push(profile);
                                 }
                             }
                         });
