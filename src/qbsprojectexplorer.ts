@@ -151,19 +151,7 @@ export class QbsProjectNode extends BaseNode {
     }
 
     dependentProductNames(): string[] {
-        const productNames: string[] = [];
-        const extractProductNames = (project: QbsProjectData) => {
-            const products = project.products();
-            for (const product of products) {
-                productNames.push(product.fullDisplayName());
-            }
-            const projects = project.subProjects();
-            for (const project of projects) {
-                extractProductNames(project);
-            }
-        }
-        extractProductNames(this._project);
-        return productNames;
+        return this._project.allProducts().map(product => product.fullDisplayName());
     }
 }
 
