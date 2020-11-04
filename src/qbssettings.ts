@@ -267,10 +267,8 @@ export class QbsSettings implements vscode.Disposable {
                 const debuggers: QbsDebuggerData[] = [];
                 try {
                     const json = JSON.parse(data.toString());
-                    const configurations = (json['configurations'] || []);
-                    for (const configuration of configurations) {
-                        debuggers.push(new QbsDebuggerData(configuration));
-                    }
+                    const configurations: any[] = json['configurations'] || [];
+                    configurations.forEach(configuration => debuggers.push(new QbsDebuggerData(configuration)));
                 } catch (e) {
                 }
                 resolve(debuggers);

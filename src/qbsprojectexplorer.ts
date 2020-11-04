@@ -81,15 +81,9 @@ export class QbsGroupNode extends BaseNode {
     getChildren(): BaseNode[] {
         const nodes: BaseNode[] = [ new QbsLocationNode(this._group.location(), true) ];
         const sources = this._group.sourceArtifacts();
-        for (const source of sources) {
-            const node = new QbsSourceArtifactNode(source);
-            nodes.push(node);
-        }
+        sources.forEach(source => nodes.push(new QbsSourceArtifactNode(source)));
         const wildcards = this._group.sourceWildcardsArtifacts();
-        for (const wildcard of wildcards) {
-            const node = new QbsSourceArtifactNode(wildcard);
-            nodes.push(node);
-        }
+        wildcards.forEach(wildcard => nodes.push(new QbsSourceArtifactNode(wildcard)));
         return nodes;
     }
 }
@@ -111,12 +105,11 @@ export class QbsProductNode extends BaseNode {
     getChildren(): BaseNode[] {
         const nodes: BaseNode[] = [ new QbsLocationNode(this._product.location(), true) ];
         const groups = this._product.groups();
-        for (const group of groups) {
+        groups.forEach(group => {
             if (!group.isEmpty()) {
-                const node = new QbsGroupNode(group);
-                nodes.push(node);
+                nodes.push(new QbsGroupNode(group));
             }
-        }
+        });
         return nodes;
     }
 }
@@ -138,15 +131,9 @@ export class QbsProjectNode extends BaseNode {
     getChildren(): BaseNode[] {
         const nodes: BaseNode[] = [ new QbsLocationNode(this._project.location(), true) ];
         const products = this._project.products();
-        for (const product of products) {
-            const node = new QbsProductNode(product);
-            nodes.push(node);
-        }
+        products.forEach(product => nodes.push(new QbsProductNode(product)));
         const projects = this._project.subProjects();
-        for (const project of projects) {
-            const node = new QbsProjectNode(project, false);
-            nodes.push(node);
-        }
+        projects.forEach(project => nodes.push(new QbsProjectNode(project, false)));
         return nodes;
     }
 

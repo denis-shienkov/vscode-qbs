@@ -213,26 +213,19 @@ export class QbsMessageResponse {
 
     constructor(obj: any) {
         if (typeof obj === 'string') {
-            const message = new QbsMessageItemResponse(obj);
-            this._messages.push(message);
+            this._messages.push(new QbsMessageItemResponse(obj));
         } else if (obj) {
-            const items = obj['items'] || [];
-            for (const item of items) {
-                const message = new QbsMessageItemResponse(item);
-                this._messages.push(message);
-            }
+            const items: any[] = obj['items'] || [];
+            items.forEach(item => this._messages.push(new QbsMessageItemResponse(item)));
         }
     }
 
     isEmpty(): boolean { return this._messages.length === 0; }
 
     toString(): string {
-        const list: string[] = [];
-        for (const item of this._messages) {
-            const s = item.toString();
-            list.push(s);
-        }
-        return list.join('\n');
+        const strings: string[] = [];
+        this._messages.forEach(message => strings.push(message.toString()));
+        return strings.join('\n');
     }
 }
 
@@ -242,8 +235,7 @@ export enum QbsOperationType { Resolve, Build, Clean, Install }
 export enum QbsOperationStatus { Started, Completed, Failed }
 
 export class QbsOperation {
-    constructor(readonly _type: QbsOperationType, readonly _status: QbsOperationStatus, readonly _elapsed: number) {
-    }
+    constructor(readonly _type: QbsOperationType, readonly _status: QbsOperationStatus, readonly _elapsed: number) {}
 }
 
 // QBS project types.
@@ -268,21 +260,15 @@ export class QbsProjectData {
 
     products(): QbsProductData[] {
         const products: QbsProductData[] = [];
-        const datas = this._data['products'] || [];
-        for (const data of datas) {
-            const product = new QbsProductData(data);
-            products.push(product);
-        }
+        const datas: any[] = this._data['products'] || [];
+        datas.forEach(data => products.push(new QbsProductData(data)));
         return products;
     }
 
     subProjects(): QbsProjectData[] {
         const projects: QbsProjectData[] = [];
-        const datas = this._data['sub-projects'] || [];
-        for (const data of datas) {
-            const project = new QbsProjectData(data);
-            projects.push(project);
-        }
+        const datas: any[] = this._data['sub-projects'] || [];
+        datas.forEach(data => projects.push(new QbsProjectData(data)));
         return projects;
     }
 
@@ -291,9 +277,7 @@ export class QbsProjectData {
         const extractProducts = (project: QbsProjectData) => {
             products.push(...project.products());
             const projects = project.subProjects();
-            for (const project of projects) {
-                extractProducts(project);
-            }
+            projects.forEach(project => extractProducts(project));
         }
         extractProducts(this);
         return products;
@@ -319,11 +303,8 @@ export class QbsProductData {
 
     groups(): QbsGroupData[] {
         const groups: QbsGroupData[] = [];
-        const datas = this._data['groups'] || [];
-        for (const data of datas) {
-            const group = new QbsGroupData(data);
-            groups.push(group);
-        }
+        const datas: any[] = this._data['groups'] || [];
+        datas.forEach(data => groups.push(new QbsGroupData(data)));
         return groups;
     }
 }
@@ -336,19 +317,15 @@ export class QbsGroupData {
 
     sourceArtifacts(): QbsSourceArtifactData[] {
         const artifacts: QbsSourceArtifactData[] = [];
-        const datas = this._data['source-artifacts'] || [];
-        for (const data of datas) {
-            artifacts.push(new QbsSourceArtifactData(data));
-        }
+        const datas: any[] = this._data['source-artifacts'] || [];
+        datas.forEach(data => artifacts.push(new QbsSourceArtifactData(data)));
         return artifacts;
     }
 
     sourceWildcardsArtifacts(): QbsSourceArtifactData[] {
         const artifacts: QbsSourceArtifactData[] = [];
-        const datas = this._data['source-artifacts-from-wildcards'] || [];
-        for (const data of datas) {
-            artifacts.push(new QbsSourceArtifactData(data));
-        }
+        const datas: any[] = this._data['source-artifacts-from-wildcards'] || [];
+        datas.forEach(data => artifacts.push(new QbsSourceArtifactData(data)));
         return artifacts;
     }
 
