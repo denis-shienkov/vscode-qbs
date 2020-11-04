@@ -56,7 +56,7 @@ export class QbsResolveRequest extends QbsRequest {
     setSettingsDirectory(settingsDirectory: string) { this._data['settings-directory'] = settingsDirectory; }
     setForceProbeExecution(forceProbeExecution: boolean) { this._data['force-probe-execution'] = forceProbeExecution; }
     setErrorHandlingMode(errorHandlingMode: string) { this._data['error-handling-mode'] = errorHandlingMode; }
-    setLogLevel(logLavel: string) { this._data['log-level'] = logLavel; }
+    setLogLevel(logLevel: string) { this._data['log-level'] = logLevel; }
 }
 
 export class QbsBuildRequest extends QbsRequest {
@@ -76,7 +76,7 @@ export class QbsBuildRequest extends QbsRequest {
     setMaxJobCount(maxJobCount: number) { this._data['max-job-count'] = maxJobCount; }
     setKeepGoing(keepGoing: boolean) { this._data['keep-going'] = keepGoing; }
     setCommandEchoMode(commandEchoMode: string) { this._data['command-echo-mode'] = commandEchoMode; }
-    setLogLevel(logLavel: string) { this._data['log-level'] = logLavel; }
+    setLogLevel(logLevel: string) { this._data['log-level'] = logLevel; }
     setCleanInstallRoot(cleanInstallRoot: boolean) { this._data['clean-install-root'] = cleanInstallRoot; }
     setProductNames(productNames: string[]) {this._data['products'] = productNames; }
 }
@@ -91,7 +91,7 @@ export class QbsCleanRequest extends QbsRequest {
     }
 
     setKeepGoing(keepGoing: boolean) { this._data['keep-going'] = keepGoing; }
-    setLogLevel(logLavel: string) { this._data['log-level'] = logLavel; }
+    setLogLevel(logLevel: string) { this._data['log-level'] = logLevel; }
     setProductNames(productNames: string[]) {this._data['products'] = productNames; }
 }
 
@@ -104,7 +104,7 @@ export class QbsInstallRequest extends QbsRequest {
     }
 
     setKeepGoing(keepGoing: boolean) { this._data['keep-going'] = keepGoing; }
-    setLogLevel(logLavel: string) { this._data['log-level'] = logLavel; }
+    setLogLevel(logLevel: string) { this._data['log-level'] = logLevel; }
     setProductNames(productNames: string[]) {this._data['products'] = productNames; }
 }
 
