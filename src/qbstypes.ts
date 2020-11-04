@@ -254,7 +254,7 @@ export class QbsLocationData {
     fileName(): string { return basename(this.filePath()); }
     line(): number { return this._data['line']; }
     column(): number { return this._data['column']; }
-    id(): string { return this.filePath() + ':' + this.line() + ':' + this.column(); }
+    id(): string { return `${this.filePath()}:${this.line()}:${this.column()}`; }
 }
 
 export class QbsProjectData {
