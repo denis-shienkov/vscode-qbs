@@ -129,16 +129,16 @@ async function onResolveCommand(session: QbsSession, request: QbsResolveRequest,
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
-                    const delta = newPercentage - oldPercentage;
-                    if (delta > 0) {
+                    const increment = newPercentage - oldPercentage;
+                    if (increment > 0) {
                         oldPercentage = newPercentage;
-                        p.report({increment: delta});
+                        p.report({increment});
                     }
                     const message = `${description} ${newPercentage} %`;
-                    p.report({message: message});
+                    p.report({message});
                 } else {
                     const message = description;
-                    p.report({ message: message});
+                    p.report({message});
                 }
             };
 
@@ -197,16 +197,16 @@ async function onBuildCommand(session: QbsSession, request: QbsBuildRequest, tim
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
-                    const delta = newPercentage - oldPercentage;
-                    if (delta > 0) {
+                    const increment = newPercentage - oldPercentage;
+                    if (increment > 0) {
                         oldPercentage = newPercentage;
-                        p.report({increment: delta});
+                        p.report({increment});
                     }
                     const message = `${description} ${newPercentage} %`;
-                    p.report({message: message});
+                    p.report({message});
                 } else {
                     const message = description;
-                    p.report({ message: message});
+                    p.report({message});
                 }
             };
 
@@ -266,16 +266,16 @@ async function onCleanCommand(session: QbsSession, request: QbsCleanRequest, tim
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
-                    const delta = newPercentage - oldPercentage;
-                    if (delta > 0) {
+                    const increment = newPercentage - oldPercentage;
+                    if (increment > 0) {
                         oldPercentage = newPercentage;
-                        p.report({increment: delta});
+                        p.report({increment});
                     }
                     const message = `${description} ${newPercentage} %`;
-                    p.report({message: message});
+                    p.report({message});
                 } else {
                     const message = description;
-                    p.report({ message: message});
+                    p.report({message});
                 }
             };
 
@@ -334,16 +334,16 @@ async function onInstallCommand(session: QbsSession, request: QbsInstallRequest)
                 if (showPercentage) {
                     const newPercentage = (progress > 0)
                         ? Math.round((100 * progress) / maxProgress) : 0;
-                    const delta = newPercentage - oldPercentage;
-                    if (delta > 0) {
+                    const increment = newPercentage - oldPercentage;
+                    if (increment > 0) {
                         oldPercentage = newPercentage;
-                        p.report({increment: delta});
+                        p.report({increment});
                     }
                     const message = `${description} ${newPercentage} %`;
-                    p.report({message: message});
+                    p.report({message});
                 } else {
                     const message = description;
-                    p.report({ message: message});
+                    p.report({message});
                 }
             };
 
@@ -427,7 +427,7 @@ async function onRunProductCommand(session: QbsSession) {
         const escaped = QbsUtils.escapeShell(executable);
         const terminal = vscode.window.createTerminal({
             name: 'QBS Run',
-            env: env,
+            env,
             cwd: path.dirname(executable)
         });
         if (process.platform === 'darwin') {
@@ -462,17 +462,17 @@ async function onDebugProductCommand(session: QbsSession) {
     }
 
     const env = runStep?.runEnvironment()?.data();
-    const executable = runStep?.targetExecutable();
-    if (!executable || !env) {
+    const program = runStep?.targetExecutable();
+    if (!program || !env) {
         vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
                                                 'Target executable missing, please re-build the product.'));
         return;
     }
 
     const targetConfig = {
-        program: executable,
-        cwd: path.dirname(executable),
-        env: env
+        program,
+        cwd: path.dirname(program),
+        env
     };
 
     const fullConfig = Object.assign(debuggerConfig.data(), targetConfig);

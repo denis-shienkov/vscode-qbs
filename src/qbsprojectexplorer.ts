@@ -170,7 +170,7 @@ export class QbsProjectExplorer implements vscode.Disposable {
     constructor(session: QbsSession) {
         const treeDataProvider = new QbsProjectDataProvider(session);
         this._viewer = vscode.window.createTreeView('qbs-project', {
-            treeDataProvider: treeDataProvider,
+            treeDataProvider,
             showCollapseAll: true
         });
     }

@@ -60,7 +60,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         for (const uri of uris) {
             const configuration = this._sourceFileConfigurations.get(uri.toString());
             if (configuration) {
-                items.push({uri: uri, configuration: configuration});
+                items.push({uri, configuration});
             }
         }
         return items;
@@ -138,12 +138,12 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                         const intelliSenseMode = this.extractIntelliSenseMode(moduleProperties);
                         const standard = this.extractLanguageStandard(moduleProperties, tags);
                         const cfg: cpt.SourceFileConfiguration = {
-                            includePath: includePath,
-                            defines: defines,
-                            intelliSenseMode: intelliSenseMode,
-                            standard: standard,
-                            forcedInclude: forcedInclude,
-                            compilerPath: compilerPath
+                            includePath,
+                            defines,
+                            intelliSenseMode,
+                            standard,
+                            forcedInclude,
+                            compilerPath
                         };
                         this._sourceFileConfigurations.set(vscode.Uri.file(filepath).toString(), cfg);
                     }

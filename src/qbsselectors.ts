@@ -13,7 +13,7 @@ export async function displayWorkspaceProjectSelector(session: QbsSession) {
     const items: QbsProjectQuickPickItem[] = projects.map(uri => {
         return {
             label: basename(uri.fsPath),
-            uri: uri
+            uri
         };
     });
     const uri = await vscode.window.showQuickPick(items).then(item => {
@@ -30,7 +30,7 @@ export async function displayProfileSelector(session: QbsSession) {
     const items: QbsProfileQuickPickItem[] = profiles.map(profile => {
         return {
             label: profile.name(),
-            profile: profile
+            profile
         };
     });
     const selectedProfile = await vscode.window.showQuickPick(items).then(item => {
@@ -48,7 +48,7 @@ export async function displayConfigurationSelector(session: QbsSession) {
         return {
             label: configuration.displayName() || 'oops',
             description: configuration.description(),
-            configuration: configuration
+            configuration
         };
     });
     const selectedConfiguration = await vscode.window.showQuickPick(items).then(item => {
@@ -77,7 +77,7 @@ export async function displayBuildProductSelector(session: QbsSession) {
     const items: QbsProductQuickPickItem[] = products?.map(product => {
         return {
             label: product.isEmpty() ? '[all]' : product.fullDisplayName(),
-            product: product
+            product
         };
     });
     const selectedProduct = await vscode.window.showQuickPick(items).then(item => {
@@ -95,7 +95,7 @@ export async function displayRunProductSelector(session: QbsSession) {
     const items: QbsProductQuickPickItem[] = products.map(product => {
         return {
             label: product.fullDisplayName(),
-            product: product
+            product
         };
     });
     const selectedProduct = await vscode.window.showQuickPick(items).then(item => {
@@ -112,7 +112,7 @@ export async function displayDebuggerSelector(session: QbsSession) {
     const items: QbsDebuggerQuickPickItem[] = dbgs.map(dbg => {
     return {
         label: dbg.name(),
-        dbg: dbg
+        dbg
     };
     });
     const selectedDbg = await vscode.window.showQuickPick(items).then(item => {
