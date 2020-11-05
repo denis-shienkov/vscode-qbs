@@ -16,7 +16,7 @@ import {
 } from './qbstypes';
 import {QbsProductNode, QbsProjectNode} from './qbsprojectexplorer';
 
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 async function onDetectProfilesCommand(session: QbsSession) {
     await vscode.window.withProgress({

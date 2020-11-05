@@ -14,7 +14,7 @@ import * as QbsUtils from './qbsutils';
 import {QbsSession} from './qbssession';
 import {QbsProfileData, QbsConfigData, QbsDebuggerData} from './qbstypes';
 
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export enum QbsSettingsEvent {
     NothingRequired,

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import {QbsSession} from './qbssession';
 
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export class QbsStatusBar implements vscode.Disposable {
     private _sessionStatusButton: vscode.StatusBarItem;

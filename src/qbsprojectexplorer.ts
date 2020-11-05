@@ -7,7 +7,7 @@ import {
     QbsGroupData, QbsProductData, QbsProjectData
 } from './qbstypes';
 
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 async function openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position) {
     await vscode.workspace.openTextDocument(uri).then(async (doc) => {

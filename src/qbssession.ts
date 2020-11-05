@@ -16,7 +16,7 @@ import {
     QbsTaskMaxProgressResponse, QbsMessageResponse, QbsProjectData
 } from './qbstypes';
 
-const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export enum QbsSessionStatus { Stopped, Started, Stopping, Starting }
 
