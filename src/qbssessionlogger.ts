@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 
 import {QbsSession} from './qbssession';
 import {QbsOperationStatus, QbsOperationType, QbsMessageResponse} from './qbstypes';
+
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
@@ -67,35 +70,71 @@ export class QbsSessionLogger implements vscode.Disposable {
         session.onOperationChanged(async (operation) => {
             if (operation._type === QbsOperationType.Resolve) {
                 if (operation._status === QbsOperationStatus.Started) {
-                    await appendCompileText('Resolving project...');
+                    const text = localize('qbs.session.logger.resolve.message', 'Resolving project...');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Completed) {
-                    await appendCompileText(`Project successfully resolved, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.resolve.completed.message', 'Project successfully resolved')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
-                    await appendCompileText(`Error resolving project, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.resolve.failed.message', 'Error resolving project')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Build) {
                 if (operation._status === QbsOperationStatus.Started) {
-                    await appendCompileText('Building project...');
+                    const text = localize('qbs.session.logger.build.message', 'Building project...');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Completed) {
-                    await appendCompileText(`Project successfully built, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.build.completed.message', 'Project successfully built')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
-                    await appendCompileText(`Error building project, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.build.failed.message', 'Error building project')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Clean) {
                 if (operation._status === QbsOperationStatus.Started) {
-                    await appendCompileText('Cleaning project...');
+                    const text = localize('qbs.session.logger.clean.message', 'Cleaning project...');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Completed) {
-                    await appendCompileText(`Project successfully cleaned, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.clean.completed.message', 'Project successfully cleaned')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
-                    await appendCompileText(`Error cleaning project, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.clean.failed.message', 'Error cleaning project')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Install) {
                 if (operation._status === QbsOperationStatus.Started) {
-                    await appendCompileText('Installing project...');
+                    const text = localize('qbs.session.logger.install.message', 'Installing project...');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Completed) {
-                    await appendCompileText(`Project successfully installed, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.install.completed.message', 'Project successfully installed')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
-                    await appendCompileText(`Error installing project, elapsed time: ${operation._elapsed} msecs.`);
+                    const text = localize('qbs.session.logger.install.failed.message', 'Error installing project')
+                        + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
+                        + `${operation._elapsed}`
+                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                    await appendCompileText(text);
                 }
             }
         });
