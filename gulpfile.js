@@ -44,7 +44,7 @@ const doCompile = function (buildNls) {
         .pipe(sourcemaps.init())
         .pipe(tsProject()).js
         .pipe(buildNls ? nls.rewriteLocalizeCalls() : es.through())
-        .pipe(buildNls ? nls.createAdditionalLanguageFiles(languages, 'i18n', 'out') : es.through());
+        .pipe(buildNls ? nls.createAdditionalLanguageFiles(languages, 'i18n', 'src') : es.through());
 
     if (inlineMap && inlineSource) {
         r = r.pipe(sourcemaps.write());

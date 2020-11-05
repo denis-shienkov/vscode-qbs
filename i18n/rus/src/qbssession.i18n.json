@@ -1,0 +1,6 @@
+{
+    "qbs.session.status.started": "запущен",
+    "qbs.session.status.starting": "запускается",
+    "qbs.session.status.stopped": "остановлен",
+    "qbs.session.status.stopping": "останавливается"
+}
