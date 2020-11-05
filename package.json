@@ -409,8 +409,8 @@
                     "type": "string",
                     "default": "relaxed",
                     "enum": [
-                      "relaxed",
-                      "strict"
+                        "relaxed",
+                        "strict"
                     ],
                     "description": "%qbs-tools.configuration.qbs.errorHandlingMode.description%",
                     "scope": "resource"
@@ -419,10 +419,10 @@
                     "type": "string",
                     "default": "info",
                     "enum": [
-                      "error",
-                      "warning",
-                      "info",
-                      "debug"
+                        "error",
+                        "warning",
+                        "info",
+                        "debug"
                     ],
                     "description": "%qbs-tools.configuration.qbs.logLevel.description%",
                     "scope": "resource"
@@ -470,9 +470,16 @@
         "eslint": "^7.9.0",
         "@typescript-eslint/eslint-plugin": "^4.1.1",
         "@typescript-eslint/parser": "^4.1.1",
+        "del": "^4.1.1",
         "glob": "^7.1.6",
+        "gulp": "^4.0.2",
+        "gulp-filter": "^5.1.0",
+        "gulp-sourcemaps": "^2.6.5",
+        "gulp-typescript": "^5.0.1",
+        "run-sequence": "^2.2.1",
         "mocha": "^8.1.3",
         "typescript": "^4.0.2",
+        "vsce": "^1.79.5",
         "vscode-test": "^1.4.0",
         "vscode-nls-dev": "^3.3.2",
         "vscode-jsonrpc": "3.5.0"
