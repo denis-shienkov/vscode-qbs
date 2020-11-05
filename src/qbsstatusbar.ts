@@ -108,26 +108,20 @@ export class QbsStatusBar implements vscode.Disposable {
     private async updateControls() {
         // Update the session status.
         const statusName = QbsSession.statusName(this._session.status());
-        this._sessionStatusButton.text = localize('qbs.session.status',
-                                                  `$(info) QBS: ${statusName}`);
+        this._sessionStatusButton.text = `$(info) QBS: ${statusName}`;
         // Update the active project name.
         const project = this._session.project();
-        const projectName = project?.name()
-            || localize('qbs.active.project.empty', 'empty');
-        this._selectProjectButton.text = localize('qbs.select.active.project',
-                                                  `$(project) [${projectName}]`);
+        const projectName = project?.name() || localize('qbs.active.project.empty', 'empty');
+        this._selectProjectButton.text = `$(project) [${projectName}]`;
         const buildStep = project?.buildStep();
         const runStep = project?.runStep();
 
         // Update the current build profile name.
-        const profileName = buildStep?.profileName()
-            || localize('qbs.active.profile.empty', 'none');
-        this._selectBuildProfileButton.text = localize('qbs.select.build.profile',
-                                                       `$(tools) [${profileName}]`);
+        const profileName = buildStep?.profileName() || localize('qbs.active.profile.empty', 'none');
+        this._selectBuildProfileButton.text = `$(tools) [${profileName}]`;
         // Update the current build configuration name.
         const configName = buildStep?.configurationName() || 'debug';
-        this._selectBuildConfigurationButton.text = localize('qbs.select.build.configuration',
-                                                             `$(settings) [${configName}]`);
+        this._selectBuildConfigurationButton.text = `$(settings) [${configName}]`;
         // Update the current build product name.
         const buildProductName = buildStep?.productName() || 'empty';
         this._selectBuildProductButton.text = `[${buildProductName}]`;
@@ -139,7 +133,7 @@ export class QbsStatusBar implements vscode.Disposable {
             this._runProductButton.color = 'lightgreen';
             this._debugProductButton.color = 'lightgreen';
             this._selectRunProductButton.tooltip = localize('qbs.select.run.product.tooltip',
-                                                            `Click to Select the Product to Debug or Run\n\n${runProductExe}`);
+                                                            'Click to Select the Product to Debug or Run') + `\n\n${runProductExe}`;
         } else {
             this._runProductButton.color = 'orange';
             this._debugProductButton.color = 'orange';
@@ -149,7 +143,6 @@ export class QbsStatusBar implements vscode.Disposable {
         // Update the current debugger name.
         const debuggerName = runStep?.debuggerName()
             || localize('qbs.select.debugger.empty', 'No debugger');
-        this._selectDebuggerButton.text = localize('qbs.select.debuger',
-                                                   `[${debuggerName}]`);
+        this._selectDebuggerButton.text = `[${debuggerName}]`;
     }
 }

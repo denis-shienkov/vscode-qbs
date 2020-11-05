@@ -27,8 +27,8 @@ async function onDetectProfilesCommand(session: QbsSession) {
         return new Promise(resolve => {
             p.report({
                 increment: success ? 100 : 0,
-                message: localize('qbs.detect.profiles.progress.message',
-                                  success ? 'Completed' : 'Failed')
+                message: success ? localize('qbs.detect.profiles.progress.completed.message', 'Completed')
+                                 : localize('qbs.detect.profiles.progress.failed.message', 'Failed')
             });
 
             setTimeout(() => {

@@ -164,7 +164,7 @@ export class QbsSettings implements vscode.Disposable {
             return false;
         } else if (!fs.existsSync(qbsPath)) {
             await vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
-                                                          `QBS executable ${qbsPath} not found.`));
+                                                          `QBS executable not found.`));
             return false;
         }
         return true;
