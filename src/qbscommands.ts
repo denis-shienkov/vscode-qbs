@@ -162,8 +162,8 @@ async function onResolveCommand(session: QbsSession, request: QbsResolveRequest,
                     QbsOperationType.Resolve,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
-                description = errors.isEmpty() ? 'Project successfully resolved'
-                                               : 'Project resolving failed';
+                description = errors.isEmpty() ? localize('qbs.session.resolve.progress.completed.title','Project successfully resolved')
+                                               : localize('qbs.session.resolve.progress.failed.title', 'Project resolving failed');
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
@@ -231,8 +231,8 @@ async function onBuildCommand(session: QbsSession, request: QbsBuildRequest, tim
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 maxProgress = progress = oldPercentage = 0;
-                description = errors.isEmpty() ? 'Project successfully built'
-                                               : 'Project building failed';
+                description = errors.isEmpty() ? localize('qbs.session.build.progress.completed.title','Project successfully built')
+                                               : localize('qbs.session.build.progress.failed.title', 'Project building failed');
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
@@ -299,8 +299,8 @@ async function onCleanCommand(session: QbsSession, request: QbsCleanRequest, tim
                     QbsOperationType.Clean,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
-                description = errors.isEmpty() ? 'Project successfully cleaned'
-                                               : 'Project cleaning failed';
+                description = errors.isEmpty() ? localize('qbs.session.clean.progress.completed.title','Project successfully cleaned')
+                                               : localize('qbs.session.clean.progress.failed.title', 'Project cleaning failed');
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
@@ -367,8 +367,8 @@ async function onInstallCommand(session: QbsSession, request: QbsInstallRequest)
                     QbsOperationType.Install,
                     errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
-                description = errors.isEmpty() ? 'Project successfully installed'
-                                               : 'Project installing failed';
+                description = errors.isEmpty() ? localize('qbs.session.install.progress.completed.title','Project successfully installed')
+                                               : localize('qbs.session.install.progress.failed.title', 'Project installing failed');
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
