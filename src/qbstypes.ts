@@ -29,6 +29,7 @@ export class QbsResolveRequest extends QbsRequest {
             'cpp.systemFrameworkPaths',
             'cpp.compilerDefinesByLanguage',
             'cpp.defines',
+            'cpp.platformDefines',
             'cpp.compilerName',
             'cpp.compilerPath',
             'cpp.compilerPathByLanguage',

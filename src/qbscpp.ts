@@ -42,6 +42,11 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                 await this.setup(session.project()?.data());
             }
         });
+        session.onProjectBuilt(async (result) => {
+            if (result.isEmpty()) {
+                await this.setup(session.project()?.data());
+            }
+        });
     }
 
     /**
@@ -300,7 +305,9 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
      * QBS product @c properties.
      */
     private extractDefines(properties?: any): string[] {
-        return properties ? ([].concat(properties['cpp.defines'])) : [];
+        return properties ? ([]
+            .concat(properties['cpp.defines'])
+            .concat(properties['cpp.platformDefines'])) : [];
     }
 
     /**
