@@ -1,5 +1,11 @@
 # What's New?
 
+## 0.0.8
+
+- Next developer preview release.
+- [#22](https://github.com/denis-shienkov/vscode-qbs/issues/5)
+Added russian localization.
+
 ## 0.0.7
 
 - Next developer preview release.
