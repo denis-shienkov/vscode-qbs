@@ -300,7 +300,10 @@ export class QbsProductData {
     isRunnable(): boolean { return this._data['is-runnable']; }
     isEnabled(): boolean { return this._data['is-enabled']; }
     isEmpty(): boolean { return typeof this._data === 'string'; }
-    moduleProperties(): any { return this._data['module-properties']; }
+
+    moduleProperties(): QbsModulePropertiesData {
+        return new QbsModulePropertiesData(this._data['module-properties']);
+    }
 
     groups(): QbsGroupData[] {
         const groups: QbsGroupData[] = [];
@@ -315,7 +318,10 @@ export class QbsGroupData {
     id(): string { return this.name(); }
     name(): string { return this._data['name']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
-    moduleProperties(): any { return this._data['module-properties']; }
+
+    moduleProperties(): QbsModulePropertiesData {
+        return new QbsModulePropertiesData(this._data['module-properties']);
+    }
 
     sourceArtifacts(): QbsSourceArtifactData[] {
         const artifacts: QbsSourceArtifactData[] = [];
@@ -342,6 +348,50 @@ export class QbsSourceArtifactData {
     fileName(): string { return basename(this.filePath()); }
     fileTags(): string[] { return this._data['file-tags']; }
     id(): string { return this.filePath(); }
+}
+
+export class QbsModulePropertiesData {
+    constructor(private readonly _data: any) {}
+    cLanguageVersion(): string[] { return this._data['cpp.cLanguageVersion'] || []; }
+    compilerDefinesByLanguage(): any { return this._data['cpp.compilerDefinesByLanguage']; }
+    compilerIncludePaths(): string[] { return this._data['cpp.compilerIncludePaths'] || []; }
+    compilerName(): string { return this._data['cpp.compilerName'] || ''; }
+    compilerPath(): string { return this._data['cpp.compilerPath'] || ''; }
+    compilerPathByLanguage(): any { return this._data['cpp.compilerPathByLanguage']; }
+    compilerVersionMajor(): number { return this._data['cpp.compilerVersionMajor'] || 0; }
+    compilerVersionMinor(): number { return this._data['cpp.compilerVersionMinor'] || 0; }
+    compilerVersionPatch(): number { return this._data['cpp.compilerVersionPatch'] || 0; }
+    cxxLanguageVersion(): string[] { return this._data['cpp.cxxLanguageVersion'] || ''; }
+    defines(): string[] { return this._data['cpp.defines'] || []; }
+    distributionIncludePaths(): string[] { return this._data['cpp.distributionIncludePaths'] || []; }
+    frameworkPaths(): string[] { return this._data['cpp.frameworkPaths'] || []; }
+    includePaths(): string[] { return this._data['cpp.includePaths'] || []; }
+    platformDefines(): string[] { return this._data['cpp.platformDefines'] || []; }
+    prefixHeaders(): string[] { return this._data['cpp.prefixHeaders'] || []; }
+    systemFrameworkPaths(): string[] { return this._data['cpp.systemFrameworkPaths'] || []; }
+    systemIncludePaths(): string[] { return this._data['cpp.systemIncludePaths'] || []; }
+    architecture(): string { return this._data['qbs.architecture'] || ''; }
+    toolchain(): string[] { return this._data['qbs.toolchain'] || []; }
+
+    isValid(): boolean { return this._data; }
+
+    allIncludePaths(): string[] {
+        return [
+            ...this.compilerIncludePaths(),
+            ...this.distributionIncludePaths(),
+            ...this.systemIncludePaths(),
+            ...this.includePaths(),
+            ...this.frameworkPaths(),
+            ...this.systemFrameworkPaths()
+        ];
+    }
+
+    allDefines(): string[] {
+        return [
+            ...this.defines(),
+            ...this.platformDefines()
+        ];
+    }
 }
 
 // QBS project configurations.
