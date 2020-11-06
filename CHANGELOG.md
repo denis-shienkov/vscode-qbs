@@ -6,8 +6,7 @@
 - [#22](https://github.com/denis-shienkov/vscode-qbs/issues/22)
 Added russian localization.
 - [#24](https://github.com/denis-shienkov/vscode-qbs/issues/24)
-Now, the macros and other properties from the groups are taken
-into account.
+Now, the macros and other properties from the groups are processed.
 
 ## 0.0.7
 
