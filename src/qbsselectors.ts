@@ -69,8 +69,9 @@ export async function displayConfigurationSelector(session: QbsSession) {
 
 export async function displayBuildProductSelector(session: QbsSession) {
     const products = [
-        new QbsProductData('all')
-    ].concat(session.project()?.products() || []);
+        new QbsProductData('all'),
+        ...session.project()?.products() || []
+    ];
     interface QbsProductQuickPickItem extends vscode.QuickPickItem {
         product: QbsProductData;
     }
