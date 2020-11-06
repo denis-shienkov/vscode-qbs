@@ -10,7 +10,7 @@ export enum QbsSessionProtocolStatus {
     Starting
 }
 
-const PACKET_PREAMBLE = "qbsmsg:";
+const PACKET_PREAMBLE = 'qbsmsg:';
 
 export class QbsSessionProtocol implements vscode.Disposable {
     private _input: string = '';
