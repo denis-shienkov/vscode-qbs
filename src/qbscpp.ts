@@ -129,19 +129,20 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
         const parseProject = async (project: QbsProjectData) => {
             const products = project.products();
             for (const product of products) {
-                const moduleProperties = product.moduleProperties();
+                const productModuleProperties = product.moduleProperties();
                 const groups = product.groups();
                 for (const group of groups) {
+                    const groupModuleProperties = group.moduleProperties();
                     const sources = group.sourceArtifacts();
                     for (const source of sources) {
                         const filepath = source.filePath();
                         const tags = source.fileTags();
-                        const includePath = this.extractIncludePaths(moduleProperties);
-                        const defines = this.extractDefines(moduleProperties);
-                        const forcedInclude = this.extractPrefixHeaders(moduleProperties);
-                        const compilerPath = this.extractCompilerPath(moduleProperties);
-                        const intelliSenseMode = this.extractIntelliSenseMode(moduleProperties);
-                        const standard = this.extractLanguageStandard(moduleProperties, tags);
+                        const includePath = this.extractIncludePaths(groupModuleProperties || productModuleProperties);
+                        const defines = this.extractDefines(groupModuleProperties || productModuleProperties);
+                        const forcedInclude = this.extractPrefixHeaders(groupModuleProperties || productModuleProperties);
+                        const compilerPath = this.extractCompilerPath(groupModuleProperties || productModuleProperties);
+                        const intelliSenseMode = this.extractIntelliSenseMode(groupModuleProperties || productModuleProperties);
+                        const standard = this.extractLanguageStandard(groupModuleProperties || productModuleProperties, tags);
                         const cfg: cpt.SourceFileConfiguration = {
                             includePath,
                             defines,

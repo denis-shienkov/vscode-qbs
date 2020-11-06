@@ -3,8 +3,11 @@
 ## 0.0.8
 
 - Next developer preview release.
-- [#22](https://github.com/denis-shienkov/vscode-qbs/issues/5)
+- [#22](https://github.com/denis-shienkov/vscode-qbs/issues/22)
 Added russian localization.
+- [#24](https://github.com/denis-shienkov/vscode-qbs/issues/24)
+Now, the macros and other properties from the groups are taken
+into account.
 
 ## 0.0.7
 

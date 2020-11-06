@@ -18,24 +18,24 @@ export class QbsResolveRequest extends QbsRequest {
         this._data['environment'] = process.env;
         this._data['data-mode'] = 'only-if-changed';
         this._data['module-properties'] = [
-            'cpp.compilerVersionMajor',
-            'cpp.compilerVersionMinor',
-            'cpp.compilerVersionPatch',
-            'cpp.compilerIncludePaths',
-            'cpp.distributionIncludePaths',
-            'cpp.systemIncludePaths',
-            'cpp.includePaths',
-            'cpp.frameworkPaths',
-            'cpp.systemFrameworkPaths',
+            'cpp.cLanguageVersion',
             'cpp.compilerDefinesByLanguage',
-            'cpp.defines',
-            'cpp.platformDefines',
+            'cpp.compilerIncludePaths',
             'cpp.compilerName',
             'cpp.compilerPath',
             'cpp.compilerPathByLanguage',
-            'cpp.cLanguageVersion',
+            'cpp.compilerVersionMajor',
+            'cpp.compilerVersionMinor',
+            'cpp.compilerVersionPatch',
             'cpp.cxxLanguageVersion',
+            'cpp.defines',
+            'cpp.distributionIncludePaths',
+            'cpp.frameworkPaths',
+            'cpp.includePaths',
+            'cpp.platformDefines',
             'cpp.prefixHeaders',
+            'cpp.systemFrameworkPaths',
+            'cpp.systemIncludePaths',
             'qbs.architecture',
             'qbs.toolchain'
         ];
@@ -315,6 +315,7 @@ export class QbsGroupData {
     id(): string { return this.name(); }
     name(): string { return this._data['name']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+    moduleProperties(): any { return this._data['module-properties']; }
 
     sourceArtifacts(): QbsSourceArtifactData[] {
         const artifacts: QbsSourceArtifactData[] = [];
