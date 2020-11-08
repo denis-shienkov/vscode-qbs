@@ -23,4 +23,9 @@ Product {
         prefix: "src/"
         files: "**/*"
     }
+    Group {
+        name: "ci"
+        prefix: ".github/"
+        files: "**/*"
+    }
 }
