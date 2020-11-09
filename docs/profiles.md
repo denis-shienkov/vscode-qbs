@@ -37,7 +37,7 @@ $ qbs setup-toolchains --detect
 * Also from the command palette in VS Code, run the
 **QBS: Detect Profiles** command.
 
-In this case, QBS will automatically detect the toolchainn architecture,
+In this case, QBS will automatically detect the toolchain architecture,
 the toolchain version, the compiler paths, and on this basis will
 automatically generate the profiles with unique names.
 

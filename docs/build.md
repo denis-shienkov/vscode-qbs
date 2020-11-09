@@ -9,14 +9,6 @@ the status bar:
 
 ![QBS session status button](images/qbs-session-status-button.png)
 
-Also, in the lower right corner of VS Code, the popup notifications will
-be displayed that the QBS executable file has been found and the QBS session
-has started successfully:
-
-![QBS executable found message](images/qbs-exe-found-popup.png)
-
-![QBS session started message](images/qbs-session-started-popup.png)
-
 If something goes wrong, the user can manually restart the QBS session
 using the following commands:
 
@@ -123,7 +115,7 @@ popup message:
 The progress of operations such as `resolving`, `building`, and
 `cleaning' is also displayed as text messages reported from QBS.
 
-The KBS extension provides two output panels for displaying
+The QBS extension provides two output channels for displaying
 these messages:
 
 * **QBS Compile Output** - displays the progress of the main build,

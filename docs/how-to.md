@@ -43,7 +43,7 @@ or press the **Run** button in the status bar.
 * From the command palette in VS Code, run the **QBS: Select Run Product** command
 to select the desired product to debug.
 * From the command palette in VS Code, run the **QBS: Select Debugger** command,
-to select the desired debugegr configuration for debugging.
+to select the desired debugger configuration for debugging.
 * From the command palette in VS Code, run the **QBS: Debug** command,
 or press the **Debug** button in the status bar.
 
