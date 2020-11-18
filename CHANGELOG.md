@@ -1,5 +1,13 @@
 # What's New?
 
+## 0.0.9
+
+- Next developer preview release.
+- [#29](https://github.com/denis-shienkov/vscode-qbs/issues/29)
+Fixed updating debugger settings when its configuration file changed.
+- [#30](https://github.com/denis-shienkov/vscode-qbs/issues/30)
+Implemented ability to select the 'Auto' entry for the debugging.
+
 ## 0.0.8
 
 - Next developer preview release.
