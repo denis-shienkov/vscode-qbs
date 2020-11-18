@@ -44,8 +44,8 @@ the `qbs.launchFilePath` variable in the plugin settings.
 
 You should choose the desired debugger for debugging.
 
-* From the command palette in VS Code, run the **QBS: Select Debugger**
-command, or press the **Click to Select the Debugger** button in right
+* From the command palette in VS Code, run the **QBS: Select Launch Configuration**
+command, or press the **Click to Select the Launch Configuration** button in right
 of the status bar.
 
 * From the command palette in VS Code, run the **QBS: Debug**

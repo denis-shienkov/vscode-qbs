@@ -10,7 +10,7 @@
     "qbs-tools.command.qbs.select.configuration.title": "Выбрать конфигурацию сборки",
     "qbs-tools.command.qbs.select.build.title": "Выбрать продукт для сборки",
     "qbs-tools.command.qbs.select.run.title": "Выбрать продукт для запуска",
-    "qbs-tools.command.qbs.select.debugger.title": "Выбрать отладчик",
+    "qbs-tools.command.qbs.select.debugger.title": "Выбрать конфигурацию запуска",
     "qbs-tools.command.qbs.resolve.title": "Сканировать",
     "qbs-tools.command.qbs.resolveforceprobes.title": "Сканировать с принудительным запуском зондов",
     "qbs-tools.command.qbs.build.title": "Собрать",

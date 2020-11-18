@@ -80,7 +80,7 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectDebuggerButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
         this._selectDebuggerButton.text = '[No debugger]';
         this._selectDebuggerButton.tooltip = localize('qbs.select.debugger.tooltip',
-                                                      'Click to Select the Debugger');
+                                                      'Click to Select the Launch Configuration');
         this._selectDebuggerButton.command = 'qbs.selectDebugger';
         this._selectDebuggerButton.show();
 

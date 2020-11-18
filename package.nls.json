@@ -10,7 +10,7 @@
     "qbs-tools.command.qbs.select.configuration.title": "Select Build Configuration",
     "qbs-tools.command.qbs.select.build.title": "Select Build Product",
     "qbs-tools.command.qbs.select.run.title": "Select Run Product",
-    "qbs-tools.command.qbs.select.debugger.title": "Select Debugger",
+    "qbs-tools.command.qbs.select.debugger.title": "Select Launch Configuration",
     "qbs-tools.command.qbs.resolve.title": "Resolve",
     "qbs-tools.command.qbs.resolveforceprobes.title": "Resolve and Force Probe Execution",
     "qbs-tools.command.qbs.build.title": "Build",

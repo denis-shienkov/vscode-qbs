@@ -11,7 +11,7 @@
     "qbs.debug.product": "$(bug)",
     "qbs.debug.product.tooltip": "Нажмите для отладки выбранного продукта",
     "qbs.select.run.product.tooltip": "Нажмите для выбора продукта для запуска или отладки",
-    "qbs.select.debugger.tooltip": "Нажмите для выбора отладчика",
+    "qbs.select.debugger.tooltip": "Нажмите для выбора конфигурации запуска",
     "qbs.active.project.empty": "Пусто",
     "qbs.active.profile.empty": "Нет",
     "qbs.select.debugger.empty": "Отладчик не задан"
