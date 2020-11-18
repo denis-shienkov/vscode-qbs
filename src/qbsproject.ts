@@ -35,7 +35,6 @@ export class QbsProject implements vscode.Disposable {
     }
 
     data(): QbsProjectData | undefined { return this._data; }
-    setRunEnvironment(env: QbsRunEnvironmentData) { this._runStep.setup(undefined, undefined, env); }
     buildStep(): QbsBuildStep { return this._buildStep; }
     runStep(): QbsRunStep { return this._runStep; }
     isEmpty(): boolean { return this._data ? true : false; }

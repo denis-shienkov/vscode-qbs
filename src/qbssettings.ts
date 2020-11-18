@@ -8,21 +8,25 @@ import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 import * as which from 'which';
 import * as cp from 'child_process';
+import * as chokidar from 'chokidar';
 
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
 import {QbsProfileData, QbsConfigData, QbsDebuggerData} from './qbstypes';
+import { formatWithOptions } from 'util';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export enum QbsSettingsEvent {
     NothingRequired,
     SessionRestartRequired,
-    ProjectResolveRequired
+    ProjectResolveRequired,
+    DebuggerUpdateRequired
 }
 
 export class QbsSettings implements vscode.Disposable {
+    private _debuggerSettingsWatcher?: chokidar.FSWatcher
     private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
@@ -38,14 +42,19 @@ export class QbsSettings implements vscode.Disposable {
                 signal = QbsSettingsEvent.ProjectResolveRequired;
             } else if (e.affectsConfiguration('qbs.logLevel')) {
                 signal = QbsSettingsEvent.ProjectResolveRequired;
+            } else if (e.affectsConfiguration('qbs.launchFilePath')) {
+                signal = QbsSettingsEvent.DebuggerUpdateRequired;
+                this.subscribeDebuggerSettingsChanged();
             }
             if (signal !== QbsSettingsEvent.NothingRequired) {
                 this._onChanged.fire(signal);
             }
         });
+
+        this.subscribeDebuggerSettingsChanged();
     }
 
-    dispose() {}
+    dispose() { this._debuggerSettingsWatcher?.close(); }
 
     /**
      * Returns the path to the QBS executable obtained
@@ -264,7 +273,7 @@ export class QbsSettings implements vscode.Disposable {
         return new Promise<QbsDebuggerData[]>((resolve, reject) => {
             const settingsPath = this.debuggerSettingsPath();
             fs.readFile(settingsPath, (error, data) => {
-                const debuggers: QbsDebuggerData[] = [];
+                const debuggers: QbsDebuggerData[] = [ QbsDebuggerData.createAutomatic() ];
                 try {
                     const text = data.toString();
                     const json = JSON.parse(text);
@@ -293,5 +302,12 @@ export class QbsSettings implements vscode.Disposable {
                 ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
         configPath = configPath.replace('${sourceDirectory}', sourceDirectory);
         return QbsUtils.fixPathSeparators(configPath);
+    }
+
+    private async subscribeDebuggerSettingsChanged() {
+        this._debuggerSettingsWatcher?.close();
+        const settingsPath = this.debuggerSettingsPath();
+        this._debuggerSettingsWatcher = chokidar.watch(settingsPath, {ignoreInitial: true});
+        this._debuggerSettingsWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.DebuggerUpdateRequired); });
     }
 }

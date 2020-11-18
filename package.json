@@ -485,8 +485,9 @@
         "vscode-jsonrpc": "3.5.0"
     },
     "dependencies": {
-        "vscode-nls": "^4.1.1",
+        "chokidar": "^3.4.3",
         "vscode-cpptools": "^4.0.1",
+        "vscode-nls": "^4.1.1",
         "which": "~1.3.0"
     }
 }

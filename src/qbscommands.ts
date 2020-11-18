@@ -408,75 +408,47 @@ async function onRunProductCommand(session: QbsSession) {
         }
     }
 
-    // Retrieve the run environment for the selected product.
-    const success = await session.ensureRunEnvironmentUpdated();
-    if (!success) {
-        vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
-                                                'Run environment missing, please select the runnable product.'));
-        return;
-    }
-
-    const runStep = session.project()?.runStep();
-    const env = runStep?.runEnvironment()?.data();
-    const executable = runStep?.targetExecutable();
-    if (!executable || !env) {
+    const dbg = session.project()?.runStep().debugger();
+    if (!dbg?.hasProgram()) {
         vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
                                                 'Target executable missing, please re-build the product.'));
         return;
-    } else {
-        const escaped = QbsUtils.escapeShell(executable);
-        const terminal = vscode.window.createTerminal({
-            name: 'QBS Run',
-            env,
-            cwd: path.dirname(executable)
-        });
-        if (process.platform === 'darwin') {
-            // workaround for macOS system integrity protection
-            const specialEnvs: string[] = ['DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH'];
-            for (const specialEnv of specialEnvs) {
-                if (env[specialEnv]) {
-                    terminal.sendText(`export ${specialEnv}=${QbsUtils.escapeShell(env[specialEnv])}`);
-                }
+    }
+
+    const escaped = QbsUtils.escapeShell(dbg.program());
+    const program = dbg.program();
+    const env = dbg.environment().data();
+    const terminal = vscode.window.createTerminal({
+        name: 'QBS Run',
+        env,
+        cwd: path.dirname(program)
+    });
+    if (process.platform === 'darwin') {
+        // workaround for macOS system integrity protection
+        const specialEnvs: string[] = ['DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH'];
+        for (const specialEnv of specialEnvs) {
+            if (env[specialEnv]) {
+                terminal.sendText(`export ${specialEnv}=${QbsUtils.escapeShell(env[specialEnv])}`);
             }
         }
-        terminal.sendText(escaped);
-        terminal.show();
     }
+    terminal.sendText(escaped);
+    terminal.show();
 }
 
 async function onDebugProductCommand(session: QbsSession) {
-    const runStep = session.project()?.runStep();
-    const debuggerConfig = runStep?.debugger();
-    if (!debuggerConfig) {
+    const dbg = session.project()?.runStep().debugger();
+    if (!dbg) {
         vscode.window.showErrorMessage(localize('qbs.product.debugger.missed.error.message',
                                                 'Debugger missing, please select the debugger.'));
         return;
-    }
-
-    // Retrieve the run environment for the selected product.
-    const success = await session.ensureRunEnvironmentUpdated();
-    if (!success) {
-        vscode.window.showErrorMessage(localize('qbs.product.env.missed.error.message',
-                                                'Run environment missing, please select the runnable product.'));
-        return;
-    }
-
-    const env = runStep?.runEnvironment()?.data();
-    const program = runStep?.targetExecutable();
-    if (!program || !env) {
+    } else if (!dbg.hasProgram()) {
         vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
                                                 'Target executable missing, please re-build the product.'));
         return;
     }
 
-    const targetConfig = {
-        program,
-        cwd: path.dirname(program),
-        env
-    };
-
-    const fullConfig = Object.assign(debuggerConfig.data(), targetConfig);
-    await vscode.debug.startDebugging(undefined, fullConfig);
+    await vscode.debug.startDebugging(undefined, dbg.data());
 }
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {

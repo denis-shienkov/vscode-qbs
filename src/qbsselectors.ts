@@ -102,7 +102,7 @@ export async function displayRunProductSelector(session: QbsSession) {
     const selectedProduct = await vscode.window.showQuickPick(items).then(item => {
         return item?.product;
     });
-    session.project()?.runStep().setup(selectedProduct, undefined, undefined);
+    session.project()?.runStep().setup(selectedProduct, undefined);
 }
 
 export async function displayDebuggerSelector(session: QbsSession) {
@@ -119,5 +119,5 @@ export async function displayDebuggerSelector(session: QbsSession) {
     const selectedDbg = await vscode.window.showQuickPick(items).then(item => {
         return item?.dbg;
     });
-    session.project()?.runStep().setup(undefined, selectedDbg, undefined);
+    session.project()?.runStep().setup(undefined, selectedDbg);
 }

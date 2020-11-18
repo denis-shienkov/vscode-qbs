@@ -410,8 +410,37 @@ export class QbsConfigData {
 
 export class QbsDebuggerData {
     constructor(private readonly _data: any) {}
+    setName(name: string) { this._data['name'] = name; }
     name(): string { return this._data['name']; }
+    setAutomatic(isAutomatic: boolean) { this._data['is-automatic'] = isAutomatic; }
+    isAutomatic(): boolean { return this._data['is-automatic'] || false; }
+    setProgram(program: string) { this._data['program'] = program; }
+    program(): string { return this._data['program'] || ''; }
+    hasProgram(): boolean { return this._data['program']; }
+    setCwd(cwd: string) { this._data['cwd'] = cwd; };
+    cwd(): string { return this._data['cwd'] || ''; }
+    setEnvironment(env: QbsRunEnvironmentData) { this._data['env'] = env.data(); };
+    environment(): QbsRunEnvironmentData { return new QbsRunEnvironmentData(this._data['env'] || {}); }
+    setExternalConsole(console: boolean) { this._data['externalConsole'] = console; }
+    hasExternalConsole(): boolean { return this._data['externalConsole']; }
+    setRequest(request: string) { this._data['request'] = request; }
+    request(): string { return this._data['request'] || ''; }
+    setType(type: string) { this._data['type'] = type; }
+    type(): string { return this._data['type'] || ''; }
+    setMiMode(mode: string) { this._data['MIMode'] = mode; }
+    miMode(): string { return this._data['MIMode'] || ''; }
+    setMiDebuggerPath(path: string) { this._data['miDebuggerPath'] = path; }
+    miDebuggerPath(): string { return this._data['miDebuggerPath'] || ''; }
     data(): vscode.DebugConfiguration { return this._data; }
+
+    static createAutomatic(): QbsDebuggerData {
+        const auto = new QbsDebuggerData({});
+        auto.setAutomatic(true);
+        auto.setName('Auto');
+        auto.setRequest('launch');
+        auto.setExternalConsole(false);
+        return auto;
+    }
 }
 
 export class QbsRunEnvironmentData {

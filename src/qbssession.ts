@@ -44,6 +44,7 @@ export class QbsSession implements vscode.Disposable {
     private _onCommandDescriptionReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
     private _onProcessResultReceived: vscode.EventEmitter<QbsProcessResponse> = new vscode.EventEmitter<QbsProcessResponse>();
     private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
+    private _onRunEnvironmentReceived: vscode.EventEmitter<QbsRunEnvironmentData> = new vscode.EventEmitter<QbsRunEnvironmentData>();
 
     readonly onOperationChanged: vscode.Event<QbsOperation> = this._onOperationChanged.event;
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
@@ -62,6 +63,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onCommandDescriptionReceived: vscode.Event<QbsMessageResponse> = this._onCommandDescriptionReceived.event;
     readonly onProcessResultReceived: vscode.Event<QbsProcessResponse> = this._onProcessResultReceived.event;
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsMessageResponse> = this._onRunEnvironmentResultReceived.event;
+    readonly onRunEnvironmentReceived: vscode.Event<QbsRunEnvironmentData> = this._onRunEnvironmentReceived.event;
 
     constructor(private readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
@@ -91,6 +93,8 @@ export class QbsSession implements vscode.Disposable {
                 }
             } else if (event === QbsSettingsEvent.SessionRestartRequired) {
                 await vscode.commands.executeCommand('qbs.autoRestartSession');
+            } else if (event === QbsSettingsEvent.DebuggerUpdateRequired) {
+                await this._project?.runStep().restore();
             }
         });
     }
@@ -127,18 +131,6 @@ export class QbsSession implements vscode.Disposable {
         if (this._status === QbsSessionStatus.Started) {
             await this._protocol.stop();
         }
-    }
-
-    async ensureRunEnvironmentUpdated() {
-        return new Promise<boolean>(resolve => {
-            const runEnvironmentResultReceivedSubscription = this.onRunEnvironmentResultReceived(result => {
-                runEnvironmentResultReceivedSubscription.dispose();
-                resolve(result.isEmpty());
-            });
-            const envRequest = new QbsGetRunEnvironmentRequest(this.settings());
-            envRequest.setProductName(this._project?.runStep().productName() || '');
-            this.getRunEnvironment(envRequest);
-        });
     }
 
     async setupProject(uri?: vscode.Uri) {
@@ -254,10 +246,10 @@ export class QbsSession implements vscode.Disposable {
             const result = new QbsProcessResponse(response);
             this._onProcessResultReceived.fire(result);
         } else if (type === 'run-environment') {
-            const env = new QbsRunEnvironmentData(response['full-environment']);
-            this._project?.setRunEnvironment(env);
             const result = new QbsMessageResponse(response['error']);
             this._onRunEnvironmentResultReceived.fire(result);
+            const env = new QbsRunEnvironmentData(response['full-environment']);
+            this._onRunEnvironmentReceived.fire(env);
         }
     }
 

@@ -14,7 +14,6 @@
     "qbs.session.install.progress.title": "Установка проекта",
     "qbs.session.install.progress.completed.title": "Установка проекта успешно завершена",
     "qbs.session.install.progress.failed.title": "Установка проекта завершена с ошибками",
-    "qbs.product.env.missed.error.message": "Отсутствуют переменные окружения выполнения, выберите продукт для запуска.",
     "qbs.product.exe.missed.error.message": "Целевой исполняемый файл отсутствует, пересоберите продукт.",
     "qbs.product.debugger.missed.error.message": "Отсутствует отладчик, выберите отладчик."
 }

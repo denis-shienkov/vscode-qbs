@@ -1,9 +1,12 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as which from 'which';
 
 import {QbsProject} from './qbsproject';
 import {
     QbsProductData, QbsProfileData, QbsConfigData,
-    QbsDebuggerData, QbsRunEnvironmentData
+    QbsDebuggerData, QbsGetRunEnvironmentRequest
 } from './qbstypes'
 
 export class QbsBuildStep implements vscode.Disposable {
@@ -115,8 +118,7 @@ export class QbsBuildStep implements vscode.Disposable {
 
 export class QbsRunStep implements vscode.Disposable {
     private _product?: QbsProductData;
-    private _gdb?: QbsDebuggerData;
-    private _env?: QbsRunEnvironmentData;
+    private _dbg?: QbsDebuggerData;
     private _onChanged: vscode.EventEmitter<boolean> = new vscode.EventEmitter<boolean>();
 
     readonly onChanged: vscode.Event<boolean> = this._onChanged.event;
@@ -128,15 +130,14 @@ export class QbsRunStep implements vscode.Disposable {
     project(): QbsProject { return this._project; }
     productName(): string { return this._product?.fullDisplayName() || ''; }
     targetExecutable(): string { return this._product?.targetExecutable() || ''; }
-    debugger(): QbsDebuggerData | undefined { return this._gdb; }
-    runEnvironment(): QbsRunEnvironmentData | undefined { return this._env; }
-    debuggerName(): string | undefined { return this._gdb?.name(); }
+    debugger(): QbsDebuggerData | undefined { return this._dbg; }
+    debuggerName(): string | undefined { return this._dbg?.name(); }
 
     async restore() {
         const group = `${this._project.name()}::`;
         const product = await this.extractProduct(group);
         const dbg = await this.extractDebugger(group);
-        await this.setup(product, dbg, undefined);
+        await this.setup(product, dbg);
     }
 
     async save() {
@@ -145,16 +146,13 @@ export class QbsRunStep implements vscode.Disposable {
         await this._project.session().extensionContext().workspaceState.update(`${group}DebuggerName`, this.debuggerName());
     }
 
-    async setup(product?: QbsProductData, dbg?: QbsDebuggerData, env?: QbsRunEnvironmentData) {
+    async setup(product?: QbsProductData, dbg?: QbsDebuggerData) {
         let changed = false;
         let autoResolveRequred = false;
         if (this.setupProduct(product)) {
             changed = true;
         }
         if (this.setupDebugger(dbg)) {
-            changed = true;
-        }
-        if (this.setupRunEnvironment(env)) {
             changed = true;
         }
         if (changed) {
@@ -171,34 +169,98 @@ export class QbsRunStep implements vscode.Disposable {
         return (index !== -1) ? products[index] : (products.length > 0 ? products[0] : undefined);
     }
 
-    private async extractDebugger(group: string) {
+    private async extractDebugger(group: string): Promise<QbsDebuggerData> {
         const dbgs = (await this._project.session().settings().enumerateDebuggers()) || [];
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}DebuggerName`);
         const index = dbgs.findIndex((dbg) => dbg.name() == name);
-        return (index !== -1) ? dbgs[index] : (dbgs.length > 0 ? dbgs[0] : undefined);
+        return dbgs[(index !== -1) ? index : 0];
     }
 
     private setupProduct(product?: QbsProductData): boolean {
         if (product) {
             this._product = product;
+            this.updateDebuggerConfiguration(true);
             return true;
         }
         return false;
     }
 
-    private setupDebugger(gdb?: QbsDebuggerData): boolean {
-        if (gdb && gdb.name() !== this._gdb?.name()) {
-            this._gdb = gdb;
+    private setupDebugger(dbg?: QbsDebuggerData): boolean {
+        if (dbg) {
+            this._dbg = dbg;
+            this.updateDebuggerConfiguration(false);
             return true;
         }
         return false;
     }
 
-    private setupRunEnvironment(env?: QbsRunEnvironmentData): boolean {
-        if (env) {
-            this._env = env;
-            return true;
+    private updateDebuggerConfiguration(envRequired: boolean) {
+        const program = this._product?.targetExecutable() || '';
+        const cwd = path.dirname(program);
+        this._dbg?.setProgram(program);
+        this._dbg?.setCwd(cwd);
+
+        // Request env variables.
+        if (envRequired) {
+            new Promise<void>(resolve => {
+                const envReceicedSubscription = this.project().session().onRunEnvironmentReceived(async (env) => {
+                    this._dbg?.setEnvironment(env);
+                    await envReceicedSubscription.dispose();
+                    resolve();
+                });
+                const envRequest = new QbsGetRunEnvironmentRequest(this.project().session().settings());
+                envRequest.setProductName(this.productName() || '');
+                this.project().session().getRunEnvironment(envRequest);
+            });
         }
-        return false;
+
+        if (this._dbg?.isAutomatic()) {
+            const properties = this._product?.moduleProperties();
+            const toolchain = properties?.toolchain() || [];
+            if (toolchain.indexOf('msvc') !== -1) {
+                this._dbg.setType('cppvsdbg');
+                return;
+            } else if (toolchain.indexOf('gcc') !== -1) {
+                this._dbg.setType('cppdbg');
+                const compilerDirectory = path.dirname(properties?.compilerPath() || '');
+
+                const detectDebuggerPath = (debuggerName: string) => {
+                    const ext = (process.platform === 'win32') ? '.exe' : '';
+                    let debuggerPath = path.join(compilerDirectory, debuggerName + ext);
+                    if (!fs.existsSync(debuggerPath)) {
+                        try {
+                            debuggerPath = which.sync(debuggerName + ext);
+                        } catch (e) {
+                            return '';
+                        }
+                    }
+                    return debuggerPath;
+                };
+
+                // Check for LLDB-MI debugger executable.
+                let miDebuggerPath = detectDebuggerPath('lldb-mi');
+                if (miDebuggerPath) {
+                    this._dbg.setMiMode('lldb');
+                    this._dbg.setMiDebuggerPath(miDebuggerPath);
+                    return;
+                }
+                // Check for GDB debugger executable.
+                miDebuggerPath = detectDebuggerPath('gdb');
+                if (miDebuggerPath) {
+                    this._dbg.setMiMode('gdb');
+                    this._dbg.setMiDebuggerPath(miDebuggerPath);
+                    return;
+                }
+                // Check for LLDB debugger executable.
+                miDebuggerPath = detectDebuggerPath('lldb');
+                if (miDebuggerPath) {
+                    this._dbg.setMiMode('lldb');
+                    this._dbg.setMiDebuggerPath(miDebuggerPath);
+                    return;
+                }
+            }
+
+            // TODO: Show error?
+        }
     }
 }
