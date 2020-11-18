@@ -14,7 +14,6 @@ import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
 import {QbsProfileData, QbsConfigData, QbsDebuggerData} from './qbstypes';
-import { formatWithOptions } from 'util';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -164,7 +163,9 @@ export class QbsSettings implements vscode.Disposable {
     async ensureQbsExecutableConfigured(): Promise<boolean> {
         let qbsPath = this.executablePath();
         if (qbsPath === 'qbs') {
-            qbsPath = which.sync(qbsPath);
+            try {
+                qbsPath = which.sync(qbsPath);
+            } catch (e) {}
         }
 
         if (!qbsPath) {
