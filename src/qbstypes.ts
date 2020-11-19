@@ -353,7 +353,10 @@ export class QbsSourceArtifactData {
 export class QbsModulePropertiesData {
     constructor(private readonly _data: any) {}
     cLanguageVersion(): string[] { return this._data['cpp.cLanguageVersion'] || []; }
-    compilerDefinesByLanguage(): any { return this._data['cpp.compilerDefinesByLanguage']; }
+    compilerDefinesByLanguage(language: string): any {
+        const defines = this._data['cpp.compilerDefinesByLanguage'];
+        return defines[language];
+    }
     compilerIncludePaths(): string[] { return this._data['cpp.compilerIncludePaths'] || []; }
     compilerName(): string { return this._data['cpp.compilerName'] || ''; }
     compilerPath(): string { return this._data['cpp.compilerPath'] || ''; }

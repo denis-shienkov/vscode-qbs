@@ -134,8 +134,11 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                         const tags = source.fileTags();
                         const includePath = groupModuleProperties.isValid()
                             ? groupModuleProperties.allIncludePaths() : productModuleProperties.allIncludePaths();
-                        const defines = groupModuleProperties.isValid()
+                        const compilerDefines = this.guessCompilerDefines(groupModuleProperties.isValid()
+                            ? groupModuleProperties : productModuleProperties, tags);
+                        const productDefines = groupModuleProperties.isValid()
                             ? groupModuleProperties.allDefines() : productModuleProperties.allDefines();
+                        const defines = [...compilerDefines, ...productDefines];
                         const forcedInclude = groupModuleProperties.isValid()
                             ? groupModuleProperties.prefixHeaders() : productModuleProperties.prefixHeaders();
                         const compilerPath = groupModuleProperties.isValid()
@@ -322,5 +325,38 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
             }
         }
         return 'gcc-x86';
+    }
+
+    private guessCompilerDefines(properties: QbsModulePropertiesData, tags: string[]) {
+        const toolchain = properties.toolchain();
+        // Don't handle the known compilers (like MSVC, Clang, GCC), because
+        // its pre-defined macros will be detected by the `cpp-tools` plugin engine.
+        if (toolchain.indexOf('msvc') !== -1 || toolchain.indexOf('gcc') !== -1 || toolchain.indexOf('clang') !== -1) {
+            return [];
+        }
+
+        const compilerDefinesByLanguage = (language: string) => {
+            const definesByLanguage = properties.compilerDefinesByLanguage(language);
+            if (!definesByLanguage) {
+                return [];
+            }
+            const compilerDefines = [];
+            for (var defineByLanguage in definesByLanguage) {
+                compilerDefines.push(defineByLanguage + "=" + definesByLanguage[defineByLanguage]);
+            }
+            return compilerDefines;
+        };
+
+        let compilerDefines : string[] = [];
+        tags.forEach(tag => {
+            if (compilerDefines.length > 0) {
+                return;
+            }
+            const definesByLanguage = compilerDefinesByLanguage(tag);
+            if (definesByLanguage.length > 0) {
+                compilerDefines = definesByLanguage;
+            }
+        });
+        return compilerDefines;
     }
 }
