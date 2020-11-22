@@ -457,8 +457,6 @@
         "compile": "tsc -p ./",
         "lint": "eslint src --ext ts",
         "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
-        "test": "node ./out/test/runTest.js",
         "clean": "gulp clean"
     },
     "devDependencies": {
@@ -480,7 +478,6 @@
         "mocha": "^8.1.3",
         "typescript": "^4.0.2",
         "vsce": "^1.79.5",
-        "vscode-test": "^1.4.0",
         "vscode-nls-dev": "^3.3.2",
         "vscode-jsonrpc": "3.5.0"
     },
