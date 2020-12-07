@@ -256,6 +256,7 @@ export class QbsProjectData {
     name(): string { return this._data['name']; }
     buildDirectory(): string { return this._data['build-directory']; }
     location(): QbsLocationData { return new QbsLocationData(this._data['location']); }
+    profile(): QbsProfileData { return new QbsProfileData(this._data['profile-data']); }
     isEmpty():boolean { return this._data === undefined; }
     data(): any { return this._data; }
 
@@ -400,8 +401,24 @@ export class QbsModulePropertiesData {
 // QBS project configurations.
 
 export class QbsProfileData {
-    constructor(private readonly _name: string = '') {}
-    name(): string { return this._name; }
+    constructor(private readonly _data: any = {}) {}
+    name(): string {
+        for (var i in this._data) { return i; }
+        return '';
+    }
+
+    qbs(): QbsData {
+        const data = this._data[this.name()];
+        return new QbsData(data['qbs']);
+    }
+}
+
+export class QbsData {
+    constructor(private readonly _data: any = {}) {}
+    architecture(): string { return this._data['architecture']; }
+    targetPlatform(): string { return this._data['toolchainType']; }
+    toolchainType(): string { return this._data['toolchainType']; }
+    configurationName(): string { return this._data['configurationName']; }
 }
 
 export class QbsConfigData {

@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as QbsCommands from './qbscommands';
 import * as QbsUtils from './qbsutils';
 
+import {QbsDiagnostic} from './diagnostic/qbsdiagnostic'
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
@@ -17,6 +18,7 @@ class QbsExtensionManager implements vscode.Disposable {
     private _session: QbsSession = new QbsSession(this._ctx);
     private _statusBar: QbsStatusBar = new QbsStatusBar(this._session);
     private _logger: QbsSessionLogger = new QbsSessionLogger(this._session);
+    private _diagnostic: QbsDiagnostic = new QbsDiagnostic(this._session);
     private _cpp: QbsCpp = new QbsCpp(this._session);
     private _explorer: QbsProjectExplorer = new QbsProjectExplorer(this._session);
 
@@ -29,6 +31,7 @@ class QbsExtensionManager implements vscode.Disposable {
         this._explorer.dispose();
         this._cpp.dispose();
         this._logger.dispose();
+        this._diagnostic.dispose();
         this._statusBar.dispose();
         this._session.dispose();
     }
