@@ -3,7 +3,7 @@ import {QbsSession} from '../qbssession';
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
 
-
+import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 
 export class QbsDiagnostic implements vscode.Disposable {
@@ -52,6 +52,8 @@ export class QbsDiagnostic implements vscode.Disposable {
     private createParser(type: string) {
         if (type === 'msvc') {
             this._parser = new QbsMsvcDiagnosticParser(type);
+        } else if (type === 'gcc' || type === 'mingw') {
+            this._parser = new QbsGccDiagnosticParser(type);
         } else {
             this._parser = undefined;
         }
