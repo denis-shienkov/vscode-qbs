@@ -3,6 +3,7 @@ import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
 const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
+const ARM_CLANG_REGEXP = /^(.+\.\S+):(\d+):(\d+):\s(error|warning):\s(.+)/;
 const MCS_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
 
 export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
@@ -20,6 +21,8 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
         line = line.replace(/[\n\r]/g, '');
 
         if (this.parseArmCCCompilerMessage(line)) {
+            return;
+        } else if (this.parseArmClangCompilerMessage(line)) {
             return;
         } else if (this.parseMcsCompilerMessage(line)) {
             return;
@@ -41,6 +44,27 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
             message,
             range,
             code
+        };
+
+        this.insertDiagnostic(file, diagnostic);
+        return true;
+    }
+
+    private parseArmClangCompilerMessage(line: string): boolean {
+        const matches = ARM_CLANG_REGEXP.exec(line);
+        if (!matches) {
+            return false;
+        }
+
+        const [, file, linestr, columnstr, severity, message] = matches;
+        const lineno = QbsDiagnosticUtils.substractOne(linestr);
+        const columnno = QbsDiagnosticUtils.substractOne(columnstr);
+        const range = new vscode.Range(lineno, columnno, lineno, columnno);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.type(),
+            severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
+            message,
+            range
         };
 
         this.insertDiagnostic(file, diagnostic);
