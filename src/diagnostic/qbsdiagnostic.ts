@@ -3,6 +3,7 @@ import {QbsSession} from '../qbssession';
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
 
+import {QbsClangDiagnosticParser} from './qbsclangdiagnosticparser';
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
@@ -53,6 +54,8 @@ export class QbsDiagnostic implements vscode.Disposable {
     private createParser(type: string) {
         if (type === 'msvc') {
             this._parser = new QbsMsvcDiagnosticParser(type);
+        } else if (type === 'clang-cl') {
+            this._parser = new QbsClangDiagnosticParser(type);
         } else if (type === 'gcc' || type === 'mingw') {
             this._parser = new QbsGccDiagnosticParser(type);
         } else if (type === 'sdcc') {
