@@ -6,6 +6,7 @@ import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
 import {QbsClangDiagnosticParser} from './qbsclangdiagnosticparser';
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
 import {QbsIarDiagnosticParser} from './qbsiardiagnosticparser';
+import {QbsKeilDiagnosticParser} from './qbskeildiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
 
@@ -63,7 +64,9 @@ export class QbsDiagnostic implements vscode.Disposable {
             this._parser = new QbsSdccDiagnosticParser(type);
         } else if (type === 'iar') {
             this._parser = new QbsIarDiagnosticParser(type);
-        } else {
+        } else if (type === 'keil') {
+            this._parser = new QbsKeilDiagnosticParser(type);
+        }  else {
             this._parser = undefined;
         }
     }
