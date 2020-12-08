@@ -1,9 +1,12 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import {basename} from 'path';
 
 import {QbsSession} from './qbssession';
 import {QbsProject} from './qbsproject';
 import {QbsProfileData, QbsConfigData, QbsProductData, QbsDebuggerData} from './qbstypes';
+
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function displayWorkspaceProjectSelector(session: QbsSession) {
     const projects = await QbsProject.enumerateWorkspaceProjects();
@@ -31,7 +34,8 @@ export async function displayProfileSelector(session: QbsSession) {
         const qbs = profile.qbs();
         const architecture = qbs.architecture();
         const type = qbs.toolchainType();
-        const description = `Detected toolchain architecture "${architecture}", type "${type}"`;
+        const description = localize('qbs.profile.description.begin', 'Detected architecture ') + '"'
+            + architecture + '", ' + localize('qbs.profile.description.end', 'type ') + '"' + type + '"';
         return {
             label: profile.name(),
             description,
@@ -64,7 +68,7 @@ export async function displayConfigurationSelector(session: QbsSession) {
     } else {
         const customConfigurationName = await vscode.window.showInputBox({
             value: 'custom',
-            placeHolder: 'Enter custom configuration name',
+            placeHolder: localize('qbs.enter.custom.config.name', 'Enter custom configuration name'),
         });
         const selectedCustomConfiguration = customConfigurationName
             ? new QbsConfigData(customConfigurationName) : undefined;
