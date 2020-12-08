@@ -5,6 +5,7 @@ import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
 
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
+import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
 
 export class QbsDiagnostic implements vscode.Disposable {
     private _collection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('qbs-build-diags');
@@ -54,6 +55,8 @@ export class QbsDiagnostic implements vscode.Disposable {
             this._parser = new QbsMsvcDiagnosticParser(type);
         } else if (type === 'gcc' || type === 'mingw') {
             this._parser = new QbsGccDiagnosticParser(type);
+        } else if (type === 'sdcc') {
+            this._parser = new QbsSdccDiagnosticParser(type);
         } else {
             this._parser = undefined;
         }
