@@ -5,6 +5,7 @@ import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
 
 import {QbsClangDiagnosticParser} from './qbsclangdiagnosticparser';
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
+import {QbsIarDiagnosticParser} from './qbsiardiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
 
@@ -60,6 +61,8 @@ export class QbsDiagnostic implements vscode.Disposable {
             this._parser = new QbsGccDiagnosticParser(type);
         } else if (type === 'sdcc') {
             this._parser = new QbsSdccDiagnosticParser(type);
+        } else if (type === 'iar') {
+            this._parser = new QbsIarDiagnosticParser(type);
         } else {
             this._parser = undefined;
         }
