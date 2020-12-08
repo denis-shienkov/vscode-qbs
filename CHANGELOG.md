@@ -13,6 +13,8 @@ non-generic compilers (like KEIL, IAR, SDCC).
 - [#26](https://github.com/denis-shienkov/vscode-qbs/issues/26)
 Added basic integration of the `problems` panel with compilers
 GCC/MINGW, MSVC, CLANG, SDCC, IAR, KEIL.
+- Displayed additional information (architecture and type) for
+detected profiles in a command palette.
 
 ## 0.0.8
 

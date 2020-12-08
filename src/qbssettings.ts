@@ -223,16 +223,36 @@ export class QbsSettings implements vscode.Disposable {
                         reject(undefined);
                     } else {
                         const profiles: QbsProfileData[] = [];
-                        const profile_re = /^profiles.([\w|-]+)./;
                         stdout.split('\n').map(function (line) {
-                            const matches = profile_re.exec(line);
+                            line = line.replace(/[\n\r]/g, '');
+                            const matches = /^profiles.([\w|-]+)./.exec(line);
                             if (matches) {
-                                // Create data object in a form of: { 'name': {} }.
-                                let data: any = {};
-                                data[matches[1]] = {};
-                                const profile = new QbsProfileData(data);
-                                if (profiles.map(profile => profile.name()).indexOf(profile.name()) === -1) {
-                                    profiles.push(profile);
+                                const name = matches[1];
+                                const index = profiles.map(profile => profile.name()).indexOf(name);
+                                if (index === -1) {
+                                    // Create data object in a form of: { 'name': {} }.
+                                    let data: any = {};
+                                    data[name] = { qbs: {} };
+                                    profiles.push(new QbsProfileData(data));
+                                } else {
+                                    const qbs = profiles[index].qbs();
+                                    const re = new RegExp(`^profiles.${name}.qbs.architecture:\\s\"(.+)\"$`, 'g');
+                                    const matches = re.exec(line);
+                                    if (matches) {
+                                        qbs.setArchitecture(matches[1]);
+                                    } else {
+                                        const re = new RegExp(`^profiles.${name}.qbs.targetPlatform:\\s\"(.+)\"$`, 'g');
+                                        const matches = re.exec(line);
+                                        if (matches) {
+                                            qbs.setTargetPlatform(matches[1]);
+                                        } else {
+                                            const re = new RegExp(`^profiles.${name}.qbs.toolchainType:\\s\"(.+)\"$`, 'g');
+                                            const matches = re.exec(line);
+                                            if (matches) {
+                                                qbs.setToolchainType(matches[1]);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         });

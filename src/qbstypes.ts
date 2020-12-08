@@ -411,14 +411,24 @@ export class QbsProfileData {
         const data = this._data[this.name()];
         return new QbsData(data['qbs']);
     }
+
+    setQbs(qbs: QbsData) {
+        this._data[this.name()]['qbs'] = qbs.data();
+    }
 }
 
 export class QbsData {
     constructor(private readonly _data: any = {}) {}
     architecture(): string { return this._data['architecture']; }
-    targetPlatform(): string { return this._data['toolchainType']; }
+    targetPlatform(): string { return this._data['targetPlatform']; }
     toolchainType(): string { return this._data['toolchainType']; }
     configurationName(): string { return this._data['configurationName']; }
+
+    setArchitecture(architecture: string) { this._data['architecture'] = architecture; }
+    setTargetPlatform(targetPlatform: string) { this._data['targetPlatform'] = targetPlatform; }
+    setToolchainType(toolchainType: string) { this._data['toolchainType'] = toolchainType; }
+
+    data(): any { return this.data; }
 }
 
 export class QbsConfigData {

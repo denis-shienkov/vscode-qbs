@@ -28,8 +28,13 @@ export async function displayProfileSelector(session: QbsSession) {
         profile: QbsProfileData;
     }
     const items: QbsProfileQuickPickItem[] = profiles.map(profile => {
+        const qbs = profile.qbs();
+        const architecture = qbs.architecture();
+        const type = qbs.toolchainType();
+        const description = `Detected toolchain architecture "${architecture}", type "${type}"`;
         return {
             label: profile.name(),
+            description,
             profile
         };
     });
