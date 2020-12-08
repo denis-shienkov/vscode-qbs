@@ -10,6 +10,9 @@ Implemented ability to select the 'Auto' entry for the debugging.
 - [#4](https://github.com/denis-shienkov/vscode-qbs/issues/4)
 Right now the pre-defined compiler macros also reported for the
 non-generic compilers (like KEIL, IAR, SDCC).
+- [#26](https://github.com/denis-shienkov/vscode-qbs/issues/26)
+Added basic integration of the `problems` panel with compilers
+GCC/MINGW, MSVC, CLANG, SDCC, IAR, KEIL.
 
 ## 0.0.8
 
