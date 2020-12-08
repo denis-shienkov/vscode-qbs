@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
-const REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
+const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
+const MCS_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
 
 export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
     constructor(type: string) {
@@ -18,9 +19,17 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
     private parseLine(line: string) {
         line = line.replace(/[\n\r]/g, '');
 
-        const matches = REGEXP.exec(line);
-        if (!matches) {
+        if (this.parseArmCCCompilerMessage(line)) {
             return;
+        } else if (this.parseMcsCompilerMessage(line)) {
+            return;
+        }
+    }
+
+    private parseArmCCCompilerMessage(line: string): boolean {
+        const matches = ARM_CC_REGEXP.exec(line);
+        if (!matches) {
+            return false;
         }
 
         const [, file, linestr, severity, code, message] = matches;
@@ -35,6 +44,28 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
         };
 
         this.insertDiagnostic(file, diagnostic);
+        return true;
+    }
+
+    private parseMcsCompilerMessage(line: string): boolean {
+        const matches = MCS_REGEXP.exec(line);
+        if (!matches) {
+            return false;
+        }
+
+        const [, severity, code, linestr, file, message] = matches;
+        const lineno = QbsDiagnosticUtils.substractOne(linestr);
+        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.type(),
+            severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
+            message,
+            range,
+            code
+        };
+
+        this.insertDiagnostic(file, diagnostic);
+        return true;
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
