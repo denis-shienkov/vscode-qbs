@@ -203,14 +203,18 @@ export class QbsSession implements vscode.Disposable {
             this._onHelloReceived.fire(result);
         } else if (type === 'project-resolved') {
             const data = new QbsProjectData(response['project-data']);
-            await this._project?.setData(data, true);
-            await this._project?.updateSteps();
+            if (!data.isEmpty()) {
+                await this._project?.setData(data, true);
+                await this._project?.updateSteps();
+            }
             const result = new QbsMessageResponse(response['error']);
             this._onProjectResolved.fire(result);
         } else if (type === 'project-built' || type === 'build-done') {
             const data = new QbsProjectData(response['project-data']);
-            await this._project?.setData(data, false);
-            await this._project?.updateSteps();
+            if (!data.isEmpty()) {
+                await this._project?.setData(data, false);
+                await this._project?.updateSteps();
+            }
             const result = new QbsMessageResponse(response['error']);
             this._onProjectBuilt.fire(result);
         } else if (type === 'project-cleaned') {
