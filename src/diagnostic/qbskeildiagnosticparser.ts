@@ -4,7 +4,8 @@ import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
 const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
 const ARM_CLANG_REGEXP = /^(.+\.\S+):(\d+):(\d+):\s(error|warning):\s(.+)/;
-const MCS_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
+const MCS_COMPILER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
+const MCS_ASSEMBLER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\s(\d+)\s\((.+),\sLINE\s\d+\):\s(.+)$/;
 
 export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
     constructor(type: string) {
@@ -25,6 +26,8 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
         } else if (this.parseArmClangCompilerMessage(line)) {
             return;
         } else if (this.parseMcsCompilerMessage(line)) {
+            return;
+        } else if (this.parseMcsAssemblerMessage(line)) {
             return;
         }
     }
@@ -72,7 +75,28 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private parseMcsCompilerMessage(line: string): boolean {
-        const matches = MCS_REGEXP.exec(line);
+        const matches = MCS_COMPILER_REGEXP.exec(line);
+        if (!matches) {
+            return false;
+        }
+
+        const [, severity, code, linestr, file, message] = matches;
+        const lineno = QbsDiagnosticUtils.substractOne(linestr);
+        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.type(),
+            severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
+            message,
+            range,
+            code
+        };
+
+        this.insertDiagnostic(file, diagnostic);
+        return true;
+    }
+
+    private parseMcsAssemblerMessage(line: string): boolean {
+        const matches = MCS_ASSEMBLER_REGEXP.exec(line);
         if (!matches) {
             return false;
         }
