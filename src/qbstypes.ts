@@ -415,6 +415,8 @@ export class QbsProfileData {
     setQbs(qbs: QbsData) {
         this._data[this.name()]['qbs'] = qbs.data();
     }
+
+    isEmpty() { return this._data === {}; }
 }
 
 export class QbsData {

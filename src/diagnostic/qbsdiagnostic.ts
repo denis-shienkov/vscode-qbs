@@ -33,7 +33,10 @@ export class QbsDiagnostic implements vscode.Disposable {
         });
 
         session.onProjectResolved(async (result) => {
-            this._type = session.project()?.data()?.profile().qbs().toolchainType() || '';
+            const profile = session.project()?.data()?.profile();
+            if (profile && !profile.isEmpty()) {
+                this._type = profile.qbs().toolchainType();
+            }
         });
 
         session.onProcessResultReceived(async (result) => {

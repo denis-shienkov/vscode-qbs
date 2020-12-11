@@ -216,6 +216,9 @@ export class QbsRunStep implements vscode.Disposable {
 
         if (this._dbg?.isAutomatic()) {
             const properties = this._product?.moduleProperties();
+            if (!properties?.isValid()) {
+                return;
+            }
             const toolchain = properties?.toolchain() || [];
             if (toolchain.indexOf('msvc') !== -1) {
                 this._dbg.setType('cppvsdbg');
