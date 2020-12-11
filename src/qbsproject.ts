@@ -24,11 +24,15 @@ export class QbsProject implements vscode.Disposable {
     name(): string { return this._uri ? basename(this._uri.fsPath) : 'unknown'; }
     filePath(): string { return QbsUtils.fixPathSeparators(this._uri?.fsPath || ''); }
 
-    async setData(data: QbsProjectData, withBuildSystemFiles: boolean) {
+    async setData(data: QbsProjectData, fromResolve: boolean)  {
         if (!data.isEmpty()) {
             const buildSystemFiles = this._data?.buildSystemFiles();
-            if (!withBuildSystemFiles) {
+            const profile = this._data?.profile();
+            if (!fromResolve) {
                 data.setBuildSystemFiles(buildSystemFiles);
+                if (profile) {
+                    data.setProfile(profile);
+                }
             }
             this._data = data;
         }

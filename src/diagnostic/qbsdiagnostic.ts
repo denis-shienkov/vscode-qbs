@@ -34,7 +34,7 @@ export class QbsDiagnostic implements vscode.Disposable {
 
         session.onProjectResolved(async (result) => {
             const profile = session.project()?.data()?.profile();
-            if (profile && !profile.isEmpty()) {
+            if (profile && profile.isValid()) {
                 this._type = profile.qbs().toolchainType();
             }
         });

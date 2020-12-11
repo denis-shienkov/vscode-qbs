@@ -287,6 +287,13 @@ export class QbsProjectData {
 
     setBuildSystemFiles(files: any) { this._data['build-system-files'] = files; }
     buildSystemFiles(): any { return this._data['build-system-files']; }
+
+    setProfile(profile: QbsProfileData) {
+        let data: any = {};
+        const n = profile.name();
+        data[n] = profile.data();
+        this._data['profile-data'] = data;
+    }
 }
 
 export class QbsProductData {
@@ -401,22 +408,21 @@ export class QbsModulePropertiesData {
 // QBS project configurations.
 
 export class QbsProfileData {
-    constructor(private readonly _data: any = {}) {}
-    name(): string {
-        for (var i in this._data) { return i; }
-        return '';
+    private _name?: string;
+    private _data?: any;
+
+    constructor(data: any = {}) {
+        for (var i in data) {
+            this._name = i;
+            this._data = data[i];
+            return;
+        }
     }
 
-    qbs(): QbsData {
-        const data = this._data[this.name()];
-        return new QbsData(data['qbs']);
-    }
-
-    setQbs(qbs: QbsData) {
-        this._data[this.name()]['qbs'] = qbs.data();
-    }
-
-    isEmpty() { return this._data === {}; }
+    name(): string { return this._name || ''; }
+    data(): any { return this._data; }
+    qbs(): QbsData { return new QbsData(this._data['qbs']); }
+    isValid() { return this._name && this._data; }
 }
 
 export class QbsData {
