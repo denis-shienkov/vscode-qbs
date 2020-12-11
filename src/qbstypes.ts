@@ -65,6 +65,28 @@ export class QbsBuildRequest extends QbsRequest {
         super();
         this._data['type'] = 'build-project';
         this._data['data-mode'] = 'only-if-changed';
+        this._data['module-properties'] = [
+            'cpp.cLanguageVersion',
+            'cpp.compilerDefinesByLanguage',
+            'cpp.compilerIncludePaths',
+            'cpp.compilerName',
+            'cpp.compilerPath',
+            'cpp.compilerPathByLanguage',
+            'cpp.compilerVersionMajor',
+            'cpp.compilerVersionMinor',
+            'cpp.compilerVersionPatch',
+            'cpp.cxxLanguageVersion',
+            'cpp.defines',
+            'cpp.distributionIncludePaths',
+            'cpp.frameworkPaths',
+            'cpp.includePaths',
+            'cpp.platformDefines',
+            'cpp.prefixHeaders',
+            'cpp.systemFrameworkPaths',
+            'cpp.systemIncludePaths',
+            'qbs.architecture',
+            'qbs.toolchain'
+        ];
         this._data['install'] = true;
         this._data['max-job-count'] = settings ? settings.maxJobs() : 0;
         this._data['keep-going'] = settings ? settings.keepGoing() : false;
