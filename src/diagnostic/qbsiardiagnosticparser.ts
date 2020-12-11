@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
-const REGEX = /^"(.+\.\S+)",(\d+)\s+(Error|Warning|)\[(\S+)\]:\s*$/;
+const COMPILER_REGEXP = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\S+)\]:\s*$/;
+const ASSEMBLER_REGEXP = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
 
 export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private _diagnostic?: vscode.Diagnostic;
@@ -21,20 +22,15 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private parseLine(line: string) {
         line = line.replace(/[\n\r]/g, '');
 
-        if (!this._diagnostic) {
-            if (this.parseFirstDiagnosticPart(line))
-                return;
-        } else if (this._file) {
-            if (this.parseDiagnosticMessage(line)) {
-                this.insertDiagnostic(this._file, this._diagnostic);
-            }
-            this._diagnostic = undefined;
-            this._file = undefined;
+        if (this.parseCompilerMessage(line)) {
+            return;
+        } else if (this.parseAssemblerMessage(line)) {
+            return;
         }
     }
 
-    private parseFirstDiagnosticPart(line: string): boolean {
-        const matches = REGEX.exec(line);
+    private parseFirstMessagePart(line: string): boolean {
+        const matches = COMPILER_REGEXP.exec(line);
         if (!matches) {
             return false;
         }
@@ -54,12 +50,48 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
         return true;
     }
 
-    private parseDiagnosticMessage(line: string): boolean {
+    private parseLastMessagePart(line: string): boolean {
         const matches = /^\s+(.+)$/.exec(line);
         if (!matches || !this._diagnostic)
             return false;
         this._diagnostic.message = matches[1];
         return true;
+    }
+
+    private parseCompilerMessage(line: string): boolean {
+        if (!this._diagnostic) {
+            if (this.parseFirstMessagePart(line))
+                return true;
+        } else if (this._file) {
+            if (this.parseLastMessagePart(line)) {
+                this.insertDiagnostic(this._file, this._diagnostic);
+            }
+            this._diagnostic = undefined;
+            this._file = undefined;
+            return true;
+        }
+        return false;
+    }
+
+    private parseAssemblerMessage(line: string): boolean {
+        const matches = ASSEMBLER_REGEXP.exec(line);
+        if (!matches) {
+            return false;
+        }
+
+        const [, file, linestr, severity, code, message] = matches;
+        const lineno = QbsDiagnosticUtils.substractOne(linestr);
+        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.type(),
+            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+            message,
+            range,
+            code
+        };
+
+        this.insertDiagnostic(file, diagnostic);
+        return false;
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
