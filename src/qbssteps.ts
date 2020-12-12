@@ -88,7 +88,7 @@ export class QbsBuildStep implements vscode.Disposable {
         const products = this._project.products();
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}BuildProductName`);
         const index = products.findIndex((product) => product.fullDisplayName() == name);
-        return (index !== -1) ? products[index] : (name === 'all' ? new QbsProductData(name) : undefined);
+        return (index !== -1) ? products[index] : new QbsProductData(name ? name : 'all');
     }
 
     private setupProfile(profile?: QbsProfileData): boolean {
