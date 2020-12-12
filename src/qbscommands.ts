@@ -24,7 +24,7 @@ async function onDetectProfilesCommand(session: QbsSession) {
         title: localize('qbs.detect.profiles.progress.title', 'Detecting profiles...')
     }, async (p) => {
         const success = await session.settings().detectProfiles();
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             p.report({
                 increment: success ? 100 : 0,
                 message: success ? localize('qbs.detect.profiles.progress.completed.message', 'Completed')
@@ -119,7 +119,7 @@ async function onResolveCommand(session: QbsSession, request: QbsResolveRequest,
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Resolve, QbsOperationStatus.Started, -1));
         await session.resolve(request);
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
@@ -187,7 +187,7 @@ async function onBuildCommand(session: QbsSession, request: QbsBuildRequest, tim
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
         await session.build(request);
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
@@ -256,7 +256,7 @@ async function onCleanCommand(session: QbsSession, request: QbsCleanRequest, tim
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Clean, QbsOperationStatus.Started, -1));
         await session.clean(request);
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
@@ -324,7 +324,7 @@ async function onInstallCommand(session: QbsSession, request: QbsInstallRequest)
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Install, QbsOperationStatus.Started, -1));
         await session.install(request);
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
