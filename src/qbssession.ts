@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
 import {QbsProject} from './qbsproject';
-import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
-import {QbsSettings, QbsSettingsEvent} from './qbssettings';
+import {QbsSessionProtocolStatus} from './qbssessionprotocol';
+import {QbsSessionProtocol} from './qbssessionprotocol';
+import {QbsSettingsEvent} from './qbssettings';
+import {QbsSettings} from './qbssettings';
 
 import {QbsDataKey} from './datatypes/qbskeys';
 import {QbsOperation} from './datatypes/qbsoperation';
@@ -182,7 +184,7 @@ export class QbsSession implements vscode.Disposable {
             clearTimeout(this._timer);
         }
         this._timer = setTimeout(async () => {
-            await vscode.commands.executeCommand('qbs.resolve');
+            await vscode.commands.executeCommand(QbsCommandKey.Resolve);
             this._timer = undefined;
         }, interval);
     }

@@ -3,6 +3,7 @@ import * as nls from 'vscode-nls';
 import * as fs from 'fs';
 
 import {QbsSession} from './qbssession';
+import {QbsCommandKey} from './commands/qbscommandkey';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -27,61 +28,61 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectProjectButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -2);
         this._selectProjectButton.tooltip = localize('qbs.select.active.project.file.tooltip',
                                                      'Click to Select the Active Project');
-        this._selectProjectButton.command = 'qbs.selectProject';
+        this._selectProjectButton.command = QbsCommandKey.SelectProject;
         this._selectProjectButton.show();
 
         this._selectBuildProfileButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -3);
         this._selectBuildProfileButton.tooltip = localize('qbs.select.build.profile.tooltip',
                                                           'Click to Select the Build Profile');
-        this._selectBuildProfileButton.command = 'qbs.selectProfile';
+        this._selectBuildProfileButton.command = QbsCommandKey.SelectProfile;
         this._selectBuildProfileButton.show();
 
         this._selectBuildConfigurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -4);
         this._selectBuildConfigurationButton.tooltip = localize('qbs.select.build.configuration.tooltip',
                                                                 'Click to Select the Build Configuration');
-        this._selectBuildConfigurationButton.command = 'qbs.selectConfiguration';
+        this._selectBuildConfigurationButton.command = QbsCommandKey.SelectConfiguration;
         this._selectBuildConfigurationButton.show();
 
         this._buildProductButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -5);
         this._buildProductButton.text = localize('qbs.build.product', `$(gear) Build`);
         this._buildProductButton.tooltip = localize('qbs.build.product.tooltip',
                                                     'Click to Build the Selected Product');
-        this._buildProductButton.command = 'qbs.build';
+        this._buildProductButton.command = QbsCommandKey.Build;
         this._buildProductButton.show();
 
         this._selectBuildProductButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -6);
         this._selectBuildProductButton.text = '[none]';
         this._selectBuildProductButton.tooltip = localize('qbs.select.build.product.tooltip',
                                                           'Click to Select the Product to Build');
-        this._selectBuildProductButton.command = 'qbs.selectBuild';
+        this._selectBuildProductButton.command = QbsCommandKey.SelectBuild;
         this._selectBuildProductButton.show();
 
         this._runProductButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -7);
         this._runProductButton.text = localize('qbs.run.product', `$(play)`);
         this._runProductButton.tooltip = localize('qbs.run.product.tooltip',
                                                   'Click to Run the Selected Product');
-        this._runProductButton.command = 'qbs.run';
+        this._runProductButton.command = QbsCommandKey.Run;
         this._runProductButton.show();
 
         this._debugProductButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -8);
         this._debugProductButton.text = localize('qbs.debug.product', `$(bug)`);
         this._debugProductButton.tooltip = localize('qbs.debug.product.tooltip',
                                                     'Click to Debug the Selected Product');
-        this._debugProductButton.command = 'qbs.debug';
+        this._debugProductButton.command = QbsCommandKey.Debug;
         this._debugProductButton.show();
 
         this._selectRunProductButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -100);
         this._selectRunProductButton.text = '[]';
         this._selectRunProductButton.tooltip = localize('qbs.select.run.product.tooltip',
                                                         'Click to Select the Product to Debug or Run');
-        this._selectRunProductButton.command = 'qbs.selectRun';
+        this._selectRunProductButton.command = QbsCommandKey.SelectRun;
         this._selectRunProductButton.show();
 
         this._selectDebuggerButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
         this._selectDebuggerButton.text = '[No debugger]';
         this._selectDebuggerButton.tooltip = localize('qbs.select.debugger.tooltip',
                                                       'Click to Select the Launch Configuration');
-        this._selectDebuggerButton.command = 'qbs.selectDebugger';
+        this._selectDebuggerButton.command = QbsCommandKey.SelectDebugger;
         this._selectDebuggerButton.show();
 
         _session.onStatusChanged(async () => await this.updateControls());
