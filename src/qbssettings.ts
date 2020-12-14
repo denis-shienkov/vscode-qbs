@@ -22,6 +22,21 @@ import {QbsProfileData} from './datatypes/qbsprofiledata';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
+const QBS_SETTINGS_SECTION = 'qbs';
+
+// Defaul settings.
+const DEFAULT_BUILD_DIR_PATH = '${sourceDirectory}/build/${profileName}_${configurationName}';
+const DEFAULT_CLEAN_INSTALL_ROOT = false;
+const DEFAULT_ERROR_HANDLING_MODE = QbsErrorHandlingMode.Relaxed;
+const DEFAULT_FORCE_PROBES = false;
+const DEFAULT_KEEP_GOING = false;
+const DEFAULT_LAUNCH_FILE_PATH = '${sourceDirectory}/.vscode/launch.json';
+const DEFAULT_LOG_LEVEL = QbsLogLevel.Info;
+const DEFAULT_MAX_BUILD_JOBS = 0;
+const DEFAULT_QBS_EXE_PATH = 'qbs';
+const DEFAULT_SETTINGS_DIR_PATH = '';
+const DEFAULT_SHOW_COMMAND_LINES = false;
+
 export enum QbsSettingsEvent {
     NothingRequired,
     SessionRestartRequired,
@@ -30,12 +45,15 @@ export enum QbsSettingsEvent {
 }
 
 export class QbsSettings implements vscode.Disposable {
+    private _settings: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(QBS_SETTINGS_SECTION);
     private _debuggerSettingsWatcher?: chokidar.FSWatcher
     private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
     constructor(private readonly _session: QbsSession) {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
+            this._settings = vscode.workspace.getConfiguration(QBS_SETTINGS_SECTION);
+
             if (e.affectsConfiguration('qbs.qbsPath')) {
                 this._onChanged.fire(QbsSettingsEvent.SessionRestartRequired);
             }
@@ -65,7 +83,7 @@ export class QbsSettings implements vscode.Disposable {
      * from the plugin configuration.
      */
     executablePath(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('qbsPath') as string;
+        const v = this._settings.get<string>('qbsPath', DEFAULT_QBS_EXE_PATH);
         return this.completePath(v);
     }
 
@@ -74,7 +92,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     debuggerSettingsPath(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('launchFilePath') as string;
+        const v = this._settings.get<string>('launchFilePath', DEFAULT_LAUNCH_FILE_PATH);
         return this.completePath(v);
     }
 
@@ -83,7 +101,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     settingsDirectory(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('settingsDirectory') as string;
+        const v = this._settings.get<string>('settingsDirectory', DEFAULT_SETTINGS_DIR_PATH);
         return this.completePath(v);
     }
 
@@ -92,7 +110,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     buildDirectory(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('buildDirectory') as string;
+        const v = this._settings.get<string>('buildDirectory', DEFAULT_BUILD_DIR_PATH);
         return this.completePath(v);
     }
 
@@ -101,8 +119,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     keepGoing(): boolean {
-        const v = vscode.workspace.getConfiguration('qbs').get('keepGoing') as boolean;
-        return v || false;
+        return this._settings.get<boolean>('keepGoing', DEFAULT_KEEP_GOING);
     }
 
     /**
@@ -110,8 +127,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     maxJobs(): number {
-        const v = vscode.workspace.getConfiguration('qbs').get('maxBuildJobs') as number;
-        return v || 0;
+        return this._settings.get<number>('maxBuildJobs', DEFAULT_MAX_BUILD_JOBS);
     }
 
     /**
@@ -119,8 +135,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     showCommandLines(): boolean {
-        const v = vscode.workspace.getConfiguration('qbs').get('showCommandLines') as boolean;
-        return v || false;
+        return this._settings.get<boolean>('showCommandLines', DEFAULT_SHOW_COMMAND_LINES);
     }
 
     /**
@@ -128,8 +143,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     forceProbes(): boolean {
-        const v = vscode.workspace.getConfiguration('qbs').get('forceProbes') as boolean;
-        return v || false;
+        return this._settings.get<boolean>('forceProbes', DEFAULT_FORCE_PROBES);
     }
 
     /**
@@ -137,8 +151,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     cleanInstallRoot(): boolean {
-        const v = vscode.workspace.getConfiguration('qbs').get('cleanInstallRoot') as boolean;
-        return v || false;
+        return this._settings.get<boolean>('cleanInstallRoot', DEFAULT_CLEAN_INSTALL_ROOT);
     }
 
     /**
@@ -146,8 +159,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     errorHandlingMode(): QbsErrorHandlingMode {
-        const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as QbsErrorHandlingMode;
-        return v || QbsErrorHandlingMode.Relaxed;
+        return this._settings.get<QbsErrorHandlingMode>('errorHandlingMode', DEFAULT_ERROR_HANDLING_MODE);
     }
 
     /**
@@ -155,8 +167,7 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     logLevel(): QbsLogLevel {
-        const v = vscode.workspace.getConfiguration('qbs').get('logLevel') as QbsLogLevel;
-        return v || QbsLogLevel.Info;
+        return this._settings.get<QbsLogLevel>('logLevel', DEFAULT_LOG_LEVEL)
     }
 
     /**
