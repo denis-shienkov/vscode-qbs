@@ -214,16 +214,16 @@ export class QbsSession implements vscode.Disposable {
             const data = new QbsProjectData(response[QbsDataKey.ProjectData]);
             if (!data.isEmpty()) {
                 await this._project?.setData(data, true);
-                await this._project?.updateSteps();
             }
+            await this._project?.updateSteps();
             const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectResolved.fire(result);
         } else if (type === QbsDataKey.ProjectBuilt || type === QbsDataKey.ProjectDone) {
             const data = new QbsProjectData(response[QbsDataKey.ProjectData]);
             if (!data.isEmpty()) {
                 await this._project?.setData(data, false);
-                await this._project?.updateSteps();
             }
+            await this._project?.updateSteps();
             const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectBuilt.fire(result);
         } else if (type === QbsDataKey.ProjectCleaned) {
