@@ -1,0 +1,5 @@
+{
+    "qbs.session.build.progress.title": "Сборка проекта",
+    "qbs.session.build.progress.completed.title": "Сборка проекта успешно завершена",
+    "qbs.session.build.progress.failed.title": "Сборка проекта завершена с ошибками"
+}

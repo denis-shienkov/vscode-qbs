@@ -1,5 +1,4 @@
 {
-    "qbs.enter.custom.config.name": "Введите особое имя конфигурации",
     "qbs.profile.description.begin": "Обнаружена архитектура ",
     "qbs.profile.description.end": "тип "
 }

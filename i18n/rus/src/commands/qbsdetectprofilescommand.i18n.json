@@ -1,0 +1,5 @@
+{
+    "qbs.detect.profiles.progress.title": "Определение профилей...",
+    "qbs.detect.profiles.progress.completed.message": "Завершено",
+    "qbs.detect.profiles.progress.failed.message": "Не удалось"
+}

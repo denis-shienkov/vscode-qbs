@@ -1,0 +1,4 @@
+{
+    "qbs.product.exe.missed.error.message": "Целевой исполняемый файл отсутствует, пересоберите продукт.",
+    "qbs.product.debugger.missed.error.message": "Отсутствует отладчик, выберите отладчик."
+}
