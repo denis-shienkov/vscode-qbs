@@ -16,6 +16,7 @@ import {QbsSession} from './qbssession';
 
 import {QbsConfigData} from './datatypes/qbsconfigdata';
 import {QbsDebuggerData} from './datatypes/qbsdebuggerdata';
+import {QbsDebuggerKey} from './datatypes/qbskeys';
 import {QbsErrorHandlingMode} from './datatypes/qbserrorhandlingmode';
 import {QbsLogLevel} from './datatypes/qbsloglevel';
 import {QbsProfileData} from './datatypes/qbsprofiledata';
@@ -178,7 +179,7 @@ export class QbsSettings implements vscode.Disposable {
      */
     async ensureQbsExecutableConfigured(): Promise<boolean> {
         let qbsPath = this.executablePath();
-        if (qbsPath === 'qbs') {
+        if (qbsPath === DEFAULT_QBS_EXE_PATH) {
             try {
                 qbsPath = which.sync(qbsPath);
             } catch (e) {}
@@ -317,7 +318,7 @@ export class QbsSettings implements vscode.Disposable {
                 try {
                     const text = data.toString();
                     const json = JSON.parse(text);
-                    const configurations: any[] = json['configurations'] || [];
+                    const configurations: any[] = json[QbsDebuggerKey.Configutations] || [];
                     configurations.forEach(configuration => debuggers.push(new QbsDebuggerData(configuration)));
                 } catch (e) {
                 }

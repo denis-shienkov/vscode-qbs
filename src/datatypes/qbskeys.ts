@@ -100,6 +100,7 @@ export enum QbsQbsKey {
 }
 
 export enum QbsDebuggerKey {
+    Configutations = 'configurations',
     Cwd = 'cwd',
     Env = 'env',
     ExternalConsole = 'externalConsole',
