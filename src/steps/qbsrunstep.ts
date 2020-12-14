@@ -3,11 +3,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as which from 'which';
 
-import {QbsProject} from './qbsproject';
-import {
-    QbsProductData, QbsProfileData, QbsConfigData,
-    QbsDebuggerData, QbsGetRunEnvironmentRequest
-} from './qbstypes'
+import {QbsProject} from '../qbsproject';
+
+import {QbsConfigData} from '../datatypes/qbsconfigdata';
+import {QbsDebuggerData} from '../datatypes/qbsdebuggerdata';
+import {QbsProductData} from '../datatypes/qbsproductdata';
+import {QbsProfileData} from '../datatypes/qbsprofiledata';
+
+import {QbsGetRunEnvironmentRequest} from '../datatypes/qbsgetrunenvironmentrequest';
 
 export class QbsBuildStep implements vscode.Disposable {
     private _profile: QbsProfileData = new QbsProfileData();
@@ -209,7 +212,7 @@ export class QbsRunStep implements vscode.Disposable {
                     resolve();
                 });
                 const envRequest = new QbsGetRunEnvironmentRequest(this.project().session().settings());
-                envRequest.setProductName(this.productName() || '');
+                envRequest.setProduct(this.productName() || '');
                 this.project().session().getRunEnvironment(envRequest);
             });
         }

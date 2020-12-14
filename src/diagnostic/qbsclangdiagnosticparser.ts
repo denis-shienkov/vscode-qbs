@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
+
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
+
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
 const REGEX = /^(.+\.\S+)\((\d+,\d+)\):\s(error|warning):\s(.+)/;

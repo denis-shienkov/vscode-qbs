@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 
 export function substractOne(num: number | string): number {
-    return (typeof num === 'string') ? substractOne(parseInt(num)) : Math.max(0, num - 1);
+    return (typeof num === 'string')
+        ? substractOne(parseInt(num))
+        : Math.max(0, num - 1);
 }
 
 export abstract class QbsDiagnosticParser {
@@ -19,7 +21,10 @@ export abstract class QbsDiagnosticParser {
     }
 
     filePaths() { return this._diagnostics.keys(); }
-    diagnosticsAt(filePath: string): ReadonlyArray<vscode.Diagnostic> { return this._diagnostics.get(filePath) || []; }
+
+    diagnosticsAt(filePath: string): ReadonlyArray<vscode.Diagnostic> {
+        return this._diagnostics.get(filePath) || [];
+    }
 
     abstract parseLines(lines: string[]): void;
 }

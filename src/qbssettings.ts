@@ -13,7 +13,12 @@ import * as chokidar from 'chokidar';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
-import {QbsProfileData, QbsConfigData, QbsDebuggerData} from './qbstypes';
+
+import {QbsConfigData} from './datatypes/qbsconfigdata';
+import {QbsDebuggerData} from './datatypes/qbsdebuggerdata';
+import {QbsErrorHandlingMode} from './datatypes/qbserrorhandlingmode';
+import {QbsLogLevel} from './datatypes/qbsloglevel';
+import {QbsProfileData} from './datatypes/qbsprofiledata';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -140,18 +145,18 @@ export class QbsSettings implements vscode.Disposable {
      * Returns the value of the QBS 'error-handling-mode' property
      * obtained from the plugin configuration.
      */
-    errorHandlingMode(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as string;
-        return v || 'relaxed';
+    errorHandlingMode(): QbsErrorHandlingMode {
+        const v = vscode.workspace.getConfiguration('qbs').get('errorHandlingMode') as QbsErrorHandlingMode;
+        return v || QbsErrorHandlingMode.Relaxed;
     }
 
     /**
      * Returns the value of the QBS 'log-level' property
      * obtained from the plugin configuration.
      */
-    logLevel(): string {
-        const v = vscode.workspace.getConfiguration('qbs').get('logLevel') as string;
-        return v || 'info';
+    logLevel(): QbsLogLevel {
+        const v = vscode.workspace.getConfiguration('qbs').get('logLevel') as QbsLogLevel;
+        return v || QbsLogLevel.Info;
     }
 
     /**

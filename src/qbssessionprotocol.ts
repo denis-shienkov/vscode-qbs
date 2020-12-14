@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 
-import {QbsRequest} from './qbstypes';
+import {QbsRequest} from './datatypes/qbsrequest';
 
 export enum QbsSessionProtocolStatus {
     Stopped,

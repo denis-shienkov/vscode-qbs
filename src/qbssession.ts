@@ -2,21 +2,30 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
 import {QbsProject} from './qbsproject';
+import {QbsSessionProtocol, QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {QbsSettings, QbsSettingsEvent} from './qbssettings';
-import {
-    QbsSessionProtocol, QbsSessionProtocolStatus
-} from './qbssessionprotocol';
-import {
-    QbsOperation, QbsRunEnvironmentData,
-    // Protocol requests.
-    QbsGetRunEnvironmentRequest, QbsRequest,
-    // Protocol responses.
-    QbsHelloResponse, QbsProcessResponse,
-    QbsTaskStartedResponse, QbsTaskProgressResponse,
-    QbsTaskMaxProgressResponse, QbsMessageResponse, QbsProjectData
-} from './qbstypes';
+
+import {QbsDataKey} from './datatypes/qbskeys';
+import {QbsOperation} from './datatypes/qbsoperation';
+import {QbsProjectData} from './datatypes/qbsprojectdata';
+import {QbsRunEnvironmentData} from './datatypes/qbsrunenvironmentdata';
+
+import {QbsCommandKey} from './commands/qbscommandkey';
+
+// Protocol request.
+import {QbsRequest} from './datatypes/qbsrequest';
+
+// Protocol responses.
+import {QbsHelloResponse} from './datatypes/qbshelloresponse';
+import {QbsMessageResponse} from './datatypes/qbsmessageresponse';
+import {QbsProcessResponse} from './datatypes/qbsprocessresponse';
+import {QbsTaskMaxProgressResponse} from './datatypes/qbstaskmaxprogressresponse';
+import {QbsTaskProgressResponse} from './datatypes/qbstaskprogressresponse';
+import {QbsTaskStartedResponse} from './datatypes/qbstaskstartedresponse';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
+
+const ACTIVE_PROJECT_KEY = 'ActiveProject';
 
 export enum QbsSessionStatus { Stopped, Started, Stopping, Starting }
 
@@ -92,7 +101,7 @@ export class QbsSession implements vscode.Disposable {
                     await this.autoResolve(0);
                 }
             } else if (event === QbsSettingsEvent.SessionRestartRequired) {
-                await vscode.commands.executeCommand('qbs.autoRestartSession');
+                await vscode.commands.executeCommand(QbsCommandKey.AutoRestartSession);
             } else if (event === QbsSettingsEvent.DebuggerUpdateRequired) {
                 await this._project?.runStep().restore();
             }
@@ -153,7 +162,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     async restoreProject() {
-        const project = this.extensionContext().workspaceState.get<vscode.Uri>('ActiveProject');
+        const project = this.extensionContext().workspaceState.get<vscode.Uri>(ACTIVE_PROJECT_KEY);
         if (project) {
             await this.setupProject(project);
         } else {
@@ -165,7 +174,7 @@ export class QbsSession implements vscode.Disposable {
     }
 
     async saveProject() {
-        await this.extensionContext().workspaceState.update('ActiveProject', this._project?.uri());
+        await this.extensionContext().workspaceState.update(ACTIVE_PROJECT_KEY, this._project?.uri());
     }
 
     async autoResolve(interval: number) {
@@ -197,62 +206,62 @@ export class QbsSession implements vscode.Disposable {
     private async sendRequest(request: any) { await this._protocol.sendRequest(request); }
 
     private async parseResponse(response: any) {
-        const type = response['type'];
-        if (type === 'hello') {
+        const type = response[QbsDataKey.Type];
+        if (type === QbsDataKey.Hello) {
             const result = new QbsHelloResponse(response)
             this._onHelloReceived.fire(result);
-        } else if (type === 'project-resolved') {
-            const data = new QbsProjectData(response['project-data']);
+        } else if (type === QbsDataKey.ProjectResolved) {
+            const data = new QbsProjectData(response[QbsDataKey.ProjectData]);
             if (!data.isEmpty()) {
                 await this._project?.setData(data, true);
                 await this._project?.updateSteps();
             }
-            const result = new QbsMessageResponse(response['error']);
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectResolved.fire(result);
-        } else if (type === 'project-built' || type === 'build-done') {
-            const data = new QbsProjectData(response['project-data']);
+        } else if (type === QbsDataKey.ProjectBuilt || type === QbsDataKey.ProjectDone) {
+            const data = new QbsProjectData(response[QbsDataKey.ProjectData]);
             if (!data.isEmpty()) {
                 await this._project?.setData(data, false);
                 await this._project?.updateSteps();
             }
-            const result = new QbsMessageResponse(response['error']);
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectBuilt.fire(result);
-        } else if (type === 'project-cleaned') {
+        } else if (type === QbsDataKey.ProjectCleaned) {
             await this._project?.updateSteps();
-            const result = new QbsMessageResponse(response['error']);
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectCleaned.fire(result);
-        } else if (type === 'install-done') {
-            const result = new QbsMessageResponse(response['error']);
+        } else if (type === QbsDataKey.InstallDone) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onProjectInstalled.fire(result);
-        } else if (type === 'log-data') {
-            const result = new QbsMessageResponse(response['message']);
+        } else if (type === QbsDataKey.LogData) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Message]);
             this._onLogMessageReceived.fire(result);
-        } else if (type === 'warning') {
-            const result = new QbsMessageResponse(response['warning']);
+        } else if (type === QbsDataKey.Warning) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Warning]);
             this._onWarningMessageReceived.fire(result);
-        } else if (type === 'task-started') {
+        } else if (type === QbsDataKey.TaskStarted) {
             const result = new QbsTaskStartedResponse(response);
             this._onTaskStarted.fire(result);
-        } else if (type === 'task-progress') {
+        } else if (type === QbsDataKey.TaskProgress) {
             const result = new QbsTaskProgressResponse(response);
             this._onTaskProgressUpdated.fire(result);
-        } else if (type === 'new-max-progress') {
+        } else if (type === QbsDataKey.NewMaxProgress) {
             const result = new QbsTaskMaxProgressResponse(response);
             this._onTaskMaxProgressChanged.fire(result);
-        } else if (type === 'generated-files-for-source') {
+        } else if (type === QbsDataKey.GeneratedFilesForSource) {
             // TODO: Implement me.
-        } else if (type === 'command-description') {
-            const result = new QbsMessageResponse(response['message']);
+        } else if (type === QbsDataKey.CommandDescription) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Message]);
             this._onCommandDescriptionReceived.fire(result);
-        } else if (type === 'files-added' || type === 'files-removed') {
+        } else if (type === QbsDataKey.FilesAdded || type === QbsDataKey.FilesRemoved) {
             // TODO: Implement me.
-        } else if (type === 'process-result') {
+        } else if (type === QbsDataKey.ProcessResult) {
             const result = new QbsProcessResponse(response);
             this._onProcessResultReceived.fire(result);
-        } else if (type === 'run-environment') {
-            const result = new QbsMessageResponse(response['error']);
+        } else if (type === QbsDataKey.RunEnvironment) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
             this._onRunEnvironmentResultReceived.fire(result);
-            const env = new QbsRunEnvironmentData(response['full-environment']);
+            const env = new QbsRunEnvironmentData(response[QbsDataKey.FullEnvironment]);
             this._onRunEnvironmentReceived.fire(env);
         }
     }
@@ -262,7 +271,7 @@ export class QbsSession implements vscode.Disposable {
             this._status = status;
             this._onStatusChanged.fire(this._status);
             if (status === QbsSessionStatus.Started) {
-                await vscode.commands.executeCommand('qbs.restoreProject');
+                await vscode.commands.executeCommand(QbsCommandKey.RestoreProject);
             }
         }
     }

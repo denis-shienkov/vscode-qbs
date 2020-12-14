@@ -6,7 +6,9 @@ import * as vscode from 'vscode';
 import * as cpt from 'vscode-cpptools';
 
 import {QbsSession} from './qbssession';
-import {QbsProjectData, QbsModulePropertiesData} from './qbstypes';
+
+import {QbsModulePropertiesData} from './datatypes/qbsmodulepropertiesdata';
+import {QbsProjectData} from './datatypes/qbsprojectdata';
 
 /**
  * Supported language standards by the intelli sense engine.

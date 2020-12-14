@@ -4,8 +4,12 @@ import {basename} from 'path';
 import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
-import {QbsBuildStep, QbsRunStep} from './qbssteps';
-import {QbsProjectData, QbsProductData} from './qbstypes';
+
+import {QbsBuildStep} from './steps/qbsbuildstep';
+import {QbsRunStep} from './steps/qbsrunstep';
+
+import {QbsProductData} from './datatypes/qbsproductdata';
+import {QbsProjectData} from './datatypes/qbsprojectdata';
 
 export class QbsProject implements vscode.Disposable {
     private _data?: QbsProjectData;

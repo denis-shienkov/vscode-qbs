@@ -2,7 +2,10 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
 import {QbsSession} from './qbssession';
-import {QbsOperationStatus, QbsOperationType, QbsMessageResponse} from './qbstypes';
+
+import {QbsOperationStatus} from './datatypes/qbsoperation';
+import {QbsOperationType} from './datatypes/qbsoperation';
+import {QbsMessageResponse} from './datatypes/qbsmessageresponse';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 

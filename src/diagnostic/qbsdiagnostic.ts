@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
-import {QbsSession} from '../qbssession';
+
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
-import {QbsOperationType, QbsOperationStatus} from '../qbstypes';
+import {QbsOperationType, QbsOperationStatus} from '../datatypes/qbsoperation';
+import {QbsSession} from '../qbssession';
 
 import {QbsClangDiagnosticParser} from './qbsclangdiagnosticparser';
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';

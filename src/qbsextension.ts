@@ -1,14 +1,17 @@
 import * as vscode from 'vscode';
 
-import * as QbsCommands from './qbscommands';
+import * as QbsCommands from './commands/qbscommands';
+import {QbsCommandKey} from './commands/qbscommandkey';
+
 import * as QbsUtils from './qbsutils';
 
-import {QbsDiagnostic} from './diagnostic/qbsdiagnostic'
+import {QbsCpp} from './qbscpp';
 import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSession} from './qbssession';
 import {QbsStatusBar} from './qbsstatusbar';
-import {QbsCpp} from './qbscpp';
-import {QbsProjectExplorer} from './qbsprojectexplorer'
+
+import {QbsDiagnostic} from './diagnostic/qbsdiagnostic'
+import {QbsProjectExplorer} from './projectexplorer/qbsprojectexplorer'
 
 const QBS_EXTENSION_ACTIVATED = 'qbs:extension-activated';
 
@@ -41,7 +44,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
     QbsUtils.setContextValue(QBS_EXTENSION_ACTIVATED, true);
     manager = new QbsExtensionManager(ctx);
-    await vscode.commands.executeCommand('qbs.autoRestartSession');
+    await vscode.commands.executeCommand(QbsCommandKey.AutoRestartSession);
 }
 
 export async function deactivate() {

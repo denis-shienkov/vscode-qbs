@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
+
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
+
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
 const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
