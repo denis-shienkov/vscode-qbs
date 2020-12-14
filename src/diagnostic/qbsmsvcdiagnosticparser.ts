@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
+
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
+
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
-const REGEX = /^\s*(\d+>)?\s*([^\s>].*)\((\d+|\d+,\d+|\d+,\d+,\d+,\d+)\):\s+((?:fatal )?error|warning|info)\s+(\w{1,2}\d+)\s*:\s*(.*)$/;
+const REGEX = /^\s*(\d+>)?\s*([^\s>].*)\((\d+|\d+,\d+|\d+,\d+,\d+,\d+)\)\s*:\s+((?:fatal )?error|warning|info)\s+(\w{1,2}\d+)\s*:\s*(.*)$/;
 
 export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
     constructor(type: string) {
@@ -16,7 +18,8 @@ export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private parseLine(line: string) {
-        const matches = REGEX.exec(line.replace(/[\n\r]/g, ''));
+        line = line.replace(/[\n\r]/g, '');
+        const matches = REGEX.exec(line);
         if (!matches) {
             return;
         }
