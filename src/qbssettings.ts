@@ -25,13 +25,18 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 const QBS_SETTINGS_SECTION = 'qbs';
 
-// Defaul settings.
-const DEFAULT_BUILD_DIR_PATH = '${sourceDirectory}/build/${profileName}_${configurationName}';
+// Path patterns.
+const CONFIGURATION_NAME_PATTERN = '${configurationName}';
+const PROFILE_NAME_PATTERN = '${profileName}';
+const SOURCE_DIR_PATTERN = '${sourceDirectory}';
+
+// Default settings.
+const DEFAULT_BUILD_DIR_PATH = `${SOURCE_DIR_PATTERN}/build/${PROFILE_NAME_PATTERN}_${CONFIGURATION_NAME_PATTERN}`;
 const DEFAULT_CLEAN_INSTALL_ROOT = false;
 const DEFAULT_ERROR_HANDLING_MODE = QbsErrorHandlingMode.Relaxed;
 const DEFAULT_FORCE_PROBES = false;
 const DEFAULT_KEEP_GOING = false;
-const DEFAULT_LAUNCH_FILE_PATH = '${sourceDirectory}/.vscode/launch.json';
+const DEFAULT_LAUNCH_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/launch.json`;
 const DEFAULT_LOG_LEVEL = QbsLogLevel.Info;
 const DEFAULT_MAX_BUILD_JOBS = 0;
 const DEFAULT_QBS_EXE_PATH = 'qbs';
@@ -336,12 +341,12 @@ export class QbsSettings implements vscode.Disposable {
      */
     private completePath(configPath: string): string {
         const buildStep = this._session.project()?.buildStep();
-        configPath = configPath.replace('${profileName}', buildStep?.profileName() || 'none');
-        configPath = configPath.replace('${configurationName}', buildStep?.configurationName() || 'none');
+        configPath = configPath.replace(PROFILE_NAME_PATTERN, buildStep?.profileName() || 'none');
+        configPath = configPath.replace(CONFIGURATION_NAME_PATTERN, buildStep?.configurationName() || 'none');
         const sourceDirectory = (vscode.workspace.workspaceFolders
             && vscode.workspace.workspaceFolders.length > 0)
                 ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
-        configPath = configPath.replace('${sourceDirectory}', sourceDirectory);
+        configPath = configPath.replace(SOURCE_DIR_PATTERN, sourceDirectory);
         return QbsUtils.fixPathSeparators(configPath);
     }
 
