@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
+import * as QbsUtils from '../qbsutils';
 
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
@@ -21,7 +22,7 @@ export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private parseLine(line: string) {
-        line = line.replace(/[\n\r]/g, '');
+        line = QbsUtils.trimLine(line);
 
         if (this.parseArmCCCompilerMessage(line)) {
             return;

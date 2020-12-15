@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
+import * as QbsUtils from '../qbsutils';
 
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
@@ -22,7 +23,7 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private parseLine(line: string) {
-        line = line.replace(/[\n\r]/g, '');
+        line = QbsUtils.trimLine(line);
 
         if (this.parseCompilerMessage(line)) {
             return;

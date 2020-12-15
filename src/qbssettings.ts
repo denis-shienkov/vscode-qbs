@@ -245,8 +245,8 @@ export class QbsSettings implements vscode.Disposable {
                         reject(undefined);
                     } else {
                         const profiles: QbsProfileData[] = [];
-                        stdout.split('\n').map(function (line) {
-                            line = line.replace(/[\n\r]/g, '');
+                        stdout.split('\n').map(function(line) {
+                            line = QbsUtils.trimLine(line);
                             const matches = /^profiles.([\w|-]+)./.exec(line);
                             if (matches) {
                                 const name = matches[1];

@@ -26,3 +26,7 @@ export function escapeShell(shell: string): string {
 export function setContextValue(key: string, value: any): Thenable<void> {
     return vscode.commands.executeCommand('setContext', key, value);
 }
+
+export function trimLine(line: string): string {
+    return line.replace(/[\n\r]/g, '');
+}
