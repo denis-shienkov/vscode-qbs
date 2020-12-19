@@ -318,7 +318,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                     // Use closer value to IAR ARM compiler intelli sense mode.
                     return 'gcc-arm';
                 }
-            } else if (toolchain.indexOf('sdcc') !== -1) {
+            } else if (toolchain.indexOf('keil') !== -1) {
                 if (architecture.indexOf('arm') !== -1) {
                     const compilerName = properties.compilerName();
                     // Use closer value to KEIL ARM compiler intelli sense mode.
