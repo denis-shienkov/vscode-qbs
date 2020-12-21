@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import * as QbsUtils from '../qbsutils';
+
 import {QbsBaseNode} from './qbsbasenode';
 import {QbsLocationNode} from './qbslocationnode';
 import {QbsSourceArtifactNode} from './qbssourceartifactnode';
@@ -12,17 +14,22 @@ export class QbsGroupNode extends QbsBaseNode {
     }
 
     getTreeItem(): vscode.TreeItem {
-        const item = new vscode.TreeItem(this._group.name(), vscode.TreeItemCollapsibleState.Collapsed);
+        let label = this._group.name();
+        if (!this._group.isEnabled()) {
+            label = QbsUtils.strikeLine(label);
+        }
+        const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
         item.iconPath = new vscode.ThemeIcon('group-by-ref-type');
         return item;
     }
 
     getChildren(): QbsBaseNode[] {
-        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._group.location(), true) ];
+        const isEnabled = this._group.isEnabled();
+        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._group.location(), true, isEnabled) ];
         const sources = this._group.sourceArtifacts();
-        sources.forEach(source => nodes.push(new QbsSourceArtifactNode(source)));
+        sources.forEach(source => nodes.push(new QbsSourceArtifactNode(source, isEnabled)));
         const wildcards = this._group.sourceWildcardsArtifacts();
-        wildcards.forEach(wildcard => nodes.push(new QbsSourceArtifactNode(wildcard)));
+        wildcards.forEach(wildcard => nodes.push(new QbsSourceArtifactNode(wildcard, isEnabled)));
         return nodes;
     }
 }

@@ -36,6 +36,10 @@ export class QbsGroupData {
         return artifacts;
     }
 
+    isEnabled(): boolean {
+        return this._data[QbsDataKey.IsEnabled];
+    }
+
     isEmpty(): boolean {
         return this.sourceArtifacts().length === 0 && this.sourceWildcardsArtifacts().length === 0;
     }

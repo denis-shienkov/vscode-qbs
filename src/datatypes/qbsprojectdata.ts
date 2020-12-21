@@ -26,6 +26,10 @@ export class QbsProjectData {
         return new QbsProfileData(this._data[QbsDataKey.ProfileData]);
     }
 
+    isEnabled(): boolean {
+        return this._data[QbsDataKey.IsEnabled];
+    }
+
     isEmpty():boolean {
         return this._data === undefined;
     }

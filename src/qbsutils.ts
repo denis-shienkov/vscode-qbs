@@ -30,3 +30,9 @@ export function setContextValue(key: string, value: any): Thenable<void> {
 export function trimLine(line: string): string {
     return line.replace(/[\n\r]/g, '');
 }
+
+export function strikeLine(text: string, canStrike = (char: string) => true): string {
+    return text.split('')
+        .map(char => canStrike(char) ? char + '\u0336' : char)
+        .join('')
+}

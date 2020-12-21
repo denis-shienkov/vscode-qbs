@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
+import * as QbsUtils from '../qbsutils';
+
 import {QbsBaseNode} from './qbsbasenode';
 
 import {QbsLocationData} from '../datatypes/qbslocationdata';
@@ -10,7 +12,8 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 export class QbsLocationNode extends QbsBaseNode {
     constructor(
         private readonly _location: QbsLocationData,
-        private readonly _isQbsFile: boolean) {
+        private readonly _isQbsFile: boolean,
+        private readonly _isEnabled: boolean) {
         super(_location.id());
     }
 
@@ -18,6 +21,9 @@ export class QbsLocationNode extends QbsBaseNode {
         let label = this._location.fileName();
         if (this._isQbsFile) {
             label += ':' + this._location.line();
+        }
+        if (!this._isEnabled) {
+            label = QbsUtils.strikeLine(label);
         }
         const item = new vscode.TreeItem(label);
         item.resourceUri = vscode.Uri.file(this._location.filePath());

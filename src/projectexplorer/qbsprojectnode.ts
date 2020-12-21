@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import * as QbsUtils from '../qbsutils';
+
 import {QbsBaseNode} from './qbsbasenode';
 import {QbsLocationNode} from './qbslocationnode';
 import {QbsProductNode} from './qbsproductnode';
@@ -16,14 +18,18 @@ export class QbsProjectNode extends QbsBaseNode {
     getTreeItem(): vscode.TreeItem {
         const collapsible = this._isRoot ? vscode.TreeItemCollapsibleState.Expanded
                                          : vscode.TreeItemCollapsibleState.Collapsed;
-        const item = new vscode.TreeItem(this._project.name(), collapsible);
+        let label = this._project.name();
+        if (!this._project.isEnabled()) {
+            label = QbsUtils.strikeLine(label);
+        }
+        const item = new vscode.TreeItem(label, collapsible);
         item.iconPath = new vscode.ThemeIcon('project');
         item.contextValue = this._isRoot ? 'root-project-node' : 'sub-project-node';
         return item;
     }
 
     getChildren(): QbsBaseNode[] {
-        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._project.location(), true) ];
+        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._project.location(), true, this._project.isEnabled()) ];
         const products = this._project.products();
         products.forEach(product => nodes.push(new QbsProductNode(product)));
         const projects = this._project.subProjects();
