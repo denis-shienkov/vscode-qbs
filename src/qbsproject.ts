@@ -5,6 +5,7 @@ import * as QbsUtils from './qbsutils';
 
 import {QbsSession} from './qbssession';
 
+import {QbsBuildSystemFilesWatcher} from './qbsbuildsystemfileswatcher';
 import {QbsBuildStep} from './steps/qbsbuildstep';
 import {QbsRunStep} from './steps/qbsrunstep';
 
@@ -15,12 +16,14 @@ export class QbsProject implements vscode.Disposable {
     private _data?: QbsProjectData;
     private _buildStep: QbsBuildStep = new QbsBuildStep(this);
     private _runStep: QbsRunStep = new QbsRunStep(this);
+    private _buildSystemFilesWatcher?: QbsBuildSystemFilesWatcher;
 
     constructor(private readonly _session: QbsSession, readonly _uri?: vscode.Uri) {}
 
     dispose() {
         this._buildStep.dispose();
         this._runStep.dispose();
+        this._buildSystemFilesWatcher?.dispose();
     }
 
     session(): QbsSession { return this._session; }
@@ -30,13 +33,18 @@ export class QbsProject implements vscode.Disposable {
 
     async setData(data: QbsProjectData, fromResolve: boolean)  {
         if (!data.isEmpty()) {
-            const buildSystemFiles = this._data?.buildSystemFiles();
+            const buildSystemFiles = this._data?.buildSystemFiles() || [];
             const profile = this._data?.profile();
             if (!fromResolve) {
                 data.setBuildSystemFiles(buildSystemFiles);
                 if (profile) {
                     data.setProfile(profile);
                 }
+            } else {
+                // We need to create the watchers only once when the `resolve` command
+                // completes. Otherwise the project data can not contains the build
+                // directory, and other properties.
+                this._buildSystemFilesWatcher = new QbsBuildSystemFilesWatcher(data);
             }
             this._data = data;
         }

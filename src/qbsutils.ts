@@ -3,6 +3,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 export function fixPathSeparators(path: string): string {
     return path.replace(/\\/g, '/');
@@ -35,4 +36,9 @@ export function strikeLine(text: string, canStrike = (char: string) => true): st
     return text.split('')
         .map(char => canStrike(char) ? char + '\u0336' : char)
         .join('')
+}
+
+export function isChildOf(filePath: string, parentDirectory: string) {
+    const relative = path.relative(parentDirectory, filePath);
+    return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 }

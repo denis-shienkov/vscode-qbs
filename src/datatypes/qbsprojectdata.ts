@@ -63,11 +63,11 @@ export class QbsProjectData {
         return products;
     }
 
-    setBuildSystemFiles(files: any) {
+    setBuildSystemFiles(files: string[]) {
         this._data[QbsDataKey.BuildSystemFiles] = files;
     }
 
-    buildSystemFiles(): any {
+    buildSystemFiles(): string[] {
         return this._data[QbsDataKey.BuildSystemFiles];
     }
 
