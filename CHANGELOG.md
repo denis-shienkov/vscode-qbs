@@ -1,5 +1,13 @@
 # What's New?
 
+## 1.0.0
+
+- First production release.
+- [#31](https://github.com/denis-shienkov/vscode-qbs/issues/31)
+Added option to show or hide the disabled project items.
+- [#31](https://github.com/denis-shienkov/vscode-qbs/issues/31)
+Rigt now the disabled project items are marked as striked text.
+
 ## 0.0.9
 
 - Next developer preview release.
