@@ -42,12 +42,14 @@ const DEFAULT_MAX_BUILD_JOBS = 0;
 const DEFAULT_QBS_EXE_PATH = 'qbs';
 const DEFAULT_SETTINGS_DIR_PATH = '';
 const DEFAULT_SHOW_COMMAND_LINES = false;
+const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = false;
 
 export enum QbsSettingsEvent {
     NothingRequired,
     SessionRestartRequired,
     ProjectResolveRequired,
-    DebuggerUpdateRequired
+    DebuggerUpdateRequired,
+    ProjectTreeUpdateRequired,
 }
 
 export class QbsSettings implements vscode.Disposable {
@@ -64,7 +66,9 @@ export class QbsSettings implements vscode.Disposable {
                 this._onChanged.fire(QbsSettingsEvent.SessionRestartRequired);
             }
             let signal = QbsSettingsEvent.NothingRequired;
-            if (e.affectsConfiguration('qbs.forceProbes')) {
+            if (e.affectsConfiguration('qbs.showDisabledProjectItems')) {
+                signal = QbsSettingsEvent.ProjectTreeUpdateRequired;
+            } else if (e.affectsConfiguration('qbs.forceProbes')) {
                 signal = QbsSettingsEvent.ProjectResolveRequired;
             } else if (e.affectsConfiguration('qbs.errorHandlingMode')) {
                 signal = QbsSettingsEvent.ProjectResolveRequired;
@@ -174,6 +178,10 @@ export class QbsSettings implements vscode.Disposable {
      */
     logLevel(): QbsLogLevel {
         return this._settings.get<QbsLogLevel>('logLevel', DEFAULT_LOG_LEVEL)
+    }
+
+    showDisabledProjectItems(): boolean {
+        return this._settings.get<boolean>('showDisabledProjectItems', DEFAULT_SHOW_DISABLED_PROJECT_ITEMS)
     }
 
     /**

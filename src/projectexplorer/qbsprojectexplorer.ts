@@ -4,6 +4,7 @@ import {QbsBaseNode} from './qbsbasenode';
 import {QbsProjectNode} from './qbsprojectnode';
 
 import {QbsSession} from '../qbssession';
+import {QbsSettingsEvent} from '../qbssettings';
 
 async function openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position) {
     await vscode.workspace.openTextDocument(uri).then(async (doc) => {
@@ -16,11 +17,22 @@ async function openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position)
 }
 
 class QbsProjectDataProvider implements vscode.TreeDataProvider<QbsBaseNode> {
+    private _showDisabledNodes: boolean = false;
     private _onDidChangeTreeData = new vscode.EventEmitter<void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
+
     constructor(private readonly _session: QbsSession) {
         _session.onProjectResolved(async () => this._onDidChangeTreeData.fire());
+
+        _session.settings().onChanged(async (event) => {
+            if (event === QbsSettingsEvent.ProjectTreeUpdateRequired) {
+                this._showDisabledNodes = _session.settings().showDisabledProjectItems();
+                this._onDidChangeTreeData.fire();
+            }
+        });
+
+        this._showDisabledNodes = _session.settings().showDisabledProjectItems();
     }
 
     getTreeItem(node: QbsBaseNode): vscode.TreeItem {
@@ -31,11 +43,17 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<QbsBaseNode> {
         if (node) {
             return node.getChildren();
         }
+
         const project = this._session.project()?.data();
-        if (project) {
-            return [ new QbsProjectNode(project, true) ];
+        if (!project) {
+            return [];
         }
-        return [];
+
+        if (!this._showDisabledNodes && !project.isEnabled()) {
+            return [];
+        }
+
+        return [ new QbsProjectNode(project, true, this._showDisabledNodes) ];
     }
 }
 

@@ -9,7 +9,9 @@ import {QbsLocationNode} from './qbslocationnode';
 import {QbsProductData} from '../datatypes/qbsproductdata';
 
 export class QbsProductNode extends QbsBaseNode {
-    constructor(private readonly _product: QbsProductData) {
+    constructor(
+        private readonly _product: QbsProductData,
+        private readonly _showDisabledNodes: boolean) {
         super(_product.id());
     }
 
@@ -28,9 +30,12 @@ export class QbsProductNode extends QbsBaseNode {
 
     getChildren(): QbsBaseNode[] {
         const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._product.location(), true, this._product.isEnabled()) ];
+
         const groups = this._product.groups();
         groups.forEach(group => {
-            if (!group.isEmpty()) {
+            if (!this._showDisabledNodes && !group.isEnabled()) {
+                return;
+            } else if (!group.isEmpty()) {
                 nodes.push(new QbsGroupNode(group));
             }
         });
