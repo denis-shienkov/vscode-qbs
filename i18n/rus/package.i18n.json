@@ -33,5 +33,6 @@
     "qbs-tools.configuration.qbs.errorHandlingMode.description": "Определяет, как Qbs должен поступать с проблемами в файлах проекта, например как присвоение неизвестного свойства.",
     "qbs-tools.configuration.qbs.logLevel.description": "Указывает, хочет ли клиент получать данные журнала и/или предупреждающие сообщения.",
     "qbs-tools.configuration.qbs.launchFilePath.description": "Полный путь к файлу launch.json, содержащему конфигурации отладчиков.",
+    "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }
