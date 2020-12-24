@@ -9,6 +9,10 @@ Added option to show or hide the disabled project items.
 Rigt now the disabled project items are marked as striked text.
 - [#2](https://github.com/denis-shienkov/vscode-qbs/issues/2)
 Implemented the project re-resolving when the qbs/js files change.
+- [#32](https://github.com/denis-shienkov/vscode-qbs/issues/32)
+Right now it is possible to override the project properties which
+are located in the `overriden-properties.json` file,  using the
+`Override Project Properties` command.
 
 ## 0.0.9
 
