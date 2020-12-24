@@ -24,6 +24,7 @@ Qbs >= 1.16 must be preinstalled in the system.
 - [Build a project](docs/how-to.md#build-a-project)
 - [Run a project](docs/how-to.md#run-a-project)
 - [Debug a project](docs/how-to.md#debug-a-project)
+- [Override a project properties](docs/how-to.md#override-a-project-properties)
 - [How to](docs/how-to.md)
 - [Read the online documentation](docs/README.md)
 - [Contribute](docs/contribute.md)

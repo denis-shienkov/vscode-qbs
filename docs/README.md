@@ -9,6 +9,7 @@ QBS is an extension designed to make it easy to work with QBS-based projects.
 * [Build a project](how-to.md#build-a-project)
 * [Run a project](how-to.md#run-a-project)
 * [Debug a project](how-to.md#debug-a-project)
+* [Override a project properties](how-to.md#override-a-project-properties)
 * [Set up include paths for C++ IntelliSense](how-to.md#set-up-include-paths-for-c-intellisense)
 
 [QBS profiles](profiles.md)
@@ -31,3 +32,6 @@ QBS is an extension designed to make it easy to work with QBS-based projects.
 * [Configure debuggers](debug-run.md#configure-debuggers)
 * [Run with debugging](debug-run.md#run-with-debugging)
 * [Run without debugging](debug-run.md#run-without-debugging)
+
+[Override properties](override-properties.md)
+* [Configure](override-properties.md#configure)

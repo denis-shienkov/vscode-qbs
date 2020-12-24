@@ -23,6 +23,8 @@ below, for more information about variable expansion.
 | `qbs.errorHandlingMode`| Specifies how Qbs should deal with issues in project files, such as assigning to an unknown property. | `relaxed` | No. |
 | `qbs.logLevel`| Uses the specified [log level](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-log-op-op-level-op-lt-op-level-op-gt-op). | `info` | No. |
 | `qbs.launchFilePath`| Specify location to the debugger configuration in the `launch.json` file. | `${sourceDirectory}/.vscode/launch.json` | Yes. |
+| `qbs.showDisabledProjectItems`| Shows the disabled project items (sub-projects, products, groups). | `false` | No. |
+| `qbs.overriddenPropertiesFilePath`| Specify location to the overridden project properties the `overridden-properties.json` file. | `${sourceDirectory}/.vscode/overridden-properties.json` | Yes. |
 
 ## Variable substitution
 
