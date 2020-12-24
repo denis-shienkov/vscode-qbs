@@ -1,8 +1,7 @@
 # QBS: Override properties
 
 QBS allows to override any project properties on the resolving stage. Details
-about the data format for this can be found in the official QBS [documentation]
-(https://doc.qt.io/qbs/language-introduction.html#overriding-property-values-from-the-command-line).
+about the data format for this can be found in the official QBS [documentation](https://doc.qt.io/qbs/language-introduction.html#overriding-property-values-from-the-command-line).
 
 Although, this extension allows you to do this using a special
 `overridden-properties.json` file. The data format in this file corresponds to
