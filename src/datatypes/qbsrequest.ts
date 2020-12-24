@@ -68,6 +68,10 @@ export abstract class QbsRequest {
         this._data[QbsDataKey.ModuleProperties] = moduleProperties;
     }
 
+    setOverriddenProperties(overriddenProperties: any) {
+        this._data[QbsDataKey.OverriddenProperties] = overriddenProperties;
+    }
+
     setProduct(product: string) {
         this._data[QbsDataKey.Product] = product;
     }

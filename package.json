@@ -194,6 +194,11 @@
                 "command": "qbs.cleanSubProject",
                 "title": "%qbs-tools.command.qbs.clean.title%",
                 "category": "QBS"
+            },
+            {
+                "command": "qbs.overrideProperties",
+                "title": "%qbs-tools.command.qbs.overrideproperties.title%",
+                "category": "QBS"
             }
         ],
         "menus": {
@@ -300,6 +305,10 @@
                 },
                 {
                     "command": "qbs.debug",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.overrideProperties",
                     "when": "qbs:extension-activated"
                 }
             ],
@@ -437,6 +446,12 @@
                     "type": "boolean",
                     "default": false,
                     "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
+                    "scope": "resource"
+                },
+                "qbs.overriddenPropertiesFilePath": {
+                    "type": "string",
+                    "default": "${sourceDirectory}/.vscode/overridden-properties.json",
+                    "description": "%qbs-tools.configuration.qbs.overriddenPropertiesFilePath.description%",
                     "scope": "resource"
                 }
             }

@@ -44,6 +44,7 @@ export enum QbsDataKey {
     ModuleProperties = 'module-properties',
     Name = 'name',
     NewMaxProgress = 'new-max-progress',
+    OverriddenProperties = 'overridden-properties',
     ProcessResult = 'process-result',
     Product = 'product',
     Products = 'products',

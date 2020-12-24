@@ -6,6 +6,7 @@ export * from './qbsdebugproductcommand';
 export * from './qbsdetectprofilescommand';
 export * from './qbsgetrunenvironmentcommand';
 export * from './qbsinstallcommand';
+export * from './qbsoverridepropertiescommand';
 export * from './qbsrebuildcommand';
 export * from './qbsresolvecommand';
 export * from './qbsrestoreprojectcommand';
@@ -39,6 +40,9 @@ import {QbsProjectNode} from '../projectexplorer/qbsprojectnode';
 const DEFAULT_COMMAND_TIMEOUT_MS = 5000;
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.OverrideProperties, async () => {
+        await QbsCommand.onOverrideProperties(session);
+    }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.DetectProfiles, async () => {
         await QbsCommand.onDetectProfiles(session);
     }));

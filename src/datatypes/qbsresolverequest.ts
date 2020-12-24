@@ -18,6 +18,7 @@ export class QbsResolveRequest extends QbsRequest {
         const errorHandlingMode = this.errorHandlingModeFromSettings(settings);
         const forceProbeExecution = this.forceProbeExecutionFromSettings(settings);
         const logLevel = this.logLevelFromSettings(settings);
+        const overriddenProperties = this.overriddenPropertiesFromSettings(settings);
         const settingsDirectory = this.settingsDirectoryFromSettings(settings);
 
         this.setBuildRoot(buildRoot);
@@ -28,6 +29,7 @@ export class QbsResolveRequest extends QbsRequest {
         this.setForceProbeExecution(forceProbeExecution);
         this.setLogLevel(logLevel);
         this.setModuleProperties(QbsModuleProperties.Exported);
+        this.setOverriddenProperties(overriddenProperties);
         this.setSettingsDirectory(settingsDirectory);
         this.setType(QbsRequestType.Resolve);
     }
@@ -50,5 +52,21 @@ export class QbsResolveRequest extends QbsRequest {
 
     private settingsDirectoryFromSettings(settings?: QbsSettings): string {
         return settings ? settings.settingsDirectory() : '';
+    }
+
+    private overriddenPropertiesFromSettings(settings?: QbsSettings): any {
+        if (!settings) {
+            return {};
+        } else {
+            const propertiesPath = settings.overriddenPropertiesPath();
+            try {
+                const data = fs.readFileSync(propertiesPath);
+                const text = data.toString();
+                const json = JSON.parse(text);
+                return json;
+            } catch (e) {
+                return {};
+            }
+        }
     }
 }

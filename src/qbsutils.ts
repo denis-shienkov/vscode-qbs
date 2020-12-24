@@ -4,6 +4,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export function fixPathSeparators(path: string): string {
     return path.replace(/\\/g, '/');
@@ -41,4 +42,10 @@ export function strikeLine(text: string, canStrike = (char: string) => true): st
 export function isChildOf(filePath: string, parentDirectory: string) {
     const relative = path.relative(parentDirectory, filePath);
     return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+}
+
+export function ensureFileCreated(filePath: string) {
+    if (!fs.existsSync(filePath)) {
+        fs.createWriteStream(filePath).close();
+    }
 }

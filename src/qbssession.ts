@@ -28,6 +28,7 @@ import {QbsTaskStartedResponse} from './datatypes/qbstaskstartedresponse';
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 const ACTIVE_PROJECT_KEY = 'ActiveProject';
+const AUTO_RESOLVE_TIMEOUT = 1000;
 
 export enum QbsSessionStatus { Stopped, Started, Stopping, Starting }
 
@@ -100,7 +101,7 @@ export class QbsSession implements vscode.Disposable {
         this._settings.onChanged(async (event) => {
             if (event === QbsSettingsEvent.ProjectResolveRequired) {
                 if (this._project) {
-                    await this.autoResolve(0);
+                    await this.autoResolve(AUTO_RESOLVE_TIMEOUT);
                 }
             } else if (event === QbsSettingsEvent.SessionRestartRequired) {
                 await vscode.commands.executeCommand(QbsCommandKey.AutoRestartSession);

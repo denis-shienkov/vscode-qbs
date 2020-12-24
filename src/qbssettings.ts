@@ -43,6 +43,7 @@ const DEFAULT_QBS_EXE_PATH = 'qbs';
 const DEFAULT_SETTINGS_DIR_PATH = '';
 const DEFAULT_SHOW_COMMAND_LINES = false;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = false;
+const DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/overridden-properties.json`;
 
 export enum QbsSettingsEvent {
     NothingRequired,
@@ -55,6 +56,7 @@ export enum QbsSettingsEvent {
 export class QbsSettings implements vscode.Disposable {
     private _settings: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(QBS_SETTINGS_SECTION);
     private _debuggerSettingsWatcher?: chokidar.FSWatcher
+    private _overriddenPropertiesWatcher?: chokidar.FSWatcher
     private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
@@ -77,6 +79,9 @@ export class QbsSettings implements vscode.Disposable {
             } else if (e.affectsConfiguration('qbs.launchFilePath')) {
                 signal = QbsSettingsEvent.DebuggerUpdateRequired;
                 this.subscribeDebuggerSettingsChanged();
+            } else if (e.affectsConfiguration('qbs.overriddenPropertiesFilePath')) {
+                signal = QbsSettingsEvent.ProjectResolveRequired;
+                this.subscribeOverriddenPropertiesChanged();
             }
             if (signal !== QbsSettingsEvent.NothingRequired) {
                 this._onChanged.fire(signal);
@@ -84,6 +89,7 @@ export class QbsSettings implements vscode.Disposable {
         });
 
         this.subscribeDebuggerSettingsChanged();
+        this.subscribeOverriddenPropertiesChanged();
     }
 
     dispose() { this._debuggerSettingsWatcher?.close(); }
@@ -182,6 +188,11 @@ export class QbsSettings implements vscode.Disposable {
 
     showDisabledProjectItems(): boolean {
         return this._settings.get<boolean>('showDisabledProjectItems', DEFAULT_SHOW_DISABLED_PROJECT_ITEMS)
+    }
+
+    overriddenPropertiesPath(): string {
+        const v = this._settings.get<string>('overriddenPropertiesFilePath', DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH);
+        return this.completePath(v);
     }
 
     /**
@@ -363,5 +374,12 @@ export class QbsSettings implements vscode.Disposable {
         const settingsPath = this.debuggerSettingsPath();
         this._debuggerSettingsWatcher = chokidar.watch(settingsPath, {ignoreInitial: true});
         this._debuggerSettingsWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.DebuggerUpdateRequired); });
+    }
+
+    private async subscribeOverriddenPropertiesChanged() {
+        this._overriddenPropertiesWatcher?.close();
+        const propertiesPath = this.overriddenPropertiesPath();
+        this._overriddenPropertiesWatcher = chokidar.watch(propertiesPath, {ignoreInitial: true});
+        this._overriddenPropertiesWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.ProjectResolveRequired); });
     }
 }

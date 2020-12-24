@@ -24,4 +24,5 @@ export enum QbsCommandKey {
     SelectRun = 'qbs.selectRun',
     StartSession = 'qbs.startSession',
     StopSession = 'qbs.stopSession',
+    OverrideProperties = 'qbs.overrideProperties',
 }
