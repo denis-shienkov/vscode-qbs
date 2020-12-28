@@ -36,12 +36,6 @@
     "contributes": {
         "languages": [
             {
-                "id": "xml",
-                "extensions": [
-                    ".ts"
-                ]
-            },
-            {
                 "id": "qbs",
                 "extensions": [
                     ".qbs"
