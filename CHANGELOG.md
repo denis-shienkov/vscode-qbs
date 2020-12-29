@@ -16,6 +16,8 @@ are located in the `overriden-properties.json` file,  using the
 - [#33](https://github.com/denis-shienkov/vscode-qbs/issues/33)
 Rignt now the unreferenced QBS files are displayed in the project
 tree under the `Qbs files` node.
+- [#34](https://github.com/denis-shienkov/vscode-qbs/issues/34)
+Added integration of the `problems` panel with Qbs warning messages.
 
 ## 0.0.9
 
