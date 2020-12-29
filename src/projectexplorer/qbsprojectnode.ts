@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as QbsUtils from '../qbsutils';
 
 import {QbsBaseNode} from './qbsbasenode';
+import {QbsBuildSystemFilesNode} from './qbsbuildsystemfilesnode';
 import {QbsLocationNode} from './qbslocationnode';
 import {QbsProductNode} from './qbsproductnode';
 
@@ -45,6 +46,10 @@ export class QbsProjectNode extends QbsBaseNode {
         projects.forEach(project => {
             nodes.push(new QbsProjectNode(project, false, this._showDisabledNodes));
         });
+
+        if (this._isRoot) {
+            nodes.push(new QbsBuildSystemFilesNode(this._project));
+        }
 
         return nodes;
     }
