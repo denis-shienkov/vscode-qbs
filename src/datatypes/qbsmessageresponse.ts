@@ -4,6 +4,7 @@ export class QbsMessageItemResponse {
     readonly _description: string = '';
     readonly _filePath: string = '';
     readonly _line: number = -1;
+    readonly _column: number = -1;
 
     constructor(msg: any) {
         if (typeof msg === 'string') {
@@ -13,6 +14,7 @@ export class QbsMessageItemResponse {
             const location = msg[QbsDataKey.Location] || {};
             this._filePath = location[QbsDataKey.FilePath] || '';
             this._line = parseInt(location[QbsDataKey.Line] || -1);
+            this._column = parseInt(location[QbsDataKey.Column] || -1);
         }
     }
 

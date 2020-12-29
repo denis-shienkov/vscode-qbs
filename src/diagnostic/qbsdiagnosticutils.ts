@@ -13,6 +13,8 @@ export abstract class QbsDiagnosticParser {
 
     type(): string { return this._type; }
 
+    cleanup() { this._diagnostics.clear(); }
+
     insertDiagnostic(filePath: string, diagnostic: vscode.Diagnostic) {
         if (!this._diagnostics.has(filePath)) {
             this._diagnostics.set(filePath, []);

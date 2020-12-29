@@ -4,6 +4,7 @@ import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 import {QbsOperationType, QbsOperationStatus} from '../datatypes/qbsoperation';
 import {QbsSession} from '../qbssession';
 
+// Toolchain output parsers.
 import {QbsClangDiagnosticParser} from './qbsclangdiagnosticparser';
 import {QbsGccDiagnosticParser} from './qbsgccdiagnosticparser';
 import {QbsIarDiagnosticParser} from './qbsiardiagnosticparser';
@@ -11,24 +12,43 @@ import {QbsKeilDiagnosticParser} from './qbskeildiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
 
+// Qbs output parser.
+import {QbsQbsDiagnosticParser} from './qbsqbsdiagnosticparser';
+
 export class QbsDiagnostic implements vscode.Disposable {
-    private _collection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('qbs-build-diags');
-    private _parser?: QbsDiagnosticParser;
-    private _type: string = '';
+    private _toolchainCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('qbs-build-diags');
+    private _toolchainParser?: QbsDiagnosticParser;
+    private _toolchainType: string = '';
+
+    private _qbsCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('qbs-resolve-diags');
+    private _qbsParser: QbsQbsDiagnosticParser = new QbsQbsDiagnosticParser();
 
     constructor (session: QbsSession) {
         session.onOperationChanged(async (operation) => {
             if (operation._type === QbsOperationType.Build) {
                 if (operation._status === QbsOperationStatus.Started) {
-                    this._collection.clear();
-                    this.createParser(this._type);
+                    this._toolchainCollection.clear();
+                    this.createToolchainParser(this._toolchainType);
                 } else {
-                    // Set the collection.
-                    const filePaths = this._parser?.filePaths() || [];
+                    // Set the toolchain messages collection.
+                    const filePaths = this._toolchainParser?.filePaths() || [];
                     for (const filePath of filePaths) {
-                        const diagnostics = this._parser?.diagnosticsAt(filePath);
-                        this._collection.set(vscode.Uri.file(filePath), diagnostics);
+                        const diagnostics = this._toolchainParser?.diagnosticsAt(filePath);
+                        this._toolchainCollection.set(vscode.Uri.file(filePath), diagnostics);
                     }
+                    this._toolchainParser?.cleanup();
+                }
+            } else if (operation._type === QbsOperationType.Resolve) {
+                if (operation._status === QbsOperationStatus.Started) {
+                    this._qbsCollection.clear();
+                } else {
+                    // Set the qbs messages collection.
+                    const filePaths = this._qbsParser?.filePaths() || [];
+                    for (const filePath of filePaths) {
+                        const diagnostics = this._qbsParser?.diagnosticsAt(filePath);
+                        this._qbsCollection.set(vscode.Uri.file(filePath), diagnostics);
+                    }
+                    this._qbsParser.cleanup();
                 }
             }
         });
@@ -36,7 +56,7 @@ export class QbsDiagnostic implements vscode.Disposable {
         session.onProjectResolved(async (result) => {
             const profile = session.project()?.data()?.profile();
             if (profile && profile.isValid()) {
-                this._type = profile.qbs().toolchainType();
+                this._toolchainType = profile.qbs().toolchainType();
             }
         });
 
@@ -47,31 +67,38 @@ export class QbsDiagnostic implements vscode.Disposable {
             }
 
             if (result._stdError.length) {
-                this._parser?.parseLines(result._stdError);
+                this._toolchainParser?.parseLines(result._stdError);
             }
             if (result._stdOutput.length) {
-                this._parser?.parseLines(result._stdOutput);
+                this._toolchainParser?.parseLines(result._stdOutput);
             }
+        });
+
+        session.onWarningMessageReceived(async (result) => {
+            this._qbsParser.parseMessages(result._messages);
         });
     }
 
-    dispose() { this._collection.dispose(); }
+    dispose() {
+        this._toolchainCollection.dispose();
+        this._qbsCollection.dispose();
+    }
 
-    private createParser(type: string) {
-        if (type === 'msvc') {
-            this._parser = new QbsMsvcDiagnosticParser(type);
-        } else if (type === 'clang-cl') {
-            this._parser = new QbsClangDiagnosticParser(type);
-        } else if (type === 'gcc' || type === 'mingw') {
-            this._parser = new QbsGccDiagnosticParser(type);
-        } else if (type === 'sdcc') {
-            this._parser = new QbsSdccDiagnosticParser(type);
-        } else if (type === 'iar') {
-            this._parser = new QbsIarDiagnosticParser(type);
-        } else if (type === 'keil') {
-            this._parser = new QbsKeilDiagnosticParser(type);
+    private createToolchainParser(toolchainType: string) {
+        if (toolchainType === 'msvc') {
+            this._toolchainParser = new QbsMsvcDiagnosticParser(toolchainType);
+        } else if (toolchainType === 'clang-cl') {
+            this._toolchainParser = new QbsClangDiagnosticParser(toolchainType);
+        } else if (toolchainType === 'gcc' || toolchainType === 'mingw') {
+            this._toolchainParser = new QbsGccDiagnosticParser(toolchainType);
+        } else if (toolchainType === 'sdcc') {
+            this._toolchainParser = new QbsSdccDiagnosticParser(toolchainType);
+        } else if (toolchainType === 'iar') {
+            this._toolchainParser = new QbsIarDiagnosticParser(toolchainType);
+        } else if (toolchainType === 'keil') {
+            this._toolchainParser = new QbsKeilDiagnosticParser(toolchainType);
         }  else {
-            this._parser = undefined;
+            this._toolchainParser = undefined;
         }
     }
 }
