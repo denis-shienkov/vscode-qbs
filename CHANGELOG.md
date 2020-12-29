@@ -13,6 +13,9 @@ Implemented the project re-resolving when the qbs/js files change.
 Right now it is possible to override the project properties which
 are located in the `overriden-properties.json` file,  using the
 `Override Project Properties` command.
+- [#33](https://github.com/denis-shienkov/vscode-qbs/issues/33)
+Rignt now the unreferenced QBS files are displayed in the project
+tree under the `Qbs files` node.
 
 ## 0.0.9
 
