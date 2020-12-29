@@ -35,8 +35,8 @@ export class QbsBuildSystemFilesWatcher implements vscode.Disposable {
             clearTimeout(this._timer);
         }
         this._timer = setTimeout(async () => {
-            await vscode.commands.executeCommand(QbsCommandKey.Resolve);
             this._timer = undefined;
+            await vscode.commands.executeCommand(QbsCommandKey.Resolve);
         }, interval);
     }
 }

@@ -44,6 +44,7 @@ export class QbsProject implements vscode.Disposable {
                 // We need to create the watchers only once when the `resolve` command
                 // completes. Otherwise the project data can not contains the build
                 // directory, and other properties.
+                this._buildSystemFilesWatcher?.dispose();
                 this._buildSystemFilesWatcher = new QbsBuildSystemFilesWatcher(data);
             }
             this._data = data;
