@@ -57,6 +57,7 @@ export class QbsSession implements vscode.Disposable {
     private _onProcessResultReceived: vscode.EventEmitter<QbsProcessResponse> = new vscode.EventEmitter<QbsProcessResponse>();
     private _onRunEnvironmentResultReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
     private _onRunEnvironmentReceived: vscode.EventEmitter<QbsRunEnvironmentData> = new vscode.EventEmitter<QbsRunEnvironmentData>();
+    private _onProtocolErrorMessageReceived: vscode.EventEmitter<QbsMessageResponse> = new vscode.EventEmitter<QbsMessageResponse>();
 
     readonly onOperationChanged: vscode.Event<QbsOperation> = this._onOperationChanged.event;
     readonly onStatusChanged: vscode.Event<QbsSessionStatus> = this._onStatusChanged.event;
@@ -76,6 +77,7 @@ export class QbsSession implements vscode.Disposable {
     readonly onProcessResultReceived: vscode.Event<QbsProcessResponse> = this._onProcessResultReceived.event;
     readonly onRunEnvironmentResultReceived: vscode.Event<QbsMessageResponse> = this._onRunEnvironmentResultReceived.event;
     readonly onRunEnvironmentReceived: vscode.Event<QbsRunEnvironmentData> = this._onRunEnvironmentReceived.event;
+    readonly onProtocolErrorMessageReceived: vscode.Event<QbsMessageResponse> = this._onProtocolErrorMessageReceived.event;
 
     constructor(private readonly _ctx: vscode.ExtensionContext) {
         // Handle the events from the protocol object.
@@ -266,6 +268,9 @@ export class QbsSession implements vscode.Disposable {
             this._onRunEnvironmentResultReceived.fire(result);
             const env = new QbsRunEnvironmentData(response[QbsDataKey.FullEnvironment]);
             this._onRunEnvironmentReceived.fire(env);
+        } else if (type === QbsDataKey.ProtocolError) {
+            const result = new QbsMessageResponse(response[QbsDataKey.Error]);
+            this._onProtocolErrorMessageReceived.fire(result);
         }
     }
 

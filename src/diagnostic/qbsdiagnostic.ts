@@ -75,7 +75,11 @@ export class QbsDiagnostic implements vscode.Disposable {
         });
 
         session.onWarningMessageReceived(async (result) => {
-            this._qbsParser.parseMessages(result._messages);
+            this._qbsParser.parseMessages(result._messages, vscode.DiagnosticSeverity.Warning);
+        });
+
+        session.onProtocolErrorMessageReceived(async (result) => {
+            this._qbsParser.parseMessages(result._messages, vscode.DiagnosticSeverity.Error);
         });
     }
 

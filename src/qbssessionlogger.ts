@@ -38,7 +38,8 @@ export class QbsSessionLogger implements vscode.Disposable {
         session.onProjectInstalled(async (result) => await appendCompileOutput(result));
         session.onCommandDescriptionReceived(async (result) => await appendCompileOutput(result));
         session.onRunEnvironmentResultReceived(async (result) => await appendCompileOutput(result));
-        session.onWarningMessageReceived(async (result) => await appendCompileOutput(result))
+        session.onWarningMessageReceived(async (result) => await appendCompileOutput(result));
+        session.onProtocolErrorMessageReceived(async (result) => await appendCompileOutput(result));
 
         session.onTaskStarted(async (result) => {
             if (result._description) {

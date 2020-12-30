@@ -15,20 +15,20 @@ export class QbsQbsDiagnosticParser extends QbsDiagnosticParser {
         // We don't use this method for current parser.
     }
 
-    parseMessages(messages: QbsMessageItemResponse[]) {
+    parseMessages(messages: QbsMessageItemResponse[], severity: vscode.DiagnosticSeverity) {
         for (const message of messages) {
-            this.parseMessage(message);
+            this.parseMessage(message, severity);
         }
     }
 
-    private parseMessage(message: QbsMessageItemResponse) {
+    private parseMessage(message: QbsMessageItemResponse, severity: vscode.DiagnosticSeverity) {
         const lineno = QbsDiagnosticUtils.substractOne(message._line);
         const column = QbsDiagnosticUtils.substractOne(message._column);
         const range = new vscode.Range(lineno, column, lineno, 999);
 
         const diagnostic: vscode.Diagnostic = {
             source: this.type(),
-            severity: vscode.DiagnosticSeverity.Warning,
+            severity: severity,
             message: message._description,
             range
         };
