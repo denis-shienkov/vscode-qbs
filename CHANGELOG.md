@@ -1,5 +1,11 @@
 # What's New?
 
+## 1.0.1
+
+- Next production release.
+- [#37](https://github.com/denis-shienkov/vscode-qbs/issues/37)
+Fixed stealing of the focus from the editor at building.
+
 ## 1.0.0
 
 - First production release.

@@ -18,7 +18,7 @@ export class QbsSessionLogger implements vscode.Disposable {
         this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
 
         const appendCompileText = async (text: string) => {
-            this._compileOutput.show();
+            this._compileOutput.show(true);
             this._compileOutput.appendLine(text);
         };
 
