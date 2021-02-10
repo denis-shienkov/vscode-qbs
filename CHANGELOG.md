@@ -5,6 +5,9 @@
 - Next production release.
 - [#37](https://github.com/denis-shienkov/vscode-qbs/issues/37)
 Fixed stealing of the focus from the editor at building.
+- [#40](https://github.com/denis-shienkov/vscode-qbs/issues/40)
+Fixed creation of a `overridden-properties.json` file when its
+directory does not exist yet.
 
 ## 1.0.0
 

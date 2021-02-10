@@ -44,8 +44,17 @@ export function isChildOf(filePath: string, parentDirectory: string) {
     return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
+export function ensureDirectoryExistence(filePath: string) {
+    var directory = path.dirname(filePath);
+    if (fs.existsSync(directory))
+        return;
+    ensureDirectoryExistence(directory);
+    fs.mkdirSync(directory);
+}
+
 export function ensureFileCreated(filePath: string) {
     if (!fs.existsSync(filePath)) {
+        ensureDirectoryExistence(filePath);
         fs.createWriteStream(filePath).close();
     }
 }
