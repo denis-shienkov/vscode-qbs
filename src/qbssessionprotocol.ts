@@ -58,7 +58,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
 
     async sendRequest(request: QbsRequest) {
         const json = JSON.stringify(request.data());
-        const data = Buffer.from(json, 'binary').toString('base64');
+        const data = Buffer.from(json, 'utf8').toString('base64');
         const output = PACKET_PREAMBLE + data.length + '\n' + data;
         this._process?.stdin?.write(output);
     }
@@ -94,7 +94,7 @@ export class QbsSessionProtocol implements vscode.Disposable {
                 const data = this._input.substring(0, this._expectedLength);
                 this._input = this._input.slice(this._expectedLength);
                 this._expectedLength = -1;
-                const json = Buffer.from(data, 'base64').toString('binary');
+                const json = Buffer.from(data, 'base64').toString('utf8');
                 const response = JSON.parse(json);
                 this._onResponseReceived.fire(response);
             }
