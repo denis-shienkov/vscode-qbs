@@ -25,7 +25,7 @@ export async function onRunProduct(session: QbsSession) {
 
     const escaped = QbsUtils.escapeShell(dbg.program());
     const program = dbg.program();
-    const env = dbg.environment().data();
+    const env = dbg.environmentData().data();
     const terminal = vscode.window.createTerminal({
         name: 'QBS Run',
         env,

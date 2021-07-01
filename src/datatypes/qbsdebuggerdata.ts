@@ -4,6 +4,8 @@ import {QbsDebuggerKey} from './qbskeys';
 import {QbsRunEnvironmentData} from './qbsrunenvironmentdata';
 
 export class QbsDebuggerData {
+    private _envData: QbsRunEnvironmentData = new QbsRunEnvironmentData({});
+
     constructor(private readonly _data: any) {}
 
     setName(name: string) {
@@ -42,12 +44,23 @@ export class QbsDebuggerData {
         return this._data[QbsDebuggerKey.Cwd] || '';
     }
 
-    setEnvironment(env: QbsRunEnvironmentData) {
-        this._data[QbsDebuggerKey.Env] = env.data();
-    };
+    environment(): object {
+        return this._data[QbsDebuggerKey.Environment] || {};
+    }
 
-    environment(): QbsRunEnvironmentData {
-        return new QbsRunEnvironmentData(this._data[QbsDebuggerKey.Env] || {});
+    setEnvironmentData(env: QbsRunEnvironmentData) {
+        this._envData = env;
+        const environment = Object.entries(env.data()).map(function([k, v]) {
+            return {
+                name: k,
+                value: v
+            };
+        });
+        this._data[QbsDebuggerKey.Environment] = environment;
+    }
+
+    environmentData(): QbsRunEnvironmentData {
+        return this._envData;
     }
 
     setExternalConsole(console: boolean) {

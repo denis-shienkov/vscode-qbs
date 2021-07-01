@@ -104,7 +104,7 @@ export enum QbsQbsKey {
 export enum QbsDebuggerKey {
     Configutations = 'configurations',
     Cwd = 'cwd',
-    Env = 'env',
+    Environment = 'environment',
     ExternalConsole = 'console',
     IsAutomatic = 'is-automatic',
     MiDebuggerPath = 'miDebuggerPath',
