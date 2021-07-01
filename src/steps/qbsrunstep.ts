@@ -207,7 +207,7 @@ export class QbsRunStep implements vscode.Disposable {
         if (envRequired) {
             new Promise<void>(resolve => {
                 const envReceicedSubscription = this.project().session().onRunEnvironmentReceived(async (env) => {
-                    this._dbg?.setEnvironment(env);
+                    this._dbg?.setEnvironmentData(env);
                     await envReceicedSubscription.dispose();
                     resolve();
                 });
@@ -230,9 +230,9 @@ export class QbsRunStep implements vscode.Disposable {
                 this._dbg.setType('cppdbg');
                 const compilerDirectory = path.dirname(properties?.compilerPath() || '');
 
-                const detectDebuggerPath = (debuggerName: string) => {
+                const detectDebuggerPath = (toolchainPath: string, debuggerName: string) => {
                     const ext = (process.platform === 'win32') ? '.exe' : '';
-                    let debuggerPath = path.join(compilerDirectory, debuggerName + ext);
+                    let debuggerPath = path.join(toolchainPath, debuggerName + ext);
                     if (!fs.existsSync(debuggerPath)) {
                         try {
                             debuggerPath = which.sync(debuggerName + ext);
@@ -243,22 +243,33 @@ export class QbsRunStep implements vscode.Disposable {
                     return debuggerPath;
                 };
 
+                const cpptoolsExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
+                const cpptoolsDebuggerPath = cpptoolsExtension ? path.join(cpptoolsExtension.extensionPath, "debugAdapters", "lldb-mi", "bin") : undefined;
                 // Check for LLDB-MI debugger executable.
-                let miDebuggerPath = detectDebuggerPath('lldb-mi');
+                let miDebuggerPath = detectDebuggerPath(compilerDirectory, 'lldb-mi');
                 if (miDebuggerPath) {
                     this._dbg.setMiMode('lldb');
                     this._dbg.setMiDebuggerPath(miDebuggerPath);
                     return;
                 }
+                if (cpptoolsDebuggerPath) {
+                    // Check for LLDB-MI installed by CppTools
+                    miDebuggerPath = detectDebuggerPath(cpptoolsDebuggerPath, 'lldb-mi');
+                    if (miDebuggerPath) {
+                        this._dbg.setMiMode('lldb');
+                        this._dbg.setMiDebuggerPath(miDebuggerPath);
+                        return;
+                    }
+                }
                 // Check for GDB debugger executable.
-                miDebuggerPath = detectDebuggerPath('gdb');
+                miDebuggerPath = detectDebuggerPath(compilerDirectory, 'gdb');
                 if (miDebuggerPath) {
                     this._dbg.setMiMode('gdb');
                     this._dbg.setMiDebuggerPath(miDebuggerPath);
                     return;
                 }
                 // Check for LLDB debugger executable.
-                miDebuggerPath = detectDebuggerPath('lldb');
+                miDebuggerPath = detectDebuggerPath(compilerDirectory, 'lldb');
                 if (miDebuggerPath) {
                     this._dbg.setMiMode('lldb');
                     this._dbg.setMiDebuggerPath(miDebuggerPath);
