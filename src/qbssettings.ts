@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as which from 'which';
 import * as cp from 'child_process';
 import * as chokidar from 'chokidar';
+import * as jsonc from 'jsonc-parser';
 
 import * as QbsUtils from './qbsutils';
 
@@ -341,10 +342,11 @@ export class QbsSettings implements vscode.Disposable {
                 const debuggers: QbsDebuggerData[] = [ QbsDebuggerData.createAutomatic() ];
                 try {
                     const text = data.toString();
-                    const json = JSON.parse(text);
+                    const json = jsonc.parse(text);
                     const configurations: any[] = json[QbsDebuggerKey.Configutations] || [];
                     configurations.forEach(configuration => debuggers.push(new QbsDebuggerData(configuration)));
                 } catch (e) {
+                    console.warn(e);
                 }
                 resolve(debuggers);
             });
