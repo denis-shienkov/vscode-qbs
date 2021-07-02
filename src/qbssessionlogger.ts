@@ -7,6 +7,8 @@ import {QbsOperationStatus} from './datatypes/qbsoperation';
 import {QbsOperationType} from './datatypes/qbsoperation';
 import {QbsMessageResponse} from './datatypes/qbsmessageresponse';
 
+import * as QbsUtils from './qbsutils';
+
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export class QbsSessionLogger implements vscode.Disposable {
@@ -72,6 +74,7 @@ export class QbsSessionLogger implements vscode.Disposable {
         });
 
         session.onOperationChanged(async (operation) => {
+            const elapsed = QbsUtils.msToTime(operation._elapsed);
             if (operation._type === QbsOperationType.Resolve) {
                 if (operation._status === QbsOperationStatus.Started) {
                     const text = localize('qbs.session.logger.resolve.message', 'Resolving project...');
@@ -79,14 +82,12 @@ export class QbsSessionLogger implements vscode.Disposable {
                 } else if (operation._status === QbsOperationStatus.Completed) {
                     const text = localize('qbs.session.logger.resolve.completed.message', 'Project successfully resolved')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
                     const text = localize('qbs.session.logger.resolve.failed.message', 'Error resolving project')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Build) {
@@ -96,14 +97,12 @@ export class QbsSessionLogger implements vscode.Disposable {
                 } else if (operation._status === QbsOperationStatus.Completed) {
                     const text = localize('qbs.session.logger.build.completed.message', 'Project successfully built')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
                     const text = localize('qbs.session.logger.build.failed.message', 'Error building project')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Clean) {
@@ -113,14 +112,12 @@ export class QbsSessionLogger implements vscode.Disposable {
                 } else if (operation._status === QbsOperationStatus.Completed) {
                     const text = localize('qbs.session.logger.clean.completed.message', 'Project successfully cleaned')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
                     const text = localize('qbs.session.logger.clean.failed.message', 'Error cleaning project')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 }
             } else if (operation._type === QbsOperationType.Install) {
@@ -130,14 +127,12 @@ export class QbsSessionLogger implements vscode.Disposable {
                 } else if (operation._status === QbsOperationStatus.Completed) {
                     const text = localize('qbs.session.logger.install.completed.message', 'Project successfully installed')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 } else if (operation._status === QbsOperationStatus.Failed) {
                     const text = localize('qbs.session.logger.install.failed.message', 'Error installing project')
                         + localize('qbs.session.logger.elapsed.message', ', elapsed time: ')
-                        + `${operation._elapsed}`
-                        + localize('qbs.session.logger.msecs.message', ' msecs.');
+                        + `${elapsed}`;
                     await appendCompileText(text);
                 }
             }
