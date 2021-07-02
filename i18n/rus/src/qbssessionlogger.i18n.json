@@ -1,6 +1,5 @@
 {
     "qbs.session.logger.elapsed.message": ", затраченное время: ",
-    "qbs.session.logger.msecs.message": " мсек.",
     "qbs.session.logger.resolve.message": "Сканирование проекта...",
     "qbs.session.logger.resolve.completed.message": "Сканирование проекта успешно завершено",
     "qbs.session.logger.resolve.failed.message": "Сканирование проекта завершено с ошибками",

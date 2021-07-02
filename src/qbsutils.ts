@@ -58,3 +58,19 @@ export function ensureFileCreated(filePath: string) {
         fs.createWriteStream(filePath).close();
     }
 }
+
+export function msToTime(msecs: number): string {
+    function addZ(n: number): string {
+        return (n < 10? '0' : '') + n;
+    }
+
+    let s = Math.round(msecs);
+    var ms = s % 1000;
+    s = (s - ms) / 1000;
+    var secs = s % 60;
+    s = (s - secs) / 60;
+    var mins = s % 60;
+    var hrs = (s - mins) / 60;
+  
+    return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
+  }
