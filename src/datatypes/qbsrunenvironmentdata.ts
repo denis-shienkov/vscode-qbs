@@ -1,7 +1,7 @@
 export class QbsRunEnvironmentData {
-    constructor(private readonly _data: any) {}
+    constructor(private readonly _data: {[key: string]: string}) {}
 
-    data(): any {
+    data(): {[key: string]: string} {
         return this._data;
     }
 }
