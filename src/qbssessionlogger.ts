@@ -13,19 +13,13 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
-    private _messageOutput: vscode.OutputChannel;
 
     constructor(session: QbsSession) {
         this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
-        this._messageOutput = vscode.window.createOutputChannel('QBS Message Output');
 
         const appendCompileText = async (text: string) => {
             this._compileOutput.show(true);
             this._compileOutput.appendLine(text);
-        };
-
-        const appendMessageText = async (text: string) => {
-            this._messageOutput.appendLine(text);
         };
 
         const appendCompileOutput = async (result: QbsMessageResponse) => {
@@ -68,8 +62,8 @@ export class QbsSessionLogger implements vscode.Disposable {
 
         session.onLogMessageReceived(async (result) => {
             if (!result.isEmpty()) {
-                const text = `[qbs] ${result.toString()}`;
-                await appendMessageText(text);
+                const text = result.toString();
+                await appendCompileText(text);
             }
         });
 

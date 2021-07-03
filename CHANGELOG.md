@@ -16,6 +16,9 @@ Right now the `Show command lines` setting renamed with `Command
 echo mode` and makes as enumeration to support all modes such as
 `command-line`, `command-line-with-environment`, `silent`, and
 `summary`.
+- [#46](https://github.com/denis-shienkov/vscode-qbs/issues/46)
+Right now the QBS messaging console has been removed and all QBS
+messages are now forwarded to the QBS build console.
 
 ## 1.0.0
 

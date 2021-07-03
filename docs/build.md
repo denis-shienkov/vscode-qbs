@@ -115,18 +115,14 @@ popup message:
 The progress of operations such as `resolving`, `building`, and
 `cleaning' is also displayed as text messages reported from QBS.
 
-The QBS extension provides two output channels for displaying
-these messages:
+The QBS extension provides one output channel for displaying
+the messages:
 
-* **QBS Compile Output** - displays the progress of the main build,
-cleanup and resolve processes:
+* **QBS Compile Output** - displays the messages of the main build,
+cleanup and resolve processes, and also the internal service messages
+(e.g. comes from the JS engine of QBS):
 
 ![QBS compile output pane](images/qbs-compile-output-pane.png)
-
-* **QBS Message Output** - displays the internal service QBS
-messages (e.g. comes from the JS engine of QBS):
-
-![QBS message output pane](images/qbs-message-output-pane.png)
 
 ## Next steps
 
