@@ -8,6 +8,9 @@ Fixed stealing of the focus from the editor at building.
 - [#40](https://github.com/denis-shienkov/vscode-qbs/issues/40)
 Fixed creation of a `overridden-properties.json` file when its
 directory does not exist yet.
+- Fixed parsing `launch.json` containing comments.
+- Fixed working with debugger on Mac OSX.
+- Improved elapsed time formatting in build logs.
 
 ## 1.0.0
 
