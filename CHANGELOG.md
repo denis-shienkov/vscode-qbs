@@ -11,6 +11,11 @@ directory does not exist yet.
 - Fixed parsing `launch.json` containing comments.
 - Fixed working with debugger on Mac OSX.
 - Improved elapsed time formatting in build logs.
+- [#47](https://github.com/denis-shienkov/vscode-qbs/issues/47)
+Right now the `Show command lines` setting renamed with `Command
+echo mode` and makes as enumeration to support all modes such as
+`command-line`, `command-line-with-environment`, `silent`, and
+`summary`.
 
 ## 1.0.0
 

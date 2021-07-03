@@ -26,7 +26,7 @@
     "qbs-tools.configuration.qbs.qbsPath.description": "Имя используемого исполняемого файла Qbs и путь к нему.",
     "qbs-tools.configuration.qbs.settingsDirectory.description": "Каталог настроек. Пустое значение означает каталог по умолчанию.",
     "qbs-tools.configuration.qbs.buildDirectory.description": "Каталог, в который помещаются файлы сборки Qbs.",
-    "qbs-tools.configuration.qbs.showCommandLines.description": "Показывать полные командные строки при сборке.",
+    "qbs-tools.configuration.qbs.commandEchoMode.description": "Командный эхо-режим.",
     "qbs-tools.configuration.qbs.maxBuildJobs.description": "Число параллельных заданий сборки. Для автоматического обнаружения числа ЦП используйте нулевое значение.",
     "qbs-tools.configuration.qbs.keepGoing.description": "Продолжать при возникновении ошибок (если это вообще возможно).",
     "qbs-tools.configuration.qbs.forceProbes.description": "Принудительно запускать зонды.",

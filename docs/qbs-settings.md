@@ -15,7 +15,7 @@ below, for more information about variable expansion.
 | `qbs.qbsPath`| Specify location of the QBS executable. | `qbs` (Causes QBS to search the `PATH` environment variable.) | Yes. |
 | `qbs.settingsDirectory`| Specify location of the QBS [settings directory](https://doc.qt.io/qbs/cli-config.html#op-op-op-op-settings-op-op-dir-op-lt-op-directory-op-gt-op). | `` (An empty value forces the use of the default path.) | Yes. |
 | `qbs.buildDirectory`| Specify location of the QBS [build directory](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-build-op-op-directory-op-op-op-op-d-op-lt-op-directory-op-gt-op). | `${sourceDirectory}/build/${profileName}_${configurationName}` | Yes. |
-| `qbs.showCommandLines`| If `true`, will show full build [command lines](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-command-op-op-echo-op-op-mode-op-lt-op-mode-op-gt-op). | `false` | No. |
+| `qbs.commandEchoMode`| Specifies how Qbs should display the command lines at building using the [command echo mode](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-command-op-op-echo-op-op-mode-op-lt-op-mode-op-gt-op). | `summary` | No. |
 | `qbs.maxBuildJobs`| Specify the number of CPU cores to build. | `0` (Causes QBS to use all CPU cores.) | No. |
 | `qbs.keepGoing`| Keeps [going](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-keep-op-op-going-op-op-op-op-k) when errors occur, if at all possible. | `false` | No. |
 | `qbs.forceProbes`| Forces [re-execution](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-force-op-op-probe-op-op-execution) of all Probe items' configure scripts, rather than using the cached data. | `false` | No. |

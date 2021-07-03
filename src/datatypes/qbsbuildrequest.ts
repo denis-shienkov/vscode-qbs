@@ -33,7 +33,7 @@ export class QbsBuildRequest extends QbsRequest {
     }
 
     private commandEchoModeFromSettings(settings?: QbsSettings): QbsCommandEchoMode {
-        return (settings && settings.showCommandLines()) ? QbsCommandEchoMode.CommandLine : QbsCommandEchoMode.Summary;
+        return settings ? settings.commandEchoMode() : QbsCommandEchoMode.Summary;
     }
 
     private keepGoingFromSettings(settings?: QbsSettings): boolean {

@@ -19,6 +19,7 @@ import {QbsConfigData} from './datatypes/qbsconfigdata';
 import {QbsDebuggerData} from './datatypes/qbsdebuggerdata';
 import {QbsDebuggerKey} from './datatypes/qbskeys';
 import {QbsErrorHandlingMode} from './datatypes/qbserrorhandlingmode';
+import {QbsCommandEchoMode} from './datatypes/qbscommandechomode';
 import {QbsLogLevel} from './datatypes/qbsloglevel';
 import {QbsProfileData} from './datatypes/qbsprofiledata';
 
@@ -42,7 +43,7 @@ const DEFAULT_LOG_LEVEL = QbsLogLevel.Info;
 const DEFAULT_MAX_BUILD_JOBS = 0;
 const DEFAULT_QBS_EXE_PATH = 'qbs';
 const DEFAULT_SETTINGS_DIR_PATH = '';
-const DEFAULT_SHOW_COMMAND_LINES = false;
+const DEFAULT_COMMAND_ECHO_MODE = QbsCommandEchoMode.Summary;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = false;
 const DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/overridden-properties.json`;
 
@@ -148,11 +149,11 @@ export class QbsSettings implements vscode.Disposable {
     }
 
     /**
-     * Returns the value of the QBS 'show-command-line' property
+     * Returns the value of the QBS 'command-echo-mode' property
      * obtained from the plugin configuration.
      */
-    showCommandLines(): boolean {
-        return this._settings.get<boolean>('showCommandLines', DEFAULT_SHOW_COMMAND_LINES);
+    commandEchoMode(): QbsCommandEchoMode {
+        return this._settings.get<QbsCommandEchoMode>('commandEchoMode', DEFAULT_COMMAND_ECHO_MODE);
     }
 
     /**
