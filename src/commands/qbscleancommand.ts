@@ -15,6 +15,11 @@ import {QbsOperationType} from '../datatypes/qbsoperation';
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onClean(session: QbsSession, request: QbsCleanRequest, timeout: number) {
+    const needsClearOutput = session.settings().clearOutputBeforeOperation();
+    if (needsClearOutput) {
+        session.logger()?.clearOutput();
+    }
+
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.clean.progress.title', 'Project cleaning'),

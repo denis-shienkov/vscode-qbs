@@ -36,5 +36,6 @@
     "qbs-tools.configuration.qbs.launchFilePath.description": "Полный путь к файлу launch.json, содержащему конфигурации отладчиков.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
     "qbs-tools.configuration.qbs.overriddenPropertiesFilePath.description": "Полный путь к файлу overridden-properties.json, содержащему переопределенные свойства проекта.",
+    "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }

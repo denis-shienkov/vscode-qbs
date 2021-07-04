@@ -36,5 +36,6 @@
     "qbs-tools.configuration.qbs.launchFilePath.description": "The full path to the 'launch.json' file, containing the debugging rules.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Show disabled project items.",
     "qbs-tools.configuration.qbs.overriddenPropertiesFilePath.description": "The full path to the 'overridden-properties.json' file, containing the overridden project properties.",
+    "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Clear the output before starting the operation.",
     "qbs-tools.configuration.views.qbs.project.description": "Project"
 }

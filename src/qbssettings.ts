@@ -45,6 +45,7 @@ const DEFAULT_QBS_EXE_PATH = 'qbs';
 const DEFAULT_SETTINGS_DIR_PATH = '';
 const DEFAULT_COMMAND_ECHO_MODE = QbsCommandEchoMode.Summary;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = false;
+const DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION = false;
 const DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/overridden-properties.json`;
 
 export enum QbsSettingsEvent {
@@ -185,16 +186,20 @@ export class QbsSettings implements vscode.Disposable {
      * obtained from the plugin configuration.
      */
     logLevel(): QbsLogLevel {
-        return this._settings.get<QbsLogLevel>('logLevel', DEFAULT_LOG_LEVEL)
+        return this._settings.get<QbsLogLevel>('logLevel', DEFAULT_LOG_LEVEL);
     }
 
     showDisabledProjectItems(): boolean {
-        return this._settings.get<boolean>('showDisabledProjectItems', DEFAULT_SHOW_DISABLED_PROJECT_ITEMS)
+        return this._settings.get<boolean>('showDisabledProjectItems', DEFAULT_SHOW_DISABLED_PROJECT_ITEMS);
     }
 
     overriddenPropertiesPath(): string {
         const v = this._settings.get<string>('overriddenPropertiesFilePath', DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH);
         return this.completePath(v);
+    }
+
+    clearOutputBeforeOperation(): boolean {
+        return this._settings.get<boolean>('clearOutputBeforeOperation', DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION);
     }
 
     /**

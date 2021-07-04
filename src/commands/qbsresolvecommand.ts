@@ -15,6 +15,11 @@ import {QbsResolveRequest} from '../datatypes/qbsresolverequest';
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onResolve(session: QbsSession, request: QbsResolveRequest, timeout: number) {
+    const needsClearOutput = session.settings().clearOutputBeforeOperation();
+    if (needsClearOutput) {
+        session.logger()?.clearOutput();
+    }
+
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.resolve.progress.title', 'Project resolving'),

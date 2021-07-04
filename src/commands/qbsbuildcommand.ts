@@ -15,6 +15,11 @@ import {QbsOperation} from '../datatypes/qbsoperation';
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onBuild(session: QbsSession, request: QbsBuildRequest, timeout: number) {
+    const needsClearOutput = session.settings().clearOutputBeforeOperation();
+    if (needsClearOutput) {
+        session.logger()?.clearOutput();
+    }
+
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),

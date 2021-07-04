@@ -15,6 +15,8 @@ export class QbsSessionLogger implements vscode.Disposable {
     private _compileOutput: vscode.OutputChannel;
 
     constructor(session: QbsSession) {
+        session.setLogger(this);
+
         this._compileOutput = vscode.window.createOutputChannel('QBS Compile Output');
 
         const appendCompileText = async (text: string) => {
@@ -134,4 +136,8 @@ export class QbsSessionLogger implements vscode.Disposable {
     }
 
     dispose() {}
+
+    clearOutput() {
+        this._compileOutput.clear();
+    }
 }

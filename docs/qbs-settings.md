@@ -25,6 +25,7 @@ below, for more information about variable expansion.
 | `qbs.launchFilePath`| Specify location to the debugger configuration in the `launch.json` file. | `${sourceDirectory}/.vscode/launch.json` | Yes. |
 | `qbs.showDisabledProjectItems`| Shows the disabled project items (sub-projects, products, groups). | `false` | No. |
 | `qbs.overriddenPropertiesFilePath`| Specify location to the overridden project properties the `overridden-properties.json` file. | `${sourceDirectory}/.vscode/overridden-properties.json` | Yes. |
+| `qbs.clearOutputBeforeOperation`| Clears the output console before starting the operation (applicable for Resolve, Clean, Build, and ReBuild operations). | `false` | No. |
 
 ## Variable substitution
 

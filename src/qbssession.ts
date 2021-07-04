@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
 import {QbsProject} from './qbsproject';
+import {QbsSessionLogger} from './qbssessionlogger';
 import {QbsSessionProtocolStatus} from './qbssessionprotocol';
 import {QbsSessionProtocol} from './qbssessionprotocol';
 import {QbsSettingsEvent} from './qbssettings';
@@ -38,6 +39,8 @@ export class QbsSession implements vscode.Disposable {
     private _protocol: QbsSessionProtocol = new QbsSessionProtocol();
     private _status: QbsSessionStatus = QbsSessionStatus.Stopped;
     private _project?: QbsProject;
+
+    private _logger?: QbsSessionLogger;
 
     private _onOperationChanged: vscode.EventEmitter<QbsOperation> = new vscode.EventEmitter<QbsOperation>();
     private _onStatusChanged: vscode.EventEmitter<QbsSessionStatus> = new vscode.EventEmitter<QbsSessionStatus>();
@@ -118,6 +121,9 @@ export class QbsSession implements vscode.Disposable {
         this._project?.dispose();
         this._settings?.dispose();
     }
+
+    setLogger(logger: QbsSessionLogger) { this._logger = logger; }
+    logger(): QbsSessionLogger | undefined { return this._logger; }
 
     extensionContext() { return this._ctx; }
     project(): QbsProject | undefined { return this._project; }
