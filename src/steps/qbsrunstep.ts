@@ -150,16 +150,16 @@ export class QbsRunStep implements vscode.Disposable {
     }
 
     async setup(product?: QbsProductData, dbg?: QbsDebuggerData) {
-        let changed = false;
-        let autoResolveRequred = false;
-        if (this.setupProduct(product)) {
-            changed = true;
-        }
-        if (this.setupDebugger(dbg)) {
-            changed = true;
-        }
-        if (changed) {
-            this._onChanged.fire(autoResolveRequred);
+        if (product)
+            this._product = product;
+
+        if (dbg)
+            this._dbg = dbg;
+
+        this.updateDebuggerConfiguration(true);
+
+        if (!!product || !!dbg) {
+            this._onChanged.fire(false);
             await this.save();
         }
     }
@@ -177,24 +177,6 @@ export class QbsRunStep implements vscode.Disposable {
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}DebuggerName`);
         const index = dbgs.findIndex((dbg) => dbg.name() == name);
         return dbgs[(index !== -1) ? index : 0];
-    }
-
-    private setupProduct(product?: QbsProductData): boolean {
-        if (product) {
-            this._product = product;
-            this.updateDebuggerConfiguration(true);
-            return true;
-        }
-        return false;
-    }
-
-    private setupDebugger(dbg?: QbsDebuggerData): boolean {
-        if (dbg) {
-            this._dbg = dbg;
-            this.updateDebuggerConfiguration(false);
-            return true;
-        }
-        return false;
     }
 
     private updateDebuggerConfiguration(envRequired: boolean) {
