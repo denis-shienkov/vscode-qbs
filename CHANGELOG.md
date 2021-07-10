@@ -1,5 +1,14 @@
 # What's New?
 
+## 1.0.2
+
+- Next bug-fix release.
+- Added the missing russian translation for the `re-build` command.
+- Changed default value for `qbs.showDisabledProjectItems` setting
+to `true`.
+- Fixed the critical error of the previous release related to the
+fully non-functional extension installed from the `*.vsix` package.
+
 ## 1.0.1
 
 - Next bug-fix release.
