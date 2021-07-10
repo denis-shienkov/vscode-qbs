@@ -444,7 +444,7 @@
                 },
                 "qbs.showDisabledProjectItems": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
                     "scope": "resource"
                 },
