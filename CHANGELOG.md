@@ -2,7 +2,7 @@
 
 ## 1.0.1
 
-- Next production release.
+- Next bug-fix release.
 - [#37](https://github.com/denis-shienkov/vscode-qbs/issues/37)
 Fixed stealing of the focus from the editor at building.
 - [#40](https://github.com/denis-shienkov/vscode-qbs/issues/40)
@@ -19,6 +19,11 @@ echo mode` and makes as enumeration to support all modes such as
 - [#46](https://github.com/denis-shienkov/vscode-qbs/issues/46)
 Right now the QBS messaging console has been removed and all QBS
 messages are now forwarded to the QBS build console.
+- [#48](https://github.com/denis-shienkov/vscode-qbs/issues/48)
+Added the new setting `qbs.clearOutputBeforeOperation` for cleaning
+the output console before resolving, cleaning, or building.
+- Fixed retrieving the environment when switching debuggers.
+- Disabled project items are now visible by default.
 
 ## 1.0.0
 
