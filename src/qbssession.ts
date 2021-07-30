@@ -112,6 +112,8 @@ export class QbsSession implements vscode.Disposable {
                 await vscode.commands.executeCommand(QbsCommandKey.AutoRestartSession);
             } else if (event === QbsSettingsEvent.DebuggerUpdateRequired) {
                 await this._project?.runStep().restore();
+            } else if (event === QbsSettingsEvent.ConfigurationUpdateRequired) {
+                await this._project?.buildStep().restore();
             }
         });
     }

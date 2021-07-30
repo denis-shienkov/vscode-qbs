@@ -21,7 +21,7 @@
     "qbs-tools.command.qbs.getrunenv.title": "Получить переменные окружения для запуска",
     "qbs-tools.command.qbs.run.title": "Запустить",
     "qbs-tools.command.qbs.debug.title": "Отладить",
-    "qbs-tools.command.qbs.overrideproperties.title": "Переопределить свойства проекта",
+    "qbs-tools.command.qbs.edit.configuration.title": "Редактировать конфигурацию сборки",
 
     "qbs-tools.configuration.qbs.qbsPath.description": "Имя используемого исполняемого файла Qbs и путь к нему.",
     "qbs-tools.configuration.qbs.settingsDirectory.description": "Каталог настроек. Пустое значение означает каталог по умолчанию.",
@@ -35,7 +35,7 @@
     "qbs-tools.configuration.qbs.logLevel.description": "Указывает, хочет ли клиент получать данные журнала и/или предупреждающие сообщения.",
     "qbs-tools.configuration.qbs.launchFilePath.description": "Полный путь к файлу launch.json, содержащему конфигурации отладчиков.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
-    "qbs-tools.configuration.qbs.overriddenPropertiesFilePath.description": "Полный путь к файлу overridden-properties.json, содержащему переопределенные свойства проекта.",
+    "qbs-tools.configuration.qbs.configurationsFilePath.description": "Полный путь к файлу configurations.json, содержащему конфигурации сборки.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }

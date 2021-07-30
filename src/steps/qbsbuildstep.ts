@@ -8,7 +8,7 @@ import {QbsProfileData} from '../datatypes/qbsprofiledata';
 
 export class QbsBuildStep implements vscode.Disposable {
     private _profile: QbsProfileData = new QbsProfileData();
-    private _config: QbsConfigData = new QbsConfigData('debug');
+    private _config: QbsConfigData = new QbsConfigData('none');
     private _product: QbsProductData = new QbsProductData('');
     private _onChanged: vscode.EventEmitter<boolean> = new vscode.EventEmitter<boolean>();
 
@@ -21,6 +21,7 @@ export class QbsBuildStep implements vscode.Disposable {
     project(): QbsProject { return this._project; }
     profileName(): string { return this._profile.name(); }
     configurationName(): string { return this._config.name(); }
+    configurationOverriddenProperties(): any { return this._config.overriddenProperties(); }
     productName(): string { return this._product.fullDisplayName(); }
 
     async restore() {
@@ -97,11 +98,16 @@ export class QbsBuildStep implements vscode.Disposable {
     }
 
     private setupConfiguration(configuration?: QbsConfigData) {
-        if (configuration && configuration.name() != this._config.name()) {
-            this._config = configuration;
-            return true;
+        if (!configuration)
+            return false;
+        if (this._config.name() == configuration.name()) {
+            const oldprops = JSON.stringify(this._config.overriddenProperties());
+            const newprops = JSON.stringify(configuration.overriddenProperties());
+            if (oldprops == newprops)
+                return false;
         }
-        return false;
+        this._config = configuration;
+        return true;
     }
 
     private setupProduct(product?: QbsProductData) {

@@ -2,7 +2,7 @@
     "name": "qbs-tools",
     "displayName": "QBS",
     "description": "QBS support in Visual Studio Code",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "publisher": "qbs-community",
     "author": {
         "name": "Denis Shienkov"
@@ -190,8 +190,8 @@
                 "category": "QBS"
             },
             {
-                "command": "qbs.overrideProperties",
-                "title": "%qbs-tools.command.qbs.overrideproperties.title%",
+                "command": "qbs.editConfiguration",
+                "title": "%qbs-tools.command.qbs.edit.configuration.title%",
                 "category": "QBS"
             }
         ],
@@ -302,7 +302,7 @@
                     "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.overrideProperties",
+                    "command": "qbs.editConfiguration",
                     "when": "qbs:extension-activated"
                 }
             ],
@@ -448,10 +448,10 @@
                     "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
                     "scope": "resource"
                 },
-                "qbs.overriddenPropertiesFilePath": {
+                "qbs.configurationsFilePath": {
                     "type": "string",
-                    "default": "${sourceDirectory}/.vscode/overridden-properties.json",
-                    "description": "%qbs-tools.configuration.qbs.overriddenPropertiesFilePath.description%",
+                    "default": "${sourceDirectory}/.vscode/configurations.json",
+                    "description": "%qbs-tools.configuration.qbs.configurationsFilePath.description%",
                     "scope": "resource"
                 },
                 "qbs.clearOutputBeforeOperation": {

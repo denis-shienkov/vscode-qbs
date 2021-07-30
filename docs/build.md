@@ -70,7 +70,8 @@ run the **QBS: Select Build Configuration** command, or press the
 
 ![QBS select build configuration button](images/qbs-select-configuration-button.png)
 
-Currently only `release` and `debug` configurations are supported.
+Currently the pre-defined `release`, `debug`, `profiling`, and the any
+custom configurations are supported.
 
 * To select the build product, from the VS Code command pallette
 run the **QBS: Select Build Product** command, or press the

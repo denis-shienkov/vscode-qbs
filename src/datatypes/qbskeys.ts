@@ -13,6 +13,7 @@ export enum QbsDataKey {
     Cpp = "cpp",
     DataMode = 'data-mode',
     Description = 'description',
+    DisplayName = 'display-name',
     DryRun = 'dry-run',
     Environment = 'environment',
     Error = 'error',

@@ -18,6 +18,7 @@ import {QbsSession} from './qbssession';
 import {QbsConfigData} from './datatypes/qbsconfigdata';
 import {QbsDebuggerData} from './datatypes/qbsdebuggerdata';
 import {QbsDebuggerKey} from './datatypes/qbskeys';
+import {QbsDataKey} from './datatypes/qbskeys';
 import {QbsErrorHandlingMode} from './datatypes/qbserrorhandlingmode';
 import {QbsCommandEchoMode} from './datatypes/qbscommandechomode';
 import {QbsLogLevel} from './datatypes/qbsloglevel';
@@ -46,7 +47,7 @@ const DEFAULT_SETTINGS_DIR_PATH = '';
 const DEFAULT_COMMAND_ECHO_MODE = QbsCommandEchoMode.Summary;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = true;
 const DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION = false;
-const DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/overridden-properties.json`;
+const DEFAULT_CONFIGURATIONS_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/configurations.json`;
 
 export enum QbsSettingsEvent {
     NothingRequired,
@@ -54,12 +55,13 @@ export enum QbsSettingsEvent {
     ProjectResolveRequired,
     DebuggerUpdateRequired,
     ProjectTreeUpdateRequired,
+    ConfigurationUpdateRequired
 }
 
 export class QbsSettings implements vscode.Disposable {
     private _settings: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(QBS_SETTINGS_SECTION);
     private _debuggerSettingsWatcher?: chokidar.FSWatcher
-    private _overriddenPropertiesWatcher?: chokidar.FSWatcher
+    private _configurationsWatcher?: chokidar.FSWatcher
     private _onChanged: vscode.EventEmitter<QbsSettingsEvent> = new vscode.EventEmitter<QbsSettingsEvent>();
     readonly onChanged: vscode.Event<QbsSettingsEvent> = this._onChanged.event;
 
@@ -82,9 +84,9 @@ export class QbsSettings implements vscode.Disposable {
             } else if (e.affectsConfiguration('qbs.launchFilePath')) {
                 signal = QbsSettingsEvent.DebuggerUpdateRequired;
                 this.subscribeDebuggerSettingsChanged();
-            } else if (e.affectsConfiguration('qbs.overriddenPropertiesFilePath')) {
-                signal = QbsSettingsEvent.ProjectResolveRequired;
-                this.subscribeOverriddenPropertiesChanged();
+            } else if (e.affectsConfiguration('qbs.configurationsFilePath')) {
+                signal = QbsSettingsEvent.ConfigurationUpdateRequired;
+                this.subscribeConfigurationsChanged();
             }
             if (signal !== QbsSettingsEvent.NothingRequired) {
                 this._onChanged.fire(signal);
@@ -92,7 +94,7 @@ export class QbsSettings implements vscode.Disposable {
         });
 
         this.subscribeDebuggerSettingsChanged();
-        this.subscribeOverriddenPropertiesChanged();
+        this.subscribeConfigurationsChanged();
     }
 
     dispose() { this._debuggerSettingsWatcher?.close(); }
@@ -193,8 +195,8 @@ export class QbsSettings implements vscode.Disposable {
         return this._settings.get<boolean>('showDisabledProjectItems', DEFAULT_SHOW_DISABLED_PROJECT_ITEMS);
     }
 
-    overriddenPropertiesPath(): string {
-        const v = this._settings.get<string>('overriddenPropertiesFilePath', DEFAULT_OVERRIDDEN_PROPERTIES_FILE_PATH);
+    configurationsFilePath(): string {
+        const v = this._settings.get<string>('configurationsFilePath', DEFAULT_CONFIGURATIONS_FILE_PATH);
         return this.completePath(v);
     }
 
@@ -318,23 +320,29 @@ export class QbsSettings implements vscode.Disposable {
      * @c debug and @c release.
      */
     async enumerateConfigurations(): Promise<QbsConfigData[]> {
-        const configurations = [];
-        configurations.push(new QbsConfigData(
-            'debug',
-            localize('qbs.configuration.debug.label', 'Debug'),
-            localize('qbs.configuration.debug.description', 'Disable optimizations.'))
-        );
-        configurations.push(new QbsConfigData(
-            'release',
-            localize('qbs.configuration.release.label', 'Release'),
-            localize('qbs.configuration.release.description', 'Enable optimizations.'))
-        );
-        configurations.push(new QbsConfigData(
-            'custom',
-            localize('qbs.configuration.custom.label', '[Custom]'),
-            localize('qbs.configuration.custom.description', 'Custom configuration.'))
-        );
-        return configurations;
+        return new Promise<QbsConfigData[]>((resolve, reject) => {
+            const configsPath = this.configurationsFilePath();
+            QbsUtils.ensureFileCreated(configsPath, QbsUtils.writeDefaultConfigurations);
+            fs.readFile(configsPath, (error, data) => {
+                const configurations: QbsConfigData[] = [];
+                try {
+                    const text = data.toString();
+                    const items: any[] = jsonc.parse(text) || [];
+                    items.forEach(item => {
+                        const name = item[QbsDataKey.Name];
+                        if (name) {
+                            const display = item[QbsDataKey.DisplayName];
+                            const descr = item[QbsDataKey.Description];
+                            const props = item[QbsDataKey.OverriddenProperties];
+                            configurations.push(new QbsConfigData(name, display, descr, props)) ;
+                        }
+                    });
+                } catch (e) {
+                    console.warn(e);
+                }
+                resolve(configurations);
+            });
+        });
     }
 
     /**
@@ -384,10 +392,10 @@ export class QbsSettings implements vscode.Disposable {
         this._debuggerSettingsWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.DebuggerUpdateRequired); });
     }
 
-    private async subscribeOverriddenPropertiesChanged() {
-        this._overriddenPropertiesWatcher?.close();
-        const propertiesPath = this.overriddenPropertiesPath();
-        this._overriddenPropertiesWatcher = chokidar.watch(propertiesPath, {ignoreInitial: true});
-        this._overriddenPropertiesWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.ProjectResolveRequired); });
+    private async subscribeConfigurationsChanged() {
+        this._configurationsWatcher?.close();
+        const configurationsPath = this.configurationsFilePath();
+        this._configurationsWatcher = chokidar.watch(configurationsPath, {ignoreInitial: true});
+        this._configurationsWatcher.on('change', () => { this._onChanged.fire(QbsSettingsEvent.ConfigurationUpdateRequired); });
     }
 }

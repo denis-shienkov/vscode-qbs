@@ -47,14 +47,14 @@ to select the desired launch configuration for debugging.
 * From the command palette in VS Code, run the **QBS: Debug** command,
 or press the **Debug** button in the status bar.
 
-## Override a project properties
+## Edit a build configurations
 
-* From the command palette in VS Code, run the **QBS: Override Project Properties**
-command, which will create the `overriden-properties.json` file.
-* Add desired overridden properties to this `overriden-properties.json` file,
-and save it.
-* When the `overriden-properties.json` file is saved, the project will automatically
-resolved with the new overridden properties.
+* From the command palette in VS Code, run the **QBS: Edit Build Configuration**
+command, which will create the `configurations.json` file.
+* Add desired build configurations and the overridden properties to this
+`configurations.json` file, and save it.
+* When the `configurations.json` file is saved, the project will automatically
+resolved with the new build configurations.
 
 ## Set up include paths for C++ IntelliSense
 

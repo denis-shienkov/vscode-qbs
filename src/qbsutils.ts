@@ -52,10 +52,13 @@ export function ensureDirectoryExistence(filePath: string) {
     fs.mkdirSync(directory);
 }
 
-export function ensureFileCreated(filePath: string) {
+export function ensureFileCreated(filePath: string, callback?: (ws: fs.WriteStream) => boolean) {
     if (!fs.existsSync(filePath)) {
         ensureDirectoryExistence(filePath);
-        fs.createWriteStream(filePath).close();
+        const ws = fs.createWriteStream(filePath);
+        if (callback)
+            callback(ws);
+        ws.close();
     }
 }
 
@@ -74,3 +77,27 @@ export function msToTime(msecs: number): string {
   
     return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
   }
+
+export function writeDefaultConfigurations(ws: fs.WriteStream): boolean {
+    ws.write("[\n");
+    ws.write("    {\n");
+    ws.write("        \"name\": \"release\",\n");
+    ws.write("        \"display-name\": \"Release\",\n");
+    ws.write("        \"description\": \"Enable optimizations.\",\n");
+    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("    },\n");
+    ws.write("    {\n");
+    ws.write("        \"name\": \"debug\",\n");
+    ws.write("        \"display-name\": \"Debug\",\n");
+    ws.write("        \"description\": \"Disable optimizations.\",\n");
+    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("    },\n");
+    ws.write("    {\n");
+    ws.write("        \"name\": \"profiling\",\n");
+    ws.write("        \"display-name\": \"Profiling\",\n");
+    ws.write("        \"description\": \"Enable profiling.\",\n");
+    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("    }\n");
+    ws.write("]\n");
+    return true;
+}

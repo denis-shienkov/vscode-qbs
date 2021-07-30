@@ -6,7 +6,7 @@ export * from './qbsdebugproductcommand';
 export * from './qbsdetectprofilescommand';
 export * from './qbsgetrunenvironmentcommand';
 export * from './qbsinstallcommand';
-export * from './qbsoverridepropertiescommand';
+export * from './qbseditconfigurationcommand';
 export * from './qbsrebuildcommand';
 export * from './qbsresolvecommand';
 export * from './qbsrestoreprojectcommand';
@@ -40,8 +40,8 @@ import {QbsProjectNode} from '../projectexplorer/qbsprojectnode';
 const DEFAULT_COMMAND_TIMEOUT_MS = 5000;
 
 export async function subscribeCommands(ctx: vscode.ExtensionContext, session: QbsSession) {
-    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.OverrideProperties, async () => {
-        await QbsCommand.onOverrideProperties(session);
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.EditConfiguration, async () => {
+        await QbsCommand.onEditConfigurationCommand(session);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.DetectProfiles, async () => {
         await QbsCommand.onDetectProfiles(session);
@@ -88,6 +88,7 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         const resolveRequest = new QbsResolveRequest(session.settings());
         resolveRequest.setProjectFilePath(session.project()?.filePath() || '');
         resolveRequest.setConfigurationName(session.project()?.buildStep().configurationName() || '');
+        resolveRequest.setOverriddenProperties(session.project()?.buildStep().configurationOverriddenProperties() )
         resolveRequest.setTopLevelProfile(session.project()?.buildStep().profileName() || '');
         await QbsCommand.onResolve(session, resolveRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
