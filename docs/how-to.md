@@ -50,10 +50,10 @@ or press the **Debug** button in the status bar.
 ## Edit a build configurations
 
 * From the command palette in VS Code, run the **QBS: Edit Build Configuration**
-command, which will create the `configurations.json` file.
+command, which will create the `qbs-configurations.json` file.
 * Add desired build configurations and the overridden properties to this
-`configurations.json` file, and save it.
-* When the `configurations.json` file is saved, the project will automatically
+`qbs-configurations.json` file, and save it.
+* When the `qbs-configurations.json` file is saved, the project will automatically
 resolved with the new build configurations.
 
 ## Set up include paths for C++ IntelliSense

@@ -10,10 +10,10 @@ QBS allows to override any project properties on the resolving stage. Details
 about the data format for this can be found in the official QBS [documentation](https://doc.qt.io/qbs/language-introduction.html#overriding-property-values-from-the-command-line).
 
 Although, this extension allows you to do this using a special
-`configurations.json` file. The data format in this file corresponds to
+`qbs-configurations.json` file. The data format in this file corresponds to
 the official documentation, the link to which is given above.
 
-When this extension starts, it creates by default the `configurations.json`
+When this extension starts, it creates by default the `qbs-configurations.json`
 file containing all pre-defined buid configurations. The user can extend this
 file by its purposes. When the file is changed, the extension will automatically
 start resolving the project with the new configurations and overridden properties.
@@ -21,10 +21,10 @@ start resolving the project with the new configurations and overridden propertie
 ## Create a configurations
 
 You can to call the `Edit Build Configuration` command from the command palette.
-This command will create the default `configurations.json` file (if it is not
+This command will create the default `qbs-configurations.json` file (if it is not
 exists yet), and then will open this file in the editor. By default this file
 will be created in the current project workspace folder, along the path
-`<path/to/your/project/.vscode/configurations.json>`.
+`<path/to/your/project/.vscode/qbs-configurations.json>`.
 
 The default format of this file is the following:
 

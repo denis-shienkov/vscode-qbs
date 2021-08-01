@@ -24,7 +24,7 @@ below, for more information about variable expansion.
 | `qbs.logLevel`| Uses the specified [log level](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-log-op-op-level-op-lt-op-level-op-gt-op). | `info` | No. |
 | `qbs.launchFilePath`| Specify location to the debugger configuration in the `launch.json` file. | `${sourceDirectory}/.vscode/launch.json` | Yes. |
 | `qbs.showDisabledProjectItems`| Shows the disabled project items (sub-projects, products, groups). | `false` | No. |
-| `qbs.configurationsFilePath`| Specify location to the build configurations `configurations.json` file. | `${sourceDirectory}/.vscode/configurations.json` | Yes. |
+| `qbs.configurationsFilePath`| Specify location to the build configurations `qbs-configurations.json` file. | `${sourceDirectory}/.vscode/qbs-configurations.json` | Yes. |
 | `qbs.clearOutputBeforeOperation`| Clears the output console before starting the operation (applicable for Resolve, Clean, Build, and ReBuild operations). | `false` | No. |
 
 ## Variable substitution

@@ -35,7 +35,7 @@
     "qbs-tools.configuration.qbs.logLevel.description": "Указывает, хочет ли клиент получать данные журнала и/или предупреждающие сообщения.",
     "qbs-tools.configuration.qbs.launchFilePath.description": "Полный путь к файлу launch.json, содержащему конфигурации отладчиков.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
-    "qbs-tools.configuration.qbs.configurationsFilePath.description": "Полный путь к файлу configurations.json, содержащему конфигурации сборки.",
+    "qbs-tools.configuration.qbs.configurationsFilePath.description": "Полный путь к файлу qbs-configurations.json, содержащему конфигурации сборки.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }

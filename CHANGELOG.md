@@ -1,5 +1,13 @@
 # What's New?
 
+## 1.0.3
+
+- Next bug-fix release.
+- [#52](https://github.com/denis-shienkov/vscode-qbs/issues/52)
+Right now need to use the `qbs-configurations.json` file instead
+of the `overriden-properties.json` file to specify the build
+configurations and its overridden properties.
+
 ## 1.0.2
 
 - Next bug-fix release.

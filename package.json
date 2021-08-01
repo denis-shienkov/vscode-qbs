@@ -450,7 +450,7 @@
                 },
                 "qbs.configurationsFilePath": {
                     "type": "string",
-                    "default": "${sourceDirectory}/.vscode/configurations.json",
+                    "default": "${sourceDirectory}/.vscode/qbs-configurations.json",
                     "description": "%qbs-tools.configuration.qbs.configurationsFilePath.description%",
                     "scope": "resource"
                 },
