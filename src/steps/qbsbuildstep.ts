@@ -20,8 +20,8 @@ export class QbsBuildStep implements vscode.Disposable {
 
     project(): QbsProject { return this._project; }
     profileName(): string { return this._profile.name(); }
-    configurationName(): string { return this._config.name(); }
-    configurationOverriddenProperties(): any { return this._config.overriddenProperties(); }
+    configurationName(): string { return this._config.name; }
+    configurationOverriddenProperties(): any { return this._config.properties; }
     productName(): string { return this._product.fullDisplayName(); }
 
     async restore() {
@@ -78,7 +78,7 @@ export class QbsBuildStep implements vscode.Disposable {
     private async extractConfiguration(group: string) {
         const configurations = await this._project.session().settings().enumerateConfigurations();
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}BuildConfigurationName`);
-        const index = configurations.findIndex((configuration) => configuration.name() == name);
+        const index = configurations.findIndex((configuration) => configuration.name == name);
         return (index !== -1) ? configurations[index] : (name ? new QbsConfigData(name) : undefined);
     }
 
@@ -100,9 +100,9 @@ export class QbsBuildStep implements vscode.Disposable {
     private setupConfiguration(configuration?: QbsConfigData) {
         if (!configuration)
             return false;
-        if (this._config.name() == configuration.name()) {
-            const oldprops = JSON.stringify(this._config.overriddenProperties());
-            const newprops = JSON.stringify(configuration.overriddenProperties());
+        if (this._config.name == configuration.name) {
+            const oldprops = JSON.stringify(this._config.properties);
+            const newprops = JSON.stringify(configuration.properties);
             if (oldprops == newprops)
                 return false;
         }
