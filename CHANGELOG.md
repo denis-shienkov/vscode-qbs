@@ -1,5 +1,12 @@
 # What's New?
 
+## 1.0.4
+- Default `qbs-configurations.json` file is not created unless user runs
+  the `Edit Build Configuration` command.
+- Format of the `qbs-configurations.json` has changed - `display-name` and
+  `overridden-properties` were renamed to `displayName` and `properties`,
+  respectively. Old format also supported.
+
 ## 1.0.3
 
 - Next bug-fix release.
