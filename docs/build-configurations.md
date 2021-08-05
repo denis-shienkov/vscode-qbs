@@ -16,58 +16,62 @@ the official documentation, the link to which is given above.
 When this extension starts, it creates by default the `qbs-configurations.json`
 file containing all pre-defined buid configurations. The user can extend this
 file by its purposes. When the file is changed, the extension will automatically
-start resolving the project with the new configurations and overridden properties.
+start resolving the project with the new configurations and properties set in the file.
 
-## Create a configurations
+## Edit configurations
 
 You can to call the `Edit Build Configuration` command from the command palette.
-This command will create the default `qbs-configurations.json` file (if it is not
-exists yet), and then will open this file in the editor. By default this file
-will be created in the current project workspace folder, along the path
+This command will create the default `qbs-configurations.json` file if it does not exist, and then will open this file in the editor. By default this file
+will be created in the current project workspace folder, located at
 `<path/to/your/project/.vscode/qbs-configurations.json>`.
 
-The default format of this file is the following:
+The default contents of this file looks like this:
 
 ```json
 [
     {
         "name": "release",
-        "display-name": "Release",
-        "description": "Enable optimizations.",
-        "overridden-properties": {}
+        "displayName": "Release",
+        "description": "Build with optimizations.",
+        "properties": {
+            "qbs.buildVariant": "release"
+        }
     },
     {
         "name": "debug",
-        "display-name": "Debug",
-        "description": "Disable optimizations.",
-        "overridden-properties": {}
+        "displayName": "Debug",
+        "description": "Build with debug information.",
+        "properties": {
+            "qbs.buildVariant": "debug"
+        }
     },
     {
         "name": "profiling",
-        "display-name": "Profiling",
-        "description": "Enable profiling.",
-        "overridden-properties": {}
+        "displayName": "Profiling",
+        "description": "Build with optimizations and debug information.",
+        "properties": {
+            "qbs.buildVariant": "profiling"
+        }
     }
 ]
 ```
 
-The user can edit, remove, or add the other ocnfigurations.
+The user can edit, remove, or add the other configurations.
 
+## Specify Qbs properties
 
-## Override a properties
+It is possible to specify a list of custom properties passed to Qbs
+at resolve step for each build configuration using the `properties` item.
 
-It is possible to specify a set of the custom overridden properties
-for each build configuration using the `overridden-properties` item.
-
-For example, the possible configuration might look like this:
+For example, possible configuration might look like this:
 
 ```json
 [
     {
         "name": "my-cool-config",
-        "display-name": "My Cool Config",
+        "displayName": "My Cool Config",
         "description": "Enable something and override something.",
-        "overridden-properties": {
+        "properties": {
             "projects.someProject.projectProperty": false,
             "products.someProduct.productProperty": false,
             "modules.cpp.treatWarningsAsErrors": true,
