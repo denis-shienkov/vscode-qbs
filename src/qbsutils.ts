@@ -78,32 +78,37 @@ export function msToTime(msecs: number): string {
     return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
   }
 
+export function getDefaultConfigurations(): object[] {
+    return [
+        {
+            "name": "release",
+            "display-name": "Release",
+            "description": "Build with optimizations.",
+            "overridden-properties": {
+                "qbs.buildVariant": "release"
+            }
+        },
+        {
+            "name": "debug",
+            "display-name": "Debug",
+            "description": "Build with debug information.",
+            "overridden-properties": {
+                "qbs.buildVariant": "debug"
+            }
+        },
+        {
+            "name": "profiling",
+            "display-name": "Profiling",
+            "description": "Build with optimizations and debug information.",
+            "overridden-properties": {
+                "qbs.buildVariant": "profiling"
+            }
+        }
+    ];
+}
+
 export function writeDefaultConfigurations(ws: fs.WriteStream): boolean {
-    ws.write("[\n");
-    ws.write("    {\n");
-    ws.write("        \"name\": \"release\",\n");
-    ws.write("        \"display-name\": \"Release\",\n");
-    ws.write("        \"description\": \"Build with optimizations.\",\n");
-    ws.write("        \"overridden-properties\": {\n");
-    ws.write("            \"qbs.buildVariant\": \"release\"\n");
-    ws.write("        }\n");
-    ws.write("    },\n");
-    ws.write("    {\n");
-    ws.write("        \"name\": \"debug\",\n");
-    ws.write("        \"display-name\": \"Debug\",\n");
-    ws.write("        \"description\": \"Build with debug information.\",\n");
-    ws.write("        \"overridden-properties\": {\n");
-    ws.write("            \"qbs.buildVariant\": \"debug\"\n");
-    ws.write("        }\n");
-    ws.write("    },\n");
-    ws.write("    {\n");
-    ws.write("        \"name\": \"profiling\",\n");
-    ws.write("        \"display-name\": \"Profiling\",\n");
-    ws.write("        \"description\": \"Build with optimizations and debug information.\",\n");
-    ws.write("        \"overridden-properties\": {\n");
-    ws.write("            \"qbs.buildVariant\": \"profiling\"\n");
-    ws.write("        }\n");
-    ws.write("    }\n");
-    ws.write("]\n");
+    ws.write(JSON.stringify(getDefaultConfigurations(), null, 4));
+
     return true;
 }
