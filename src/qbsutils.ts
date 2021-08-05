@@ -74,7 +74,7 @@ export function msToTime(msecs: number): string {
     s = (s - secs) / 60;
     var mins = s % 60;
     var hrs = (s - mins) / 60;
-  
+
     return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
   }
 
@@ -83,20 +83,26 @@ export function writeDefaultConfigurations(ws: fs.WriteStream): boolean {
     ws.write("    {\n");
     ws.write("        \"name\": \"release\",\n");
     ws.write("        \"display-name\": \"Release\",\n");
-    ws.write("        \"description\": \"Enable optimizations.\",\n");
-    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("        \"description\": \"Build with optimizations.\",\n");
+    ws.write("        \"overridden-properties\": {\n");
+    ws.write("            \"qbs.buildVariant\": \"release\"\n");
+    ws.write("        }\n");
     ws.write("    },\n");
     ws.write("    {\n");
     ws.write("        \"name\": \"debug\",\n");
     ws.write("        \"display-name\": \"Debug\",\n");
-    ws.write("        \"description\": \"Disable optimizations.\",\n");
-    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("        \"description\": \"Build with debug information.\",\n");
+    ws.write("        \"overridden-properties\": {\n");
+    ws.write("            \"qbs.buildVariant\": \"debug\"\n");
+    ws.write("        }\n");
     ws.write("    },\n");
     ws.write("    {\n");
     ws.write("        \"name\": \"profiling\",\n");
     ws.write("        \"display-name\": \"Profiling\",\n");
-    ws.write("        \"description\": \"Enable profiling.\",\n");
-    ws.write("        \"overridden-properties\": {}\n");
+    ws.write("        \"description\": \"Build with optimizations and debug information.\",\n");
+    ws.write("        \"overridden-properties\": {\n");
+    ws.write("            \"qbs.buildVariant\": \"profiling\"\n");
+    ws.write("        }\n");
     ws.write("    }\n");
     ws.write("]\n");
     return true;
