@@ -331,9 +331,11 @@ export class QbsSettings implements vscode.Disposable {
                     items.forEach(item => {
                         const name = item[QbsDataKey.Name];
                         if (name) {
-                            const display = item[QbsDataKey.DisplayName];
+                            const display = item[QbsDataKey.DisplayName]
+                                || item[QbsDataKey.DisplayNameOld];
                             const descr = item[QbsDataKey.Description];
-                            const props = item[QbsDataKey.OverriddenProperties];
+                            const props = item[QbsDataKey.Properties]
+                                || item[QbsDataKey.OverriddenProperties];
                             configurations.push(new QbsConfigData(name, display, descr, props)) ;
                         }
                     });

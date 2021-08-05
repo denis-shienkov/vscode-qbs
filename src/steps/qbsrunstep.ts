@@ -26,7 +26,7 @@ export class QbsBuildStep implements vscode.Disposable {
 
     project(): QbsProject { return this._project; }
     profileName(): string { return this._profile.name(); }
-    configurationName(): string { return this._config.name(); }
+    configurationName(): string { return this._config.name; }
     productName(): string { return this._product.fullDisplayName(); }
 
     async restore() {
@@ -83,7 +83,7 @@ export class QbsBuildStep implements vscode.Disposable {
     private async extractConfiguration(group: string) {
         const configurations = await this._project.session().settings().enumerateConfigurations();
         const name = this._project.session().extensionContext().workspaceState.get<string>(`${group}BuildConfigurationName`);
-        const index = configurations.findIndex((configuration) => configuration.name() == name);
+        const index = configurations.findIndex((configuration) => configuration.name == name);
         return (index !== -1) ? configurations[index] : (name ? new QbsConfigData(name) : undefined);
     }
 
@@ -103,7 +103,7 @@ export class QbsBuildStep implements vscode.Disposable {
     }
 
     private setupConfiguration(configuration?: QbsConfigData) {
-        if (configuration && configuration.name() != this._config.name()) {
+        if (configuration && configuration.name != this._config.name) {
             this._config = configuration;
             return true;
         }

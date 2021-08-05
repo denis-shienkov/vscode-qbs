@@ -6,6 +6,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import {QbsConfigData} from './datatypes/qbsconfigdata';
+
 export function fixPathSeparators(path: string): string {
     return path.replace(/\\/g, '/');
 }
@@ -78,29 +80,29 @@ export function msToTime(msecs: number): string {
     return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
   }
 
-export function getDefaultConfigurations(): object[] {
+export function getDefaultConfigurations(): QbsConfigData[] {
     return [
         {
             "name": "release",
-            "display-name": "Release",
+            "displayName": "Release",
             "description": "Build with optimizations.",
-            "overridden-properties": {
+            "properties": {
                 "qbs.buildVariant": "release"
             }
         },
         {
             "name": "debug",
-            "display-name": "Debug",
+            "displayName": "Debug",
             "description": "Build with debug information.",
-            "overridden-properties": {
+            "properties": {
                 "qbs.buildVariant": "debug"
             }
         },
         {
             "name": "profiling",
-            "display-name": "Profiling",
+            "displayName": "Profiling",
             "description": "Build with optimizations and debug information.",
-            "overridden-properties": {
+            "properties": {
                 "qbs.buildVariant": "profiling"
             }
         }

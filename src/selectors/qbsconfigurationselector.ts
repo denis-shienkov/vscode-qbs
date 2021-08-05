@@ -11,8 +11,8 @@ export async function displayConfigurationSelector(session: QbsSession) {
 
     const items: QbsConfigQuickPickItem[] = configurations.map(configuration => {
         return {
-            label: configuration.displayName()  || configuration.name(),
-            description: configuration.description(),
+            label: configuration.displayName  || configuration.name,
+            description: configuration.description,
             configuration
         };
     });
