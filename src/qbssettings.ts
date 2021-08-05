@@ -322,7 +322,10 @@ export class QbsSettings implements vscode.Disposable {
     async enumerateConfigurations(): Promise<QbsConfigData[]> {
         return new Promise<QbsConfigData[]>((resolve, reject) => {
             const configsPath = this.configurationsFilePath();
-            QbsUtils.ensureFileCreated(configsPath, QbsUtils.writeDefaultConfigurations);
+            if (!fs.existsSync(configsPath)) {
+                resolve(QbsUtils.getDefaultConfigurations());
+                return;
+            }
             fs.readFile(configsPath, (error, data) => {
                 const configurations: QbsConfigData[] = [];
                 try {
