@@ -14,15 +14,15 @@ import {QbsProjectData} from './datatypes/qbsprojectdata';
  * Supported language standards by the intelli sense engine.
  */
 type LanguageStandard = 'c89' | 'c99' | 'c11' | 'c18' | 'gnu89' | 'gnu99' | 'gnu11' | 'gnu18'
-                        | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20'
-                        | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20';
+    | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20'
+    | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20';
 
 /**
  * Supported intelli sense modes by the intelli sense engine.
  */
 type IntelliSenseMode = 'msvc-x86' | 'msvc-x64' | 'msvc-arm' | 'msvc-arm64'
-                        | 'gcc-x86' | 'gcc-x64' | 'gcc-arm' | 'gcc-arm64'
-                        | 'clang-x86' | 'clang-x64' | 'clang-arm' | 'clang-arm64';
+    | 'gcc-x86' | 'gcc-x64' | 'gcc-arm' | 'gcc-arm64'
+    | 'clang-x86' | 'clang-x64' | 'clang-arm' | 'clang-arm64';
 
 /**
  * Custom intelli sense provider for the QBS plugin.
@@ -66,7 +66,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
             }
         }
         return items;
-     }
+    }
 
     /**
      * @note From the cpt.CustomConfigurationProvider interface.
@@ -130,7 +130,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                 const groups = product.groups();
                 for (const group of groups) {
                     const groupModuleProperties = group.moduleProperties();
-                    const sources = group.sourceArtifacts();
+                    const sources = group.sourceArtifacts().concat(group.sourceWildcardsArtifacts());
                     for (const source of sources) {
                         const filepath = source.filePath();
                         const tags = source.fileTags();
@@ -210,7 +210,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                     } else if (major > 6 || (major === 6 && minor > 1)) {
                         return 'c++14';
                     } else if (major > 4 || (major === 4 && minor > 8)
-                            || (major === 4 && minor == 8 && patch > 1)) {
+                        || (major === 4 && minor == 8 && patch > 1)) {
                         return 'c++11';
                     } else {
                         return 'c++03';
@@ -218,7 +218,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                 } else if (toolchain.indexOf('iar') !== -1) {
                     return 'c++03';
                 } else if (toolchain.indexOf('keil') !== -1
-                            && architecture.indexOf('arm') !== -1) {
+                    && architecture.indexOf('arm') !== -1) {
                     if (major >= 5) {
                         return 'c++11';
                     } else {
@@ -252,7 +252,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                     } else if (major > 6 || (major === 6 && minor > 1)) {
                         return 'c11';
                     } else if (major > 4 || (major === 4 && minor > 8)
-                                || (major === 4 && minor == 8 && patch > 1)) {
+                        || (major === 4 && minor == 8 && patch > 1)) {
                         return 'c99';
                     } else {
                         return 'c89';
@@ -295,8 +295,8 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                     return (architecture.indexOf('64') !== -1) ? 'msvc-arm64' : 'msvc-arm';
                 }
             } else if (toolchain.indexOf('clang') !== -1
-                        || toolchain.indexOf('clang-cl') !== -1
-                        || toolchain.indexOf('llvm') !== -1) {
+                || toolchain.indexOf('clang-cl') !== -1
+                || toolchain.indexOf('llvm') !== -1) {
                 if (architecture === 'x86') {
                     return 'clang-x86';
                 } else if (architecture === 'x86_64') {
@@ -305,7 +305,7 @@ export class QbsCpp implements cpt.CustomConfigurationProvider {
                     return (architecture.indexOf('64') !== -1) ? 'clang-arm64' : 'clang-arm';
                 }
             } else if (toolchain.indexOf('gcc') !== -1
-                        || toolchain.indexOf('mingw') !== -1) {
+                || toolchain.indexOf('mingw') !== -1) {
                 if (architecture === 'x86') {
                     return 'gcc-x86';
                 } else if (architecture === 'x86_64') {
