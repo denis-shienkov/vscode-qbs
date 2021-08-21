@@ -9,9 +9,11 @@ We use [yarn](https://yarnpkg.com/getting-started/install) to compile the code.
 
 The process is:
 
-1. Open the repo in VS Code
+1. Call `npm install` at project root to install dependencies.
 
-2. Press <kbd>F5</kbd> to build and run the extension
+2. Open the repo in VS Code
+
+3. Press <kbd>F5</kbd> to build and run the extension
 
 ## Coding guidelines
 
