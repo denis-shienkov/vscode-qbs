@@ -2,14 +2,15 @@
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
-  the `Edit Build Configuration` command.
+the `Edit Build Configuration` command.
 - Format of the `qbs-configurations.json` has changed - `display-name` and
-  `overridden-properties` were renamed to `displayName` and `properties`,
+`overridden-properties` were renamed to `displayName` and `properties`,
   respectively. Old format also supported.
 - Right now the `qbs.buildVariant` sets explicitly for the all default
-  `release`, `debug`, and `profiling` configurations.
+`release`, `debug`, and `profiling` configurations.
 - Added support for the missing `none` configuration profile.
-- Handling the wildcard source artifacts for the proper intellisense.
+- [#55](https://github.com/denis-shienkov/vscode-qbs/issues/55)
+Handling the wildcards source artifacts for the proper intellisense.
 
 ## 1.0.3
 
