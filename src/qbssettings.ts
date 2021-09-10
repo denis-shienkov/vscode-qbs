@@ -30,6 +30,7 @@ const QBS_SETTINGS_SECTION = 'qbs';
 
 // Path patterns.
 const CONFIGURATION_NAME_PATTERN = '${configurationName}';
+const PROJECT_NAME_PATTERN = '${projectName}';
 const PROFILE_NAME_PATTERN = '${profileName}';
 const SOURCE_DIR_PATTERN = '${sourceDirectory}';
 
@@ -380,7 +381,9 @@ export class QbsSettings implements vscode.Disposable {
      * @note Can be used to fix paths obtained from the plugin configurations.
      */
     private completePath(configPath: string): string {
-        const buildStep = this._session.project()?.buildStep();
+        const project = this._session.project();
+        const buildStep = project?.buildStep();
+        configPath = configPath.replace(PROJECT_NAME_PATTERN, project?.name() || 'none');
         configPath = configPath.replace(PROFILE_NAME_PATTERN, buildStep?.profileName() || 'none');
         configPath = configPath.replace(CONFIGURATION_NAME_PATTERN, buildStep?.configurationName() || 'none');
         const sourceDirectory = (vscode.workspace.workspaceFolders
