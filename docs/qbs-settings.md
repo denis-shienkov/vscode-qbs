@@ -34,9 +34,10 @@ by using a `${variable}` syntax. The following built-in variables are expanded:
 
 | Variable | Expansion |
 |---------|---------|
-|`${sourceDirectory}` | The full path to the workspace root directory. |
-|`${profileName}`| The current QBS build name. For example: `MSVC2019-x86`, `clang-cl-x86` |
-|`${configurationName}`| The current QBS build configuration name. For example: `debug`, `release` |
+| `${sourceDirectory}` | The full path to the workspace root directory. |
+| `${profileName}` | The current QBS build name. For example: `MSVC2019-x86`, `clang-cl-x86`. |
+| `${configurationName}`| The current QBS build configuration name. For example: `debug`, `release`. |
+| `${projectName}` | The project name. |
 
 ## Next steps
 

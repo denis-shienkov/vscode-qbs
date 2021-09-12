@@ -1,5 +1,9 @@
 # What's New?
 
+## 1.0.5
+
+- Added the project name `${projectName}` substitution.
+
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
 the `Edit Build Configuration` command.
