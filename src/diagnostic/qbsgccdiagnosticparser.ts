@@ -122,14 +122,18 @@ export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
-        if (severity.toLowerCase() === 'error')
+        const s = severity.toLowerCase();
+        switch (s) {
+        case 'error':
+        case 'fatal':
             return vscode.DiagnosticSeverity.Error;
-        else if (severity.toLowerCase() === 'fatal')
-            return vscode.DiagnosticSeverity.Error;
-        else if (severity.toLowerCase() === 'warning')
+        case 'warning':
             return vscode.DiagnosticSeverity.Warning;
-        else if (severity.toLowerCase() === 'info')
+        case 'info':
+        case 'note':
             return vscode.DiagnosticSeverity.Information;
-        return vscode.DiagnosticSeverity.Hint;
+        default:
+            return vscode.DiagnosticSeverity.Hint;
+        }
     }
 }
