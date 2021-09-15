@@ -131,6 +131,7 @@ export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
             return vscode.DiagnosticSeverity.Warning;
         case 'info':
         case 'note':
+        case 'remark':
             return vscode.DiagnosticSeverity.Information;
         default:
             return vscode.DiagnosticSeverity.Hint;
