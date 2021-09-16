@@ -5,7 +5,7 @@ import * as QbsUtils from '../qbsutils';
 
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
-const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#.+):\s(.+)$/;
+const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#\d+):\s(.+)$/;
 const ARM_CLANG_REGEXP = /^(.+\.\S+):(\d+):(\d+):\s(error|warning):\s(.+)/;
 const MCS_COMPILER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
 const MCS_ASSEMBLER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\s(\d+)\s\((.+),\sLINE\s\d+\):\s(.+)$/;
