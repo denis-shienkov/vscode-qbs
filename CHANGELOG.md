@@ -4,13 +4,15 @@
 
 - Added the project name `${projectName}` substitution.
 - Fixed displaying for the 'note' and 'remark' messages in the `problems`
-pane with the 'information' severity level for GCC toolchains.
+pane with the 'information' severity level for the GCC toolchains.
 - Fixed displaying for the 'fatal error' messages in the `problems`
-pane with the 'error' severity level for IAR toolchains.
+pane with the 'error' severity level for the IAR toolchains.
 - Fixed displaying for the error or warning codes in the `problems`
-pane for ARMCC compiler from the KEIL toolchain.
+pane for the ARMCC compiler from the KEIL toolchain.
 - Fixed displaying for the 'fatal error' messages in the `problems`
-pane for ARMCLANG compiler from the KEIL toolchain.
+pane for the ARMCLANG compiler from the KEIL toolchain.
+- Fixed displaying for the 'fatal error' messages in the `problems`
+pane for the Clang-Cl compiler.
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
