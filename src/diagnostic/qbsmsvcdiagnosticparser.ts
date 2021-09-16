@@ -55,15 +55,17 @@ export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
-        severity = severity.toLowerCase();
-        if (severity === 'error')
+        const s = severity.toLowerCase();
+        switch (s) {
+        case 'error':
+        case 'fatal error':
             return vscode.DiagnosticSeverity.Error;
-        else if (severity === 'fatal')
-            return vscode.DiagnosticSeverity.Error;
-        else if (severity === 'warning')
+        case 'warning':
             return vscode.DiagnosticSeverity.Warning;
-        else if (severity === 'info')
+        case 'info':
             return vscode.DiagnosticSeverity.Information;
-        return vscode.DiagnosticSeverity.Hint;
+        default:
+            return vscode.DiagnosticSeverity.Hint;
+        }
     }
 }

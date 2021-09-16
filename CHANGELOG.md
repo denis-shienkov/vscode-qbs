@@ -13,6 +13,8 @@ pane for the ARMCC compiler from the KEIL toolchain.
 pane for the ARMCLANG compiler from the KEIL toolchain.
 - Fixed displaying for the 'fatal error' messages in the `problems`
 pane for the Clang-Cl compiler.
+- Fixed displaying for the 'fatal error' messages in the `problems`
+pane for the MSVC compiler.
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
