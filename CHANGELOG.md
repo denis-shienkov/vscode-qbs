@@ -5,6 +5,8 @@
 - Added the project name `${projectName}` substitution.
 - Fixed displaying for the 'note' and 'remark' messages in the `problems`
 pane with the 'information' severity level for GCC toolchains.
+- Fixed displaying for the 'fatal error' messages in the `problems`
+pane with the 'error' severity level for IAR toolchains.
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs

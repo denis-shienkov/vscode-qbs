@@ -5,7 +5,7 @@ import * as QbsUtils from '../qbsutils';
 
 import {QbsDiagnosticParser} from './qbsdiagnosticutils';
 
-const COMPILER_REGEXP = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\S+)\]:\s*$/;
+const COMPILER_REGEXP = /^"(.+\.\S+)",(\d+)\s+(Fatal error|Error|Warning)\[(\S+)\]:\s*$/;
 const ASSEMBLER_REGEXP = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
 
 export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
@@ -98,11 +98,15 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
-        severity = severity.toLowerCase();
-        if (severity === 'error')
+        const s = severity.toLowerCase();
+        switch (s) {
+        case 'error':
+        case 'fatal error':
             return vscode.DiagnosticSeverity.Error;
-        else if (severity === 'warning')
+        case 'warning':
             return vscode.DiagnosticSeverity.Warning;
-        return vscode.DiagnosticSeverity.Hint;
+        default:
+            return vscode.DiagnosticSeverity.Information;
+        }
     }
 }
