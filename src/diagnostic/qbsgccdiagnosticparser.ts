@@ -125,7 +125,6 @@ export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
         const s = severity.toLowerCase();
         switch (s) {
         case 'error':
-        case 'fatal':
             return vscode.DiagnosticSeverity.Error;
         case 'warning':
             return vscode.DiagnosticSeverity.Warning;
