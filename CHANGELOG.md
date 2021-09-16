@@ -9,6 +9,8 @@ pane with the 'information' severity level for GCC toolchains.
 pane with the 'error' severity level for IAR toolchains.
 - Fixed displaying for the error or warning codes in the `problems`
 pane for ARMCC compiler from the KEIL toolchain.
+- Fixed displaying for the 'fatal error' messages in the `problems`
+pane for ARMCLANG compiler from the KEIL toolchain.
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
