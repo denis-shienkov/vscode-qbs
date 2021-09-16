@@ -11,6 +11,7 @@ import {QbsIarDiagnosticParser} from './qbsiardiagnosticparser';
 import {QbsKeilDiagnosticParser} from './qbskeildiagnosticparser';
 import {QbsMsvcDiagnosticParser} from './qbsmsvcdiagnosticparser';
 import {QbsSdccDiagnosticParser} from './qbssdccdiagnosticparser';
+import {QbsCosmicDiagnosticParser} from './qbscosmicdiagnosticparser';
 
 // Qbs output parser.
 import {QbsQbsDiagnosticParser} from './qbsqbsdiagnosticparser';
@@ -101,7 +102,9 @@ export class QbsDiagnostic implements vscode.Disposable {
             this._toolchainParser = new QbsIarDiagnosticParser(toolchainType);
         } else if (toolchainType === 'keil') {
             this._toolchainParser = new QbsKeilDiagnosticParser(toolchainType);
-        }  else {
+        } else if (toolchainType === 'cosmic') {
+            this._toolchainParser = new QbsCosmicDiagnosticParser(toolchainType);
+        } else {
             this._toolchainParser = undefined;
         }
     }

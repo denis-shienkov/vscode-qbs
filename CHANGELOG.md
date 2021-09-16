@@ -17,6 +17,8 @@ pane for the Clang-Cl compiler.
 pane for the MSVC compiler.
 - Fixed displaying for the 'fatal error' messages in the `problems`
 pane for the SDCC compiler.
+- Added displaying the error and warning messages in the `problems`
+pane for the COSMIC toolchains.
 
 ## 1.0.4
 - Default `qbs-configurations.json` file is not created unless user runs
