@@ -25,4 +25,6 @@ export enum QbsCommandKey {
     StartSession = 'qbs.startSession',
     StopSession = 'qbs.stopSession',
     EditConfiguration = 'qbs.editConfiguration',
+    GetSelectedProductPath = 'qbs.getSelectedProductPath',
+    GetBuildDirectory = 'qbs.getBuildDirectory',
 }
