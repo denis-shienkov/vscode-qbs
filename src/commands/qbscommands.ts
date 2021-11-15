@@ -4,7 +4,9 @@ export * from './qbscancelcommand';
 export * from './qbscleancommand';
 export * from './qbsdebugproductcommand';
 export * from './qbsdetectprofilescommand';
+export * from './qbsgetbuilddirectory'
 export * from './qbsgetrunenvironmentcommand';
+export * from './qbsgetselectedproductpath';
 export * from './qbsinstallcommand';
 export * from './qbseditconfigurationcommand';
 export * from './qbsrebuildcommand';
@@ -147,5 +149,11 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProducts(projectNode.dependentProductNames());
         await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetSelectedProductPath, async () => {
+        return QbsCommand.getSelectedProductPath(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetBuildDirectory, async () => {
+        return QbsCommand.getBuildDirectory(session);
     }));
 }
