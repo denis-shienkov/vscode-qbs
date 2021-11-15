@@ -64,6 +64,36 @@ Make sure that the product being debugged is preselected in the
 
 The output of the running product will be shown in an integrated terminal.
 
+## Command values for launch.json and task.json
+
+Sometime running an application natively via this extenion is not desired
+(for example when using
+[Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug)).
+For that case the QBS extensions provides the following [command variables](https://code.visualstudio.com/docs/editor/variables-reference#_command-variables):
+*  `qbs.getSelectedProductPath`
+*  `qbs.getBuildDirectory`
+
+For example, set the path to an `.elf`-file when using the cortex-debug extension
+can be done with:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+		{
+			"cwd": "${workspaceRoot}",
+			"executable": "${command:qbs.getBuildDirectory}/install-root/usr/local/bin/firmware.elf",
+			"name": "Debug Microcontroller",
+			"request": "launch",
+			"type": "cortex-debug",
+			"showDevDebugOutput": false,
+			"servertype": "jlink"
+		}
+    ]
+}
+```
+(assuming that you set the `qbs.installDir` for `firmware.elf` to `bin`)
+
 ## Next steps
 
 - Explore the [QBS documentation](README.md)
