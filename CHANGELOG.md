@@ -1,5 +1,10 @@
 # What's New?
 
+## 1.0.6
+
+- [#60] Added the command substitutions such as `qbs.getBuildDirectory`
+and `qbs.getSelectedProductPath`.
+
 ## 1.0.5
 
 - Added the project name `${projectName}` substitution.

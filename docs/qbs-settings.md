@@ -39,6 +39,21 @@ by using a `${variable}` syntax. The following built-in variables are expanded:
 | `${configurationName}`| The current QBS build configuration name. For example: `debug`, `release`. |
 | `${projectName}` | The project name. |
 
+### Command substitution
+
+QBS tools can expand VS Code commands. For example, you can expand the path to the
+build directory by using the syntax `${command:qbs.getBuildDirectory}`
+
+Be careful with long-running commands because it isn't specified when, or how many times,
+QBS tools will execute a command for a given expansion.
+
+Supported commands for substitution:
+
+|command|substitution|
+|-------|------------|
+|`qbs.getBuildDirectory`|The full path to the root project's build directory|
+|`qbs.getSelectedProductPath`|The full path to the selected product's executable, including the filename.|
+
 ## Next steps
 
 - Explore the [QBS documentation](README.md)
