@@ -215,7 +215,7 @@ export class QbsSettings implements vscode.Disposable {
     }
 
     buildBeforeRun(): boolean {
-        return this._settings.get<boolean>('buildBeforeRun', DEFAULT_BUILD_BEFORE_RUN);
+        return this._settings.get<boolean>('buildBeforeRun', DEFAULT_BUILD_BEFORE_RUN) && this.buildAndRunTheSameTarget();
     }
 
     /**

@@ -469,7 +469,7 @@
                 "qbs.buildBeforeRun": {
                     "type": "boolean",
                     "default": false,
-                    "description": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
+                    "markdownDescription": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
                     "scope": "resource"
                 }
             }
