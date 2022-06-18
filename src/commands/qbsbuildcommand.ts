@@ -20,7 +20,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
         session.logger()?.clearOutput();
     }
 
-    await vscode.window.withProgress({
+    return await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),
         cancellable: true
@@ -29,7 +29,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
         await session.build(request);
-        return new Promise<void>(resolve => {
+        return new Promise<boolean>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
@@ -81,7 +81,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
                 await taskProgressUpdatedSubscription.dispose();
                 await projectBuiltSubscription.dispose();
                 setTimeout(() => {
-                    resolve();
+                    resolve(errors.isEmpty());
                 }, timeout);
             });
         });

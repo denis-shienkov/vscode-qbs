@@ -50,6 +50,7 @@ const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = true;
 const DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION = false;
 const DEFAULT_CONFIGURATIONS_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/qbs-configurations.json`;
 const DEFAULT_BUILD_AND_RUN_THE_SAME_TARGET = false;
+const DEFAULT_BUILD_BEFORE_RUN = false;
 
 export enum QbsSettingsEvent {
     NothingRequired,
@@ -211,6 +212,10 @@ export class QbsSettings implements vscode.Disposable {
 
     buildAndRunTheSameTarget(): boolean {
         return this._settings.get<boolean>('buildAndRunTheSameTarget', DEFAULT_BUILD_AND_RUN_THE_SAME_TARGET);
+    }
+
+    buildBeforeRun(): boolean {
+        return this._settings.get<boolean>('buildBeforeRun', DEFAULT_BUILD_BEFORE_RUN);
     }
 
     /**

@@ -463,7 +463,13 @@
                 "qbs.buildAndRunTheSameTarget": {
                     "type": "boolean",
                     "default": false,
-                    "description": "%qbs-tools.configuration.qbs.buildRunSameTarget.description%",
+                    "description": "%qbs-tools.configuration.qbs.buildAndRunTheSameTarget.description%",
+                    "scope": "resource"
+                },
+                "qbs.buildBeforeRun": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
                     "scope": "resource"
                 }
             }
