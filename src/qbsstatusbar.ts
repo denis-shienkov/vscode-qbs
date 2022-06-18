@@ -4,8 +4,8 @@ import * as fs from 'fs';
 
 import {QbsSession} from './qbssession';
 import {QbsCommandKey} from './commands/qbscommandkey';
-import { QbsSettingsEvent} from './qbssettings';
-import { QbsProject } from './qbsproject';
+import {QbsSettingsEvent} from './qbssettings';
+import {QbsProject} from './qbsproject';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 

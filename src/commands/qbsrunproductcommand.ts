@@ -5,13 +5,13 @@ import * as path from 'path';
 import * as QbsUtils from '../qbsutils';
 
 import {QbsSession} from '../qbssession';
-import { QbsCommandKey } from './qbscommandkey';
+import {QbsCommandKey} from './qbscommandkey';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onRunProduct(session: QbsSession) {
     if (session.settings().buildBeforeRun()) {
-        let success = await vscode.commands.executeCommand<boolean>(QbsCommandKey.Build);
+        const success = await vscode.commands.executeCommand<boolean>(QbsCommandKey.Build);
         if (!success)
             return;
     }

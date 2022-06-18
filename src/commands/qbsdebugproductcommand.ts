@@ -8,7 +8,7 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onDebugProduct(session: QbsSession) {
     if (session.settings().buildBeforeRun()) {
-        let success = await vscode.commands.executeCommand<boolean>(QbsCommandKey.Build);
+        const success = await vscode.commands.executeCommand<boolean>(QbsCommandKey.Build);
         if (!success)
             return;
     }

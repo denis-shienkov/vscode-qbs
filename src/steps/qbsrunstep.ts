@@ -11,7 +11,7 @@ import {QbsProductData} from '../datatypes/qbsproductdata';
 import {QbsProfileData} from '../datatypes/qbsprofiledata';
 
 import {QbsGetRunEnvironmentRequest} from '../datatypes/qbsgetrunenvironmentrequest';
-import { QbsSettingsEvent } from '../qbssettings';
+import {QbsSettingsEvent} from '../qbssettings';
 
 export class QbsBuildStep implements vscode.Disposable {
     private _profile: QbsProfileData = new QbsProfileData();
