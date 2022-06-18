@@ -11,6 +11,7 @@ import {QbsProductData} from '../datatypes/qbsproductdata';
 import {QbsProfileData} from '../datatypes/qbsprofiledata';
 
 import {QbsGetRunEnvironmentRequest} from '../datatypes/qbsgetrunenvironmentrequest';
+import { QbsSettingsEvent } from '../qbssettings';
 
 export class QbsBuildStep implements vscode.Disposable {
     private _profile: QbsProfileData = new QbsProfileData();
@@ -55,20 +56,20 @@ export class QbsBuildStep implements vscode.Disposable {
 
     async setup(profile?: QbsProfileData, configuration?: QbsConfigData, product?: QbsProductData) {
         let changed = false;
-        let autoResolveRequred = false;
+        let autoResolveRequired = false;
         if (this.setupProfile(profile)) {
             changed = true;
-            autoResolveRequred = true;
+            autoResolveRequired = true;
         };
         if (this.setupConfiguration(configuration)) {
             changed = true;
-            autoResolveRequred = true;
+            autoResolveRequired = true;
         }
         if (this.setupProduct(product)) {
             changed = true;
         }
         if (changed) {
-            this._onChanged.fire(autoResolveRequred);
+            this._onChanged.fire(autoResolveRequired);
             await this.save();
         }
     }
@@ -126,7 +127,14 @@ export class QbsRunStep implements vscode.Disposable {
 
     readonly onChanged: vscode.Event<boolean> = this._onChanged.event;
 
-    constructor(private readonly _project: QbsProject) {}
+    constructor(private readonly _project: QbsProject) {
+        _project.session().settings().onChanged(async (event: QbsSettingsEvent) => {
+            if (event == QbsSettingsEvent.TargetProductUpdateRequired && _project.session().settings().buildAndRunTheSameTarget()) {
+                // Sync product with build step when buildAndRunTheSameTarget setting enabled
+                _project.buildStep().setup(undefined, undefined, this._product);
+            }
+        });
+    }
 
     dispose() {}
 
@@ -150,6 +158,9 @@ export class QbsRunStep implements vscode.Disposable {
     }
 
     async setup(product?: QbsProductData, dbg?: QbsDebuggerData) {
+        if (this._project.session().settings().buildAndRunTheSameTarget())
+            this._project.buildStep().setup(undefined, undefined, product);
+
         if (product)
             this._product = product;
 

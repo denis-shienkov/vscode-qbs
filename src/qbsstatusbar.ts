@@ -4,6 +4,8 @@ import * as fs from 'fs';
 
 import {QbsSession} from './qbssession';
 import {QbsCommandKey} from './commands/qbscommandkey';
+import { QbsSettingsEvent} from './qbssettings';
+import { QbsProject } from './qbsproject';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -86,10 +88,15 @@ export class QbsStatusBar implements vscode.Disposable {
         this._selectDebuggerButton.show();
 
         _session.onStatusChanged(async () => await this.updateControls());
-        _session.onProjectActivated(async (project) => {
+        _session.onProjectActivated(async (project: QbsProject) => {
             await this.updateControls();
             project.buildStep().onChanged(async () => await this.updateControls());
             project.runStep().onChanged(async () => await this.updateControls());
+        });
+        _session.settings().onChanged(async (event: QbsSettingsEvent) => {
+            if (event === QbsSettingsEvent.TargetProductUpdateRequired) {
+                await this.updateControls();
+            }
         });
 
         this.updateControls();
@@ -126,6 +133,7 @@ export class QbsStatusBar implements vscode.Disposable {
         // Update the current build product name.
         const buildProductName = buildStep?.productName() || 'empty';
         this._selectBuildProductButton.text = `[${buildProductName}]`;
+        this._session.settings().buildAndRunTheSameTarget() ? this._selectBuildProductButton.hide() : this._selectBuildProductButton.show();
         // Update the current run product name.
         const runProductName = runStep?.productName() || '---';
         const runProductExe = runStep?.targetExecutable() || '';

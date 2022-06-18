@@ -49,6 +49,7 @@ const DEFAULT_COMMAND_ECHO_MODE = QbsCommandEchoMode.Summary;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = true;
 const DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION = false;
 const DEFAULT_CONFIGURATIONS_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/qbs-configurations.json`;
+const DEFAULT_BUILD_AND_RUN_THE_SAME_TARGET = false;
 
 export enum QbsSettingsEvent {
     NothingRequired,
@@ -56,7 +57,8 @@ export enum QbsSettingsEvent {
     ProjectResolveRequired,
     DebuggerUpdateRequired,
     ProjectTreeUpdateRequired,
-    ConfigurationUpdateRequired
+    ConfigurationUpdateRequired,
+    TargetProductUpdateRequired
 }
 
 export class QbsSettings implements vscode.Disposable {
@@ -88,6 +90,8 @@ export class QbsSettings implements vscode.Disposable {
             } else if (e.affectsConfiguration('qbs.configurationsFilePath')) {
                 signal = QbsSettingsEvent.ConfigurationUpdateRequired;
                 this.subscribeConfigurationsChanged();
+            } else if (e.affectsConfiguration('qbs.buildAndRunTheSameTarget')) {
+                signal = QbsSettingsEvent.TargetProductUpdateRequired;
             }
             if (signal !== QbsSettingsEvent.NothingRequired) {
                 this._onChanged.fire(signal);
@@ -203,6 +207,10 @@ export class QbsSettings implements vscode.Disposable {
 
     clearOutputBeforeOperation(): boolean {
         return this._settings.get<boolean>('clearOutputBeforeOperation', DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION);
+    }
+
+    buildAndRunTheSameTarget(): boolean {
+        return this._settings.get<boolean>('buildAndRunTheSameTarget', DEFAULT_BUILD_AND_RUN_THE_SAME_TARGET);
     }
 
     /**
