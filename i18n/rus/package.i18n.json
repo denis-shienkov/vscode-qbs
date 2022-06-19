@@ -39,5 +39,6 @@
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
     "qbs-tools.configuration.qbs.buildAndRunTheSameTarget.description": "Использовать один продукт для построения и запуска/отладки.",
     "qbs-tools.configuration.qbs.buildBeforeRun.description": "Построить продукт перед запуском. Применяется, только если `#qbs.buildAndRunTheSameTarget#` настройка включена.",
+    "qbs-tools.configuration.qbs.autoResolve.description": "Запускать переконфигурацию автоматически при обнаружении измененй в qbs файлах.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }

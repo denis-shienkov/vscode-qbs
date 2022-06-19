@@ -5,14 +5,17 @@ import * as QbsUtils from './qbsutils';
 
 import {QbsCommandKey} from './commands/qbscommandkey';
 import {QbsProjectData} from './datatypes/qbsprojectdata';
+import {QbsSettings} from './qbssettings';
 
 const AUTO_RESOLVE_DELAY = 1000; // in milliseconds
 
 export class QbsBuildSystemFilesWatcher implements vscode.Disposable {
+    private _settings: QbsSettings;
     private _watchers: chokidar.FSWatcher[] = [];
     private _timer?: NodeJS.Timeout;
 
-    constructor(data: QbsProjectData) {
+    constructor(data: QbsProjectData, settings: QbsSettings) {
+        this._settings = settings;
         const buildDirectory = data.buildDirectory();
         data.buildSystemFiles().forEach(buildSystemFile => {
             const isChildren = QbsUtils.isChildOf(buildSystemFile, buildDirectory);
@@ -36,7 +39,9 @@ export class QbsBuildSystemFilesWatcher implements vscode.Disposable {
         }
         this._timer = setTimeout(async () => {
             this._timer = undefined;
-            await vscode.commands.executeCommand(QbsCommandKey.Resolve);
+            if (this._settings.autoResolve()) {
+                await vscode.commands.executeCommand(QbsCommandKey.Resolve);
+            }
         }, interval);
     }
 }
