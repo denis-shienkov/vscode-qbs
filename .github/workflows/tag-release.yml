@@ -1,0 +1,19 @@
+name: Tag Release Publishing
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  Build-Package:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+    - run: npm install && npm install -g gulp
+    - run: gulp package
+    - uses: actions/upload-artifact@v3
+      with:
+        path: qbs-tools-*.vsix
