@@ -27,4 +27,7 @@ export enum QbsCommandKey {
     EditConfiguration = 'qbs.editConfiguration',
     GetSelectedProductPath = 'qbs.getSelectedProductPath',
     GetBuildDirectory = 'qbs.getBuildDirectory',
+    GetBuildDirectoryUnresolved = 'qbs.getBuildDirectoryUnresolved',
+    GetProfileName = 'qbs.getProfileName',
+    GetConfigurationName = 'qbs.getConfigurationName'
 }

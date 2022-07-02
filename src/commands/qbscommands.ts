@@ -156,4 +156,13 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetBuildDirectory, async () => {
         return QbsCommand.getBuildDirectory(session);
     }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetBuildDirectoryUnresolved, async () => {
+        return QbsCommand.getBuildDirectoryUnresolved(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetProfileName, async () => {
+        return QbsCommand.getProfileName(session);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetConfigurationName, async () => {
+        return QbsCommand.getConfigurationName(session);
+    }));
 }
