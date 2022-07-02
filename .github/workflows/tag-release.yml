@@ -27,4 +27,5 @@ jobs:
         file: qbs-tools-*.vsix
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true
 
