@@ -1,5 +1,12 @@
 # What's New?
 
+## 1.1.6
+
+- Added `buildRunSameTarget` and `buildBeforeRun` options in settings.
+- Added `autoResolve` option in settings.
+- Added `profile` field for configurations in `qbs-configurations.json`.
+- Added `qbs.profileName`, `qbs.configurationName`, `qbs.buildDirectoryUnresolved` command substitutions.
+
 ## 1.0.6
 
 - [#60] Added the command substitutions such as `qbs.getBuildDirectory`
