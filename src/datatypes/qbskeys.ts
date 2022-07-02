@@ -59,6 +59,7 @@ export enum QbsDataKey {
     ProjectFilePath = 'project-file-path',
     ProjectResolved = 'project-resolved',
     Properties = 'properties',
+    AssociatedProfile = 'profile',
     ProtocolError = 'protocol-error',
     Qbs = 'qbs',
     RunEnvironment = 'run-environment',

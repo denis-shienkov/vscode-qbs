@@ -21,5 +21,11 @@ export async function displayConfigurationSelector(session: QbsSession) {
         return item?.configuration;
     });
 
-    session.project()?.buildStep().setup(undefined, selectedConfiguration, undefined);
+    let profile = undefined;
+    if (selectedConfiguration?.profile) {
+        const profiles = await session.settings().enumerateProfiles();
+        profile = profiles.find(p => p.name() === selectedConfiguration.profile);
+    }
+
+    session.project()?.buildStep().setup(profile, selectedConfiguration, undefined);
 }

@@ -3,5 +3,6 @@ export class QbsConfigData {
         readonly name: string,
         readonly displayName?: string,
         readonly description?: string,
-        readonly properties?: {[key: string]: string}) {}
+        readonly properties?: {[key: string]: string},
+        readonly profile?: string) {}
 }
