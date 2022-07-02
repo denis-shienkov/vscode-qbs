@@ -22,6 +22,7 @@ export class QbsBuildStep implements vscode.Disposable {
     profileName(): string { return this._profile.name(); }
     configurationName(): string { return this._config.name; }
     configurationOverriddenProperties(): any { return this._config.properties; }
+    configurationCustomProperties(): any { return this._config.custom_properties; }
     productName(): string { return this._product.fullDisplayName(); }
 
     async restore() {
@@ -103,7 +104,9 @@ export class QbsBuildStep implements vscode.Disposable {
         if (this._config.name == configuration.name) {
             const oldprops = JSON.stringify(this._config.properties);
             const newprops = JSON.stringify(configuration.properties);
-            if (oldprops == newprops)
+            const oldcustomprops = JSON.stringify(this._config.custom_properties);
+            const newcustomprops = JSON.stringify(configuration.custom_properties);
+            if (oldprops == newprops && oldcustomprops == newcustomprops)
                 return false;
         }
         this._config = configuration;

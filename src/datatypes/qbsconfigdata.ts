@@ -4,5 +4,6 @@ export class QbsConfigData {
         readonly displayName?: string,
         readonly description?: string,
         readonly properties?: {[key: string]: string},
-        readonly profile?: string) {}
+        readonly profile?: string,
+        readonly custom_properties?: {[key: string]: string}) {}
 }

@@ -359,7 +359,8 @@ export class QbsSettings implements vscode.Disposable {
                             const props = item[QbsDataKey.Properties]
                                 || item[QbsDataKey.OverriddenProperties];
                             const profile = item[QbsDataKey.AssociatedProfile];
-                            configurations.push(new QbsConfigData(name, display, descr, props, profile)) ;
+                            const custom_props = item[QbsDataKey.CustomProperties];
+                            configurations.push(new QbsConfigData(name, display, descr, props, profile, custom_props)) ;
                         }
                     });
                 } catch (e) {
