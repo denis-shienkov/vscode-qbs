@@ -1,19 +1,30 @@
-name: Tag Release Publishing
+name: Publish Release
 on:
   push:
     tags:
       - '*'
 jobs:
-  Build-Package:
+  Publish-Release:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
       uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
         node-version: 14
-    - run: npm install && npm install -g gulp
-    - run: gulp package
-    - uses: actions/upload-artifact@v3
+    - name: Install dependencies
+      run: npm install && npm install -g gulp
+    - name: Build Extension
+      run: gulp package
+    - name: Upload Extension as Artifact
+      uses: actions/upload-artifact@v3
       with:
         path: qbs-tools-*.vsix
+    - name: Upload Extension to Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: qbs-tools-*.vsix
+        tag: ${{ github.ref }}
+        overwrite: true
+
