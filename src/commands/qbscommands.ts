@@ -5,6 +5,7 @@ export * from './qbscleancommand';
 export * from './qbsdebugproductcommand';
 export * from './qbsdetectprofilescommand';
 export * from './qbsgetbuilddirectory'
+export * from './qbsgetpathfromconanbuildinfo';
 export * from './qbsgetconfigurationparams';
 export * from './qbsgetrunenvironmentcommand';
 export * from './qbsgetselectedproductpath';
@@ -168,5 +169,8 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetCustomProperty, async (property: string) => {
         return QbsCommand.getCustomProperty(session, property);
-    }))
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetPathFromConanBuildInfo, async (args: Array<string>) => {
+        return QbsCommand.getPathFromConanBuildInfo(session, args[0], args[1]);
+    }));
 }

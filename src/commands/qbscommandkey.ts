@@ -30,5 +30,6 @@ export enum QbsCommandKey {
     GetBuildDirectoryUnresolved = 'qbs.getBuildDirectoryUnresolved',
     GetProfileName = 'qbs.getProfileName',
     GetConfigurationName = 'qbs.getConfigurationName',
+    GetPathFromConanBuildInfo = 'qbs.getPathFromConanBuildInfo',
     GetCustomProperty = 'qbs.getCustomProperty'
 }
