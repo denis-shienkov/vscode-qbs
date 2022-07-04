@@ -31,5 +31,5 @@ export enum QbsCommandKey {
     GetProfileName = 'qbs.getProfileName',
     GetConfigurationName = 'qbs.getConfigurationName',
     GetPathFromConanBuildInfo = 'qbs.getPathFromConanBuildInfo',
-    GetCustomProperty = 'qbs.getCustomProperty'
+    GetConfigurationCustomProperty = 'qbs.getConfigurationCustomProperty'
 }

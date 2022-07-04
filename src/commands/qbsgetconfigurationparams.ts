@@ -10,7 +10,7 @@ export async function getConfigurationName(session: QbsSession): Promise<string 
     return Promise.resolve(configurationName ? configurationName : null);
 }
 
-export async function getCustomProperty(session: QbsSession, property: string): Promise<string | null> {
+export async function getConfigurationCustomProperty(session: QbsSession, property: string): Promise<string | null> {
     const custom_data = session.project()?.buildStep()?.configurationCustomProperties();
     return Promise.resolve(custom_data ? custom_data[property] || null : null);
 }

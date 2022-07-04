@@ -167,10 +167,12 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetConfigurationName, async () => {
         return QbsCommand.getConfigurationName(session);
     }));
-    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetCustomProperty, async (property: string) => {
-        return QbsCommand.getCustomProperty(session, property);
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetConfigurationCustomProperty, async (property: string) => {
+        return QbsCommand.getConfigurationCustomProperty(session, property);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetPathFromConanBuildInfo, async (args: Array<string>) => {
-        return QbsCommand.getPathFromConanBuildInfo(session, args[0], args[1]);
+        const section = args[0];
+        const option = args[1];
+        return QbsCommand.getPathFromConanBuildInfo(session, section, option);
     }));
 }
