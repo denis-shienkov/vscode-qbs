@@ -1,5 +1,11 @@
 # What's New?
 
+## 1.1.7
+
+- Added `custom_properties` field for configurations in `qbs-configurations.json`.
+- Added `qbs.getConfigurationCustomProperty` command substitution.
+- Added `qbs.getPathFromConanBuildInfo` command substitution.
+
 ## 1.1.6
 
 - Added `buildRunSameTarget` and `buildBeforeRun` options in settings.
@@ -92,7 +98,7 @@ the output console before resolving, cleaning, or building.
 - [#31](https://github.com/denis-shienkov/vscode-qbs/issues/31)
 Added option to show or hide the disabled project items.
 - [#31](https://github.com/denis-shienkov/vscode-qbs/issues/31)
-Rigt now the disabled project items are marked as striked text.
+Right now the disabled project items are marked as striked text.
 - [#2](https://github.com/denis-shienkov/vscode-qbs/issues/2)
 Implemented the project re-resolving when the qbs/js files change.
 - [#32](https://github.com/denis-shienkov/vscode-qbs/issues/32)
