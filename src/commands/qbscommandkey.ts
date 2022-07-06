@@ -5,6 +5,7 @@ export enum QbsCommandKey {
     BuildSubProject = 'qbs.buildSubProject',
     Cancel = 'qbs.cancel',
     Clean = 'qbs.clean',
+    CleanAll = 'qbs.cleanAll',
     CleanProduct = 'qbs.cleanProduct',
     CleanSubProject = 'qbs.cleanSubProject',
     Debug = 'qbs.debug',

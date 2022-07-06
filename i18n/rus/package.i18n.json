@@ -15,6 +15,7 @@
     "qbs-tools.command.qbs.resolveforceprobes.title": "Сканировать с принудительным запуском зондов",
     "qbs-tools.command.qbs.build.title": "Собрать",
     "qbs-tools.command.qbs.clean.title": "Очистить",
+    "qbs-tools.command.qbs.cleanAll.title": "Очистить всё",
     "qbs-tools.command.qbs.install.title": "Установить",
     "qbs-tools.command.qbs.rebuild.title": "Пересобрать",
     "qbs-tools.command.qbs.cancel.title": "Отмена",

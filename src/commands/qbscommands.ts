@@ -106,6 +106,10 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         cleanRequest.setProducts([session.project()?.buildStep().productName() || '']);
         await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CleanAll, async () => {
+        const cleanRequest = new QbsCleanRequest(session.settings());
+        await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+    }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.Install, async () => {
         const installRequest = new QbsInstallRequest(session.settings());
         await QbsCommand.onInstall(session, installRequest);

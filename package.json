@@ -140,6 +140,11 @@
                 "category": "QBS"
             },
             {
+                "command": "qbs.cleanAll",
+                "title": "%qbs-tools.command.qbs.cleanAll.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.install",
                 "title": "%qbs-tools.command.qbs.install.title%",
                 "category": "QBS"
@@ -279,6 +284,10 @@
                 },
                 {
                     "command": "qbs.clean",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.cleanAll",
                     "when": "qbs:extension-activated"
                 },
                 {

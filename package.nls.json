@@ -15,6 +15,7 @@
     "qbs-tools.command.qbs.resolveforceprobes.title": "Resolve and Force Probe Execution",
     "qbs-tools.command.qbs.build.title": "Build",
     "qbs-tools.command.qbs.clean.title": "Clean",
+    "qbs-tools.command.qbs.cleanAll.title": "Clean All",
     "qbs-tools.command.qbs.install.title": "Install",
     "qbs-tools.command.qbs.rebuild.title": "Rebuild",
     "qbs-tools.command.qbs.cancel.title": "Cancel",
