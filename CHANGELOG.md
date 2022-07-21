@@ -1,5 +1,10 @@
 # What's New?
 
+## 1.1.8
+
+- Added `Clean All` command to clean up whole project
+- Added arguments forwarding from `launch.json` file for running target
+
 ## 1.1.7
 
 - Added `custom_properties` field for configurations in `qbs-configurations.json`.
