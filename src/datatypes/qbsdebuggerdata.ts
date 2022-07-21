@@ -107,6 +107,10 @@ export class QbsDebuggerData {
         return this._data;
     }
 
+    args(): string[] {
+        return this._data[QbsDebuggerKey.Args] || [];
+    }
+
     static createAutomatic(): QbsDebuggerData {
         const auto = new QbsDebuggerData({});
         auto.setAutomatic(true);

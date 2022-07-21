@@ -30,8 +30,9 @@ export async function onRunProduct(session: QbsSession) {
         return;
     }
 
-    const escaped = QbsUtils.escapeShell(dbg.program());
     const program = dbg.program();
+    const args = dbg.args();
+    const shellEscapedCommand = [program].concat(args).map((x) => QbsUtils.escapeShell(x)).join(' ');
     const env = dbg.environmentData().data();
     const terminal = vscode.window.createTerminal({
         name: 'QBS Run',
@@ -47,6 +48,6 @@ export async function onRunProduct(session: QbsSession) {
             }
         }
     }
-    terminal.sendText(escaped);
+    terminal.sendText(shellEscapedCommand);
     terminal.show();
 }

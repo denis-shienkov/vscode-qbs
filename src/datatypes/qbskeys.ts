@@ -118,6 +118,7 @@ export enum QbsDebuggerKey {
     Program = 'program',
     Request = 'request',
     Type = 'type',
+    Args = 'args'
 }
 
 export enum QbsQbsProfileDataKey {
