@@ -14,11 +14,13 @@ import {QbsOperation} from '../datatypes/qbsoperation';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export async function onBuild(session: QbsSession, request: QbsBuildRequest, timeout: number) {
+export async function onBuild(session: QbsSession, request: QbsBuildRequest, timeout: number): Promise<number> {
     const needsClearOutput = session.settings().clearOutputBeforeOperation();
     if (needsClearOutput) {
         session.logger()?.clearOutput();
     }
+
+    let result: number = 0;
 
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -75,6 +77,9 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
                 maxProgress = progress = oldPercentage = 0;
                 description = errors.isEmpty() ? localize('qbs.session.build.progress.completed.title','Project successfully built')
                                                : localize('qbs.session.build.progress.failed.title', 'Project building failed');
+                if (!errors.isEmpty()) {
+                    result = 1;
+                }
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
@@ -86,4 +91,5 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
             });
         });
     });
+    return result;
 }

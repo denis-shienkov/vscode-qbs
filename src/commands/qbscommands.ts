@@ -97,12 +97,12 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.Build, async () => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProducts([session.project()?.buildStep().productName() || '']);
-        await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.Clean, async () => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProducts([session.project()?.buildStep().productName() || '']);
-        await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.Install, async () => {
         const installRequest = new QbsInstallRequest(session.settings());
@@ -114,7 +114,14 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         cleanRequest.setProducts(products);
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProducts(products);
-        await QbsCommand.onRebuild(session, cleanRequest, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onRebuild(session, cleanRequest, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.RebuildProducts, async (products: string[]) => {
+        const cleanRequest = new QbsCleanRequest(session.settings());
+        cleanRequest.setProducts(products);
+        const buildRequest = new QbsBuildRequest(session.settings());
+        buildRequest.setProducts(products);
+        return await QbsCommand.onRebuild(session, cleanRequest, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.Cancel, async () => {
         const request = new QbsCancelRequest(session.settings());
@@ -133,22 +140,32 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.BuildProduct, async (productNode: QbsProductNode) => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProducts([ productNode.name() ]);
-        await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.BuildProducts, async (products: string[]) => {
+        const buildRequest = new QbsBuildRequest(session.settings());
+        buildRequest.setProducts(products);
+        return await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CleanProduct, async (productNode: QbsProductNode) => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProducts([ productNode.name() ]);
-        await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+    }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CleanProducts, async (products: string[]) => {
+        const cleanRequest = new QbsCleanRequest(session.settings());
+        cleanRequest.setProducts(products);
+        return await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.BuildSubProject, async (projectNode: QbsProjectNode) => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProducts(projectNode.dependentProductNames());
-        await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onBuild(session, buildRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CleanSubProject, async (projectNode: QbsProjectNode) => {
         const cleanRequest = new QbsCleanRequest(session.settings());
         cleanRequest.setProducts(projectNode.dependentProductNames());
-        await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
+        return await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.GetSelectedProductPath, async () => {
         return QbsCommand.getSelectedProductPath(session);

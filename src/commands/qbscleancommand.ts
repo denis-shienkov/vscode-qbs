@@ -14,11 +14,13 @@ import {QbsOperationType} from '../datatypes/qbsoperation';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export async function onClean(session: QbsSession, request: QbsCleanRequest, timeout: number) {
+export async function onClean(session: QbsSession, request: QbsCleanRequest, timeout: number): Promise<number|undefined> {
     const needsClearOutput = session.settings().clearOutputBeforeOperation();
     if (needsClearOutput) {
         session.logger()?.clearOutput();
     }
+
+    let result: number | undefined = undefined;
 
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -74,6 +76,9 @@ export async function onClean(session: QbsSession, request: QbsCleanRequest, tim
                     elapsed));
                 description = errors.isEmpty() ? localize('qbs.session.clean.progress.completed.title','Project successfully cleaned')
                                                : localize('qbs.session.clean.progress.failed.title', 'Project cleaning failed');
+                if (!errors.isEmpty()) {
+                    result = 1;
+                }
                 await updateReport(false);
                 await taskStartedSubscription.dispose();
                 await taskMaxProgressChangedSubscription.dispose();
@@ -85,4 +90,5 @@ export async function onClean(session: QbsSession, request: QbsCleanRequest, tim
             });
         });
     });
+    return result;
 }

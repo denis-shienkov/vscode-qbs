@@ -478,7 +478,45 @@
                     "name": "%qbs-tools.configuration.views.qbs.project.description%"
                 }
             ]
-        }
+        },
+        "taskDefinitions": [
+            {
+                "type": "qbs",
+                "required": [
+                    "command"
+                ],
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "description": "%qbs-tools.tasks.qbs.description%"
+                    },
+                    "command": {
+                        "type": "string",
+                        "enum": [
+                            "resolve",
+                            "build",
+                            "rebuild",
+                            "clean"
+                        ],
+                        "description": "%qbs-tools.tasks.qbs.command.description%"
+                    },
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "%qbs-tools.tasks.qbs.products.description%"
+                    },
+                    "problemMatcher": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "%qbs-tools.tasks.qbs.problemMatcher.description%"
+                    }
+                }
+            }
+        ]
     },
     "scripts": {
         "compile": "tsc -p ./",

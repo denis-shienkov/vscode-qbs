@@ -37,5 +37,10 @@
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
     "qbs-tools.configuration.qbs.configurationsFilePath.description": "Полный путь к файлу qbs-configurations.json, содержащему конфигурации сборки.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
-    "qbs-tools.configuration.views.qbs.project.description": "Проект"
+    "qbs-tools.configuration.views.qbs.project.description": "Проект",
+
+    "qbs-tools.tasks.qbs.description": "Отображаемое имя задачи",
+    "qbs-tools.tasks.qbs.command.description": "Команда на выполнение",
+    "qbs-tools.tasks.qbs.products.description" : "Продукты для задачи/команды. Если не указано, то запустится выполнится команда для текущего выбора",
+    "qbs-tools.tasks.qbs.problemMatcher.description": "Фильтр ошибок для задачи. Может быть строкой или списком строк. Например: '$gcc', '$msCompile', ..."
 }

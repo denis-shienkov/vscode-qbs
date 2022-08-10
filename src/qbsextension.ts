@@ -13,6 +13,8 @@ import {QbsStatusBar} from './qbsstatusbar';
 import {QbsDiagnostic} from './diagnostic/qbsdiagnostic'
 import {QbsProjectExplorer} from './projectexplorer/qbsprojectexplorer'
 
+import {QbsTaskProvider} from './tasks/qbstasks';
+
 const QBS_EXTENSION_ACTIVATED = 'qbs:extension-activated';
 
 let manager: QbsExtensionManager;
@@ -24,10 +26,12 @@ class QbsExtensionManager implements vscode.Disposable {
     private _diagnostic: QbsDiagnostic = new QbsDiagnostic(this._session);
     private _cpp: QbsCpp = new QbsCpp(this._session);
     private _explorer: QbsProjectExplorer = new QbsProjectExplorer(this._session);
+    private _taskProvider: vscode.Disposable;
 
     constructor(private readonly _ctx: vscode.ExtensionContext) {
         QbsCommands.subscribeCommands(_ctx, this._session);
         this._explorer.subscribeCommands(_ctx);
+        this._taskProvider = vscode.tasks.registerTaskProvider(QbsTaskProvider.scriptType, new QbsTaskProvider(this._session));
     }
 
     dispose() {
@@ -37,6 +41,7 @@ class QbsExtensionManager implements vscode.Disposable {
         this._diagnostic.dispose();
         this._statusBar.dispose();
         this._session.dispose();
+        this._taskProvider.dispose();
     }
 }
 

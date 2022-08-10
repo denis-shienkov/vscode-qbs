@@ -37,5 +37,10 @@
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Show disabled project items.",
     "qbs-tools.configuration.qbs.configurationsFilePath.description": "The full path to the 'qbs-configurations.json' file, containing the build configurations.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Clear the output before starting the operation.",
-    "qbs-tools.configuration.views.qbs.project.description": "Project"
+    "qbs-tools.configuration.views.qbs.project.description": "Project",
+
+    "qbs-tools.tasks.qbs.description": "The name of the task",
+    "qbs-tools.tasks.qbs.command.description": "Command to execute",
+    "qbs-tools.tasks.qbs.products.description" : "Products for command. If it empty then will try to build for the current qbs selection",
+    "qbs-tools.tasks.qbs.problemMatcher.description": "The problem matcher(s) to use. Can either be a string or an array of strings and problem matchers. For example: '$gcc', '$msCompile', ..."
 }
