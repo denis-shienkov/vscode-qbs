@@ -20,6 +20,10 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
         session.logger()?.clearOutput();
     }
 
+    if (session.project()?.buildStep().configurationSaveAllBeforeBuild() == "true") {
+        await vscode.workspace.saveAll(false);
+    }
+
     await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),

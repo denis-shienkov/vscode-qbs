@@ -21,6 +21,7 @@ export class QbsBuildStep implements vscode.Disposable {
     project(): QbsProject { return this._project; }
     profileName(): string { return this._profile.name(); }
     configurationName(): string { return this._config.name; }
+    configurationSaveAllBeforeBuild(): string { return this._config.saveAllBeforeBuild || ""; }
     configurationOverriddenProperties(): any { return this._config.properties; }
     productName(): string { return this._product.fullDisplayName(); }
 
@@ -50,20 +51,20 @@ export class QbsBuildStep implements vscode.Disposable {
 
     async setup(profile?: QbsProfileData, configuration?: QbsConfigData, product?: QbsProductData) {
         let changed = false;
-        let autoResolveRequred = false;
+        let autoResolveRequired = false;
         if (this.setupProfile(profile)) {
             changed = true;
-            autoResolveRequred = true;
+            autoResolveRequired = true;
         };
         if (this.setupConfiguration(configuration)) {
             changed = true;
-            autoResolveRequred = true;
+            autoResolveRequired = true;
         }
         if (this.setupProduct(product)) {
             changed = true;
         }
         if (changed) {
-            this._onChanged.fire(autoResolveRequred);
+            this._onChanged.fire(autoResolveRequired);
             await this.save();
         }
     }
@@ -100,14 +101,14 @@ export class QbsBuildStep implements vscode.Disposable {
     private setupConfiguration(configuration?: QbsConfigData) {
         if (!configuration)
             return false;
+        let hasChanges = true;
         if (this._config.name == configuration.name) {
             const oldprops = JSON.stringify(this._config.properties);
             const newprops = JSON.stringify(configuration.properties);
-            if (oldprops == newprops)
-                return false;
+            hasChanges = (oldprops != newprops);
         }
         this._config = configuration;
-        return true;
+        return hasChanges;
     }
 
     private setupProduct(product?: QbsProductData) {

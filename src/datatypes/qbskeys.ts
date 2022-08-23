@@ -12,6 +12,7 @@ export enum QbsDataKey {
     ConfigurationName = 'configuration-name',
     Cpp = "cpp",
     DataMode = 'data-mode',
+    SaveAllBeforeBuild = 'saveAllBeforeBuild',
     Description = 'description',
     DisplayName = 'displayName',
     DisplayNameOld = 'display-name',
