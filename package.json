@@ -489,7 +489,8 @@
     "scripts": {
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "clean": "gulp clean"
+        "clean": "gulp clean",
+        "package": "gulp package"
     },
     "devDependencies": {
         "@types/glob": "^7.1.3",
