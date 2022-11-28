@@ -1,5 +1,11 @@
 # What's New?
 
+## 1.0.7
+
+- [#69](https://github.com/denis-shienkov/vscode-qbs/issues/69)
+Added the new setting `qbs.saveBeforeBuild` for saving the open
+documents before resolving or building.
+
 ## 1.0.6
 
 - [#60] Added the command substitutions such as `qbs.getBuildDirectory`

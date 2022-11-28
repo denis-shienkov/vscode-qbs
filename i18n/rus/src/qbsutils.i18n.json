@@ -1,0 +1,5 @@
+{
+    "qbs.yes.button.title": "Да",
+    "qbs.no.button.title": "Нет",
+    "qbs.utils.not.saved.continue.anyway": "Не все открытые документы были сохранены. Продолжить?"
+}

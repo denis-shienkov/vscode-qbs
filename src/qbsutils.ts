@@ -3,10 +3,13 @@
  */
 
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import * as path from 'path';
 import * as fs from 'fs';
 
 import {QbsConfigData} from './datatypes/qbsconfigdata';
+
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export function fixPathSeparators(path: string): string {
     return path.replace(/\\/g, '/');
@@ -113,4 +116,21 @@ export function writeDefaultConfigurations(ws: fs.WriteStream): boolean {
     ws.write(JSON.stringify(getDefaultConfigurations(), null, 4));
 
     return true;
+}
+
+export async function trySaveAll(): Promise<boolean> {
+    if (await vscode.workspace.saveAll())
+        return true;
+    const yesButtonTitle: string = localize('qbs.yes.button.title', 'Yes');
+    const chosen = await vscode.window.showErrorMessage<vscode.MessageItem>(
+        localize('qbs.utils.not.saved.continue.anyway', 'Not all open documents were saved. Would you like to continue anyway?'),
+        {
+            title: yesButtonTitle,
+            isCloseAffordance: false,
+        },
+        {
+            title: localize('qbs.no.button.title', 'No'),
+            isCloseAffordance: true,
+        });
+    return (chosen !== undefined) && (chosen.title === yesButtonTitle);
 }

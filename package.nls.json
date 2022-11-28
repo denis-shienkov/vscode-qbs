@@ -37,5 +37,6 @@
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Show disabled project items.",
     "qbs-tools.configuration.qbs.configurationsFilePath.description": "The full path to the 'qbs-configurations.json' file, containing the build configurations.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Clear the output before starting the operation.",
+    "qbs-tools.configuration.qbs.saveBeforeBuild.description": "Save open files before building.",
     "qbs-tools.configuration.views.qbs.project.description": "Project"
 }

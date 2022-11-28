@@ -459,6 +459,12 @@
                     "default": false,
                     "description": "%qbs-tools.configuration.qbs.clearOutputBeforeOperation.description%",
                     "scope": "resource"
+                },
+                "qbs.saveBeforeBuild": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.saveBeforeBuild.description%",
+                    "scope": "resource"
                 }
             }
         },

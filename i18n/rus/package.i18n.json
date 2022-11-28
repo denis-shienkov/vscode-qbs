@@ -37,5 +37,6 @@
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
     "qbs-tools.configuration.qbs.configurationsFilePath.description": "Полный путь к файлу qbs-configurations.json, содержащему конфигурации сборки.",
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Очищать вывод перед запуском операции.",
+    "qbs-tools.configuration.qbs.saveBeforeBuild.description": "Сохранять открытые файлы перед сборкой.",
     "qbs-tools.configuration.views.qbs.project.description": "Проект"
 }

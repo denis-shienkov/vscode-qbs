@@ -48,6 +48,7 @@ const DEFAULT_SETTINGS_DIR_PATH = '';
 const DEFAULT_COMMAND_ECHO_MODE = QbsCommandEchoMode.Summary;
 const DEFAULT_SHOW_DISABLED_PROJECT_ITEMS = true;
 const DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION = false;
+const DEFAULT_SAVE_BEFORE_BUILD = true;
 const DEFAULT_CONFIGURATIONS_FILE_PATH = `${SOURCE_DIR_PATTERN}/.vscode/qbs-configurations.json`;
 
 export enum QbsSettingsEvent {
@@ -203,6 +204,10 @@ export class QbsSettings implements vscode.Disposable {
 
     clearOutputBeforeOperation(): boolean {
         return this._settings.get<boolean>('clearOutputBeforeOperation', DEFAULT_CLEAR_OUTPUT_BEFORE_OPERATION);
+    }
+
+    saveBeforeBuild(): boolean {
+        return this._settings.get<boolean>('saveBeforeBuild', DEFAULT_SAVE_BEFORE_BUILD);
     }
 
     /**

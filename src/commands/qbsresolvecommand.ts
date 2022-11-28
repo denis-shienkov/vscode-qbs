@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 
+import * as QbsUtils from '../qbsutils';
+
 import {performance} from 'perf_hooks';
 
 import {QbsCommandKey} from './qbscommandkey';
@@ -15,6 +17,11 @@ import {QbsResolveRequest} from '../datatypes/qbsresolverequest';
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export async function onResolve(session: QbsSession, request: QbsResolveRequest, timeout: number) {
+    const needsSaveOpened = session.settings().saveBeforeBuild();
+    if (needsSaveOpened && !await QbsUtils.trySaveAll()) {
+        return;
+    }
+
     const needsClearOutput = session.settings().clearOutputBeforeOperation();
     if (needsClearOutput) {
         session.logger()?.clearOutput();
