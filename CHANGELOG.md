@@ -11,7 +11,8 @@ resolving of a project when its build files are modified
 
 ## 1.0.6
 
-- [#60] Added the command substitutions such as `qbs.getBuildDirectory`
+- [#60] (https://github.com/denis-shienkov/vscode-qbs/issues/60)
+Added the command substitutions such as `qbs.getBuildDirectory`
 and `qbs.getSelectedProductPath`.
 
 ## 1.0.5
