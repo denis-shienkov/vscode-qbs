@@ -471,6 +471,12 @@
                     "default": true,
                     "description": "%qbs-tools.configuration.qbs.autoResolve.description%",
                     "scope": "resource"
+                },
+                "qbs.buildBeforeRun": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
+                    "scope": "resource"
                 }
             }
         },

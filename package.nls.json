@@ -39,5 +39,6 @@
     "qbs-tools.configuration.qbs.clearOutputBeforeOperation.description": "Clear the output before starting the operation.",
     "qbs-tools.configuration.qbs.saveBeforeBuild.description": "Save open files before building.",
     "qbs-tools.configuration.qbs.autoResolve.description": "Resolve the project automatically when build files are modified.",
+    "qbs-tools.configuration.qbs.buildBeforeRun.description": "Build the product before running it.",
     "qbs-tools.configuration.views.qbs.project.description": "Project"
 }

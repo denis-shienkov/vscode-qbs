@@ -7,7 +7,10 @@ Added the new setting `qbs.saveBeforeBuild` for saving the open
 documents before resolving or building.
 - [#63](https://github.com/denis-shienkov/vscode-qbs/issues/63)
 Added the new setting `qbs.autoResolve` to control the automatic
-resolving of a project when its build files are modified
+resolving of a project when its build files are modified.
+- [#64](https://github.com/denis-shienkov/vscode-qbs/issues/64)
+Added the new setting `qbs.buildBeforeRun` to control the build
+stage of the product before it launches.
 
 ## 1.0.6
 

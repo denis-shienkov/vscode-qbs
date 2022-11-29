@@ -9,7 +9,7 @@ export async function getSelectedProductPath(session: QbsSession): Promise<strin
     const dbg = session.project()?.runStep().debugger();
     if (!dbg?.hasProgram()) {
         vscode.window.showErrorMessage(localize('qbs.product.exe.missed.error.message',
-            'Target executable missing, please re-build the product.'));
+            'Product executable missing, please re-build the product.'));
         return Promise.resolve(null);
     }
 
