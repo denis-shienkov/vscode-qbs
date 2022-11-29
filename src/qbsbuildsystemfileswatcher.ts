@@ -3,40 +3,27 @@ import * as chokidar from 'chokidar';
 
 import * as QbsUtils from './qbsutils';
 
-import {QbsCommandKey} from './commands/qbscommandkey';
+import {QbsSession} from './qbssession';
 import {QbsProjectData} from './datatypes/qbsprojectdata';
 
 const AUTO_RESOLVE_DELAY = 1000; // in milliseconds
 
 export class QbsBuildSystemFilesWatcher implements vscode.Disposable {
-    private _watchers: chokidar.FSWatcher[] = [];
-    private _timer?: NodeJS.Timeout;
+    private _watcher?: chokidar.FSWatcher;
 
-    constructor(data: QbsProjectData) {
+    constructor(session: QbsSession, data: QbsProjectData) {
         const buildDirectory = data.buildDirectory();
-        data.buildSystemFiles().forEach(buildSystemFile => {
-            const isChildren = QbsUtils.isChildOf(buildSystemFile, buildDirectory);
-            if (isChildren) {
-                return;
-            } else {
-                const watcher = chokidar.watch(buildSystemFile, {ignoreInitial: true});
-                watcher.on('change', () => this.autoResolve(AUTO_RESOLVE_DELAY));
-                this._watchers.push(watcher);
-            }
-        });
+        const files =  data.buildSystemFiles().filter(file => !QbsUtils.isChildOf(file, buildDirectory));
+        if (files) {
+            this._watcher = chokidar.watch(files, {ignoreInitial: true});
+            this._watcher.on('change', () => {
+                if (session.settings().autoResolve())
+                    session.autoResolve(AUTO_RESOLVE_DELAY);
+            });
+        }
     }
 
     dispose() {
-        this._watchers.forEach(watcher => watcher.close());
-    }
-
-    private autoResolve(interval: number) {
-        if (this._timer) {
-            clearTimeout(this._timer);
-        }
-        this._timer = setTimeout(async () => {
-            this._timer = undefined;
-            await vscode.commands.executeCommand(QbsCommandKey.Resolve);
-        }, interval);
+        this._watcher?.close();
     }
 }

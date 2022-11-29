@@ -27,6 +27,7 @@ below, for more information about variable expansion.
 | `qbs.configurationsFilePath`| Specify location to the build configurations `qbs-configurations.json` file. | `${sourceDirectory}/.vscode/qbs-configurations.json` | Yes. |
 | `qbs.clearOutputBeforeOperation`| Clears the output console before starting the operation (applicable for Resolve, Clean, Build, and ReBuild operations). | `false` | No. |
 | `qbs.saveBeforeBuild`| Saves open files before building (applicable for Resolve, Build, and ReBuild operations). | `true` | No. |
+| `qbs.autoResolve`| Starts the automatic resolution of the project when changes are made to the build files. | `true` | No. |
 
 ## Variable substitution
 

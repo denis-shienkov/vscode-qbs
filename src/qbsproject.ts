@@ -45,7 +45,7 @@ export class QbsProject implements vscode.Disposable {
                 // completes. Otherwise the project data can not contains the build
                 // directory, and other properties.
                 this._buildSystemFilesWatcher?.dispose();
-                this._buildSystemFilesWatcher = new QbsBuildSystemFilesWatcher(data);
+                this._buildSystemFilesWatcher = new QbsBuildSystemFilesWatcher(this._session, data);
             }
             this._data = data;
         }
