@@ -23,7 +23,7 @@ export async function displayProfileSelector(session: QbsSession) {
         const label = profile.name();
         const arch = qbs.architecture();
         const type = qbs.toolchainType();
-        const description = localize('qbs.profile.description.', 'Architecture "{0}", type "{1}"', arch, type);
+        const description = localize('qbs.profile.description', 'Architecture "{0}", type "{1}"', arch, type);
         return { label, description, profile };
     }));
 
