@@ -358,7 +358,7 @@
         },
         "configuration": {
             "type": "object",
-            "title": "QBS configuration",
+            "title": "QBS Tools",
             "properties": {
                 "qbs.qbsPath": {
                     "type": "string",
