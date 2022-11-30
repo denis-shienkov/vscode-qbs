@@ -13,6 +13,8 @@ Added the new setting `qbs.buildBeforeRun` to control the build
 stage of the product before it launches.
 - Implemented redirection of messages when detecting profiles to
 the Qbs channel.
+- Profiles detection command added to the profile selector as
+the first `[Detect profiles]` item.
 
 ## 1.0.6
 
