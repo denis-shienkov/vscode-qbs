@@ -11,6 +11,8 @@ resolving of a project when its build files are modified.
 - [#64](https://github.com/denis-shienkov/vscode-qbs/issues/64)
 Added the new setting `qbs.buildBeforeRun` to control the build
 stage of the product before it launches.
+- Implemented redirection of messages when detecting profiles to
+the Qbs channel.
 
 ## 1.0.6
 

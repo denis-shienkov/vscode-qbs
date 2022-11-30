@@ -6,5 +6,7 @@
     "qbs.configuration.custom.label": "Особая",
     "qbs.configuration.debug.description": "Конфигурация с отключенной оптимизацией.",
     "qbs.configuration.release.description": "Конфигурация с включенной оптимизацией.",
-    "qbs.configuration.custom.description": "Особая конфигурация"
+    "qbs.configuration.custom.description": "Особая конфигурация",
+    "qbs.profiles.start": "Запуск определения профилей...",
+    "qbs.profiles.finish": "Определение профилей завершено."
 }

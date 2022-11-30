@@ -257,12 +257,21 @@ export class QbsSettings implements vscode.Disposable {
                 if (qbsSettingsDirectory) {
                     qbsShell += ' --settings-dir ' + qbsSettingsDirectory;
                 }
-                cp.exec(qbsShell, (error, stdout, stderr) => {
+
+                const logger = this._session.logger();
+                logger?.appendCompileText(localize('qbs.profiles.start', 'Starting profiles detection...'));
+                const p = cp.exec(qbsShell, (error, stdout, stderr) => {
+                    logger?.appendCompileText(localize('qbs.profiles.finish', 'Profiles detection finished.'));
                     if (error) {
                         reject(undefined);
                     } else {
                         resolve(true);
                     }
+                });
+                p.stdout?.on('data', (data) => {
+                    const lines = String(data).split(/\r?\n/).filter(line => line)
+                        .map(line => { return '  ' + line.replace(/[\n\r]/g, ''); });
+                    lines.forEach(line => logger?.appendCompileText(line));
                 });
             }
         });
