@@ -13,9 +13,9 @@ import {QbsProjectData} from './datatypes/qbsprojectdata';
 /**
  * Supported language standards by the intelli sense engine.
  */
-type LanguageStandard = 'c89' | 'c99' | 'c11' | 'c18' | 'gnu89' | 'gnu99' | 'gnu11' | 'gnu18'
-                        | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20'
-                        | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20';
+type LanguageStandard = 'c89' | 'c99' | 'c11' | 'gnu89' | 'gnu99' | 'gnu11' | 'c++98' | 'c++03'
+                        | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'gnu++98' | 'gnu++03' | 'gnu++11'
+                        | 'gnu++14' | 'gnu++17' | 'gnu++20';
 
 /**
  * Supported intelli sense modes by the intelli sense engine.
