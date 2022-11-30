@@ -1,4 +1,4 @@
 {
-    "qbs.product.name.missed.error.message": "Имя продукта отсутствует, пересканируйте продукт."
+    "qbs.product.name.missed.error.message": "Имя продукта отсутствует, пересканируйте продукт.",
     "qbs.product.exe.missed.error.message": "Исполняемый файл продукта отсутствует, пересоберите продукт."
 }
