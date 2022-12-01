@@ -15,6 +15,8 @@ stage of the product before it launches.
 the Qbs channel.
 - Profiles detection command added to the profile selector as
 the first `[Detect profiles]` item.
+- Right now the QBS configuration entry name replaced with the
+`QBS Tools`.
 
 ## 1.0.6
 
