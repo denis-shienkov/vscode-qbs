@@ -20,6 +20,7 @@
     "qbs-tools.command.qbs.cancel.title": "Cancel",
     "qbs-tools.command.qbs.getrunenv.title": "Get Run Environment",
     "qbs-tools.command.qbs.run.title": "Run",
+    "qbs-tools.command.qbs.runProduct.title": "Run",
     "qbs-tools.command.qbs.debug.title": "Debug",
     "qbs-tools.command.qbs.edit.configuration.title": "Edit Build Configuration",
 

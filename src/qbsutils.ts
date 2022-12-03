@@ -49,6 +49,10 @@ export function isChildOf(filePath: string, parentDirectory: string) {
     return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
+export function isEmpty(text?: string) {
+    return (!text || text.length === 0);
+}
+
 export function ensureDirectoryExistence(filePath: string) {
     var directory = path.dirname(filePath);
     if (fs.existsSync(directory))

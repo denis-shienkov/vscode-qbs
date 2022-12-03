@@ -57,6 +57,10 @@ export class QbsProject implements vscode.Disposable {
     isEmpty(): boolean { return this._data ? true : false; }
     products(): QbsProductData[] { return this._data?.allProducts() || []; }
 
+    productAt(productName: string): QbsProductData | undefined {
+        return this.products().find(product => product.fullDisplayName() === productName);
+    }
+
     async updateSteps() {
         await this._buildStep.restore();
         await this._runStep.restore();

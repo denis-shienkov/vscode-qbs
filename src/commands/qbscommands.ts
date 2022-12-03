@@ -140,6 +140,9 @@ export async function subscribeCommands(ctx: vscode.ExtensionContext, session: Q
         cleanRequest.setProducts([ productNode.name() ]);
         await QbsCommand.onClean(session, cleanRequest, DEFAULT_COMMAND_TIMEOUT_MS);
     }));
+    ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.RunProduct, async (productNode: QbsProductNode) => {
+        await QbsCommand.onRunProduct(session, productNode.name());
+    }));
     ctx.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.BuildSubProject, async (projectNode: QbsProjectNode) => {
         const buildRequest = new QbsBuildRequest(session.settings());
         buildRequest.setProducts(projectNode.dependentProductNames());

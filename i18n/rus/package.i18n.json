@@ -20,6 +20,7 @@
     "qbs-tools.command.qbs.cancel.title": "Отмена",
     "qbs-tools.command.qbs.getrunenv.title": "Получить переменные окружения для запуска",
     "qbs-tools.command.qbs.run.title": "Запустить",
+    "qbs-tools.command.qbs.runProduct.title": "Запустить",
     "qbs-tools.command.qbs.debug.title": "Отладить",
     "qbs-tools.command.qbs.edit.configuration.title": "Редактировать конфигурацию сборки",
 

@@ -16,6 +16,7 @@ export enum QbsCommandKey {
     ResolveWithForceExecution = 'qbs.resolveWithForceProbesExecution',
     RestoreProject = 'qbs.restoreProject',
     Run = 'qbs.run',
+    RunProduct = 'qbs.runProduct',
     SelectBuild = 'qbs.selectBuild',
     SelectConfiguration = 'qbs.selectConfiguration',
     SelectDebugger = 'qbs.selectDebugger',

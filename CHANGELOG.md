@@ -1,5 +1,11 @@
 # What's New?
 
+## 1.0.8
+
+- [#21](https://github.com/denis-shienkov/vscode-qbs/issues/21)
+Added `Run` context menu for the product in the project tree
+to launch the product in the terminal.
+
 ## 1.0.7
 
 - [#69](https://github.com/denis-shienkov/vscode-qbs/issues/69)

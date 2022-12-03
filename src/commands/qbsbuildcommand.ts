@@ -16,10 +16,12 @@ import {QbsOperation} from '../datatypes/qbsoperation';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export async function onBuild(session: QbsSession, request: QbsBuildRequest, timeout: number) {
+export async function onBuild(session: QbsSession, request: QbsBuildRequest, timeout: number) : Promise<boolean> {
     const needsSaveOpened = session.settings().saveBeforeBuild();
     if (needsSaveOpened && !await QbsUtils.trySaveAll()) {
-        return;
+        vscode.window.showErrorMessage(localize('qbs.session.save.failed.message',
+                                                'Unable to save open files.'));
+        return false;
     }
 
     const needsClearOutput = session.settings().clearOutputBeforeOperation();
@@ -27,7 +29,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
         session.logger()?.clearOutput();
     }
 
-    await vscode.window.withProgress({
+    return await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: localize('qbs.session.build.progress.title', 'Project building'),
         cancellable: true
@@ -36,7 +38,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
         const timestamp = performance.now();
         await session.emitOperation(new QbsOperation(QbsOperationType.Build, QbsOperationStatus.Started, -1));
         await session.build(request);
-        return new Promise<void>(resolve => {
+        return new Promise<boolean>(resolve => {
             let maxProgress: number = 0;
             let progress: number = 0;
             let description: string = '';
@@ -75,9 +77,10 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
             });
             const projectBuiltSubscription = session.onProjectBuilt(async (errors) => {
                 const elapsed = performance.now() - timestamp;
+                const success = errors.isEmpty();
                 await session.emitOperation(new QbsOperation(
                     QbsOperationType.Build,
-                    errors.isEmpty() ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
+                    success ? QbsOperationStatus.Completed : QbsOperationStatus.Failed,
                     elapsed));
                 maxProgress = progress = oldPercentage = 0;
                 description = errors.isEmpty() ? localize('qbs.session.build.progress.completed.title','Project successfully built')
@@ -88,7 +91,7 @@ export async function onBuild(session: QbsSession, request: QbsBuildRequest, tim
                 await taskProgressUpdatedSubscription.dispose();
                 await projectBuiltSubscription.dispose();
                 setTimeout(() => {
-                    resolve();
+                    resolve(success);
                 }, timeout);
             });
         });

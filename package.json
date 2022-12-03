@@ -165,6 +165,11 @@
                 "category": "QBS"
             },
             {
+                "command": "qbs.runProduct",
+                "title": "%qbs-tools.command.qbs.runProduct.title%",
+                "category": "QBS"
+            },
+            {
                 "command": "qbs.debug",
                 "title": "%qbs-tools.command.qbs.debug.title%",
                 "category": "QBS"
@@ -343,6 +348,11 @@
                     "command": "qbs.buildProduct",
                     "when": "viewItem == product-node",
                     "group": "product_context@2"
+                },
+                {
+                    "command": "qbs.runProduct",
+                    "when": "viewItem == product-node",
+                    "group": "product_context@3"
                 },
                 {
                     "command": "qbs.cleanSubProject",
