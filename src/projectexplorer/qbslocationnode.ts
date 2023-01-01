@@ -1,39 +1,66 @@
-import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
+import * as vscode from 'vscode';
 
-import * as QbsUtils from '../qbsutils';
-
-import {QbsBaseNode} from './qbsbasenode';
-
-import {QbsLocationData} from '../datatypes/qbslocationdata';
+import { QbsBaseNode } from './qbsbasenode';
+import { QbsCommandKey } from '../datatypes/qbscommandkey';
+import { QbsProtocolLocationData } from '../protocol/qbsprotocollocationdata';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
+/** The data type encapsulates the Qbs location object to display in the project tree. */
 export class QbsLocationNode extends QbsBaseNode {
-    constructor(
-        private readonly _location: QbsLocationData,
-        private readonly _isQbsFile: boolean,
-        private readonly _isEnabled: boolean) {
-        super(_location.id());
+    private readonly fsPath: string
+    private readonly name: string
+    private readonly line: number
+    private readonly column: number
+
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        locationData: QbsProtocolLocationData,
+        private readonly isEnabled: boolean,
+        private readonly isQbsFile: boolean,
+        private readonly parentId: string) {
+        super(resourcesPath, showDisabledNodes);
+
+        const fsPath = locationData.getFilePath();
+        if (!fsPath)
+            throw new Error('Unable to create location node because the file path is undefined');
+        this.fsPath = fsPath;
+
+        const name = locationData.getFileName();
+        if (!name)
+            throw new Error('Unable to create location node because the name is undefined');
+        this.name = name;
+
+        const line = locationData.getLine();
+        if (!line)
+            throw new Error('Unable to create location node because the line number is undefined');
+        this.line = line;
+
+        const column = locationData.getColumn();
+        if (!column)
+            throw new Error('Unable to create location node id because the line column is undefined');
+        this.column = column;
     }
 
-    getTreeItem(): vscode.TreeItem {
-        let label = this._location.fileName();
-        if (this._isQbsFile) {
-            label += ':' + this._location.line();
-        }
-        if (!this._isEnabled) {
-            label = QbsUtils.strikeLine(label);
-        }
-        const item = new vscode.TreeItem(label);
-        item.resourceUri = vscode.Uri.file(this._location.filePath());
-        item.command = {
-            command: 'qbs.openTextDocumentAtPosition',
-            title: localize('open.file', 'Open file'),
-            arguments: [item.resourceUri, new vscode.Position(this._location.line() - 1, this._location.column() - 1)]
-        };
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.getLabel());
+        item.id = this.getId();
+        item.resourceUri = vscode.Uri.file(this.fsPath);
+        item.command = QbsBaseNode.createOpenFileAtPositionCommand(
+            item.resourceUri, new vscode.Position(this.line - 1, this.column - 1));
         return item;
     }
 
-    getChildren(): QbsBaseNode[] { return []; }
+    public getChildren(): QbsBaseNode[] { return []; }
+
+    private getLabel(): string {
+        let input = this.name;
+        if (this.isQbsFile)
+            input += `:${this.line}`;
+        return QbsBaseNode.createLabel(input, this.isEnabled);
+    }
+
+    private getId(): string { return `${this.parentId}:${this.fsPath}:${this.line}:${this.column}`; }
 }

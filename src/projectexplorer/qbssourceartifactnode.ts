@@ -1,35 +1,42 @@
 import * as vscode from 'vscode';
-import * as nls from 'vscode-nls';
 
-import * as QbsUtils from '../qbsutils';
+import { QbsBaseNode } from './qbsbasenode';
+import { QbsProtocolSourceArtifactData } from '../protocol/qbsprotocolsourceartifactdata';
 
-import {QbsBaseNode} from './qbsbasenode';
-
-import {QbsSourceArtifactData} from '../datatypes/qbssourceartifactdata';
-
-const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
-
+/** The data type encapsulates the Qbs source artifact object to display in the project tree. */
 export class QbsSourceArtifactNode extends QbsBaseNode {
-    constructor(
-        private readonly _artifact: QbsSourceArtifactData,
-        private readonly _isEnabled: boolean) {
-        super(_artifact.id());
+    private readonly name: string
+    private readonly fsPath: string
+
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        artifactData: QbsProtocolSourceArtifactData,
+        private readonly isEnabled: boolean,
+        private readonly parentId: string) {
+        super(resourcesPath, showDisabledNodes);
+
+        const name = artifactData.getFileName();
+        if (!name)
+            throw new Error('Unable to create source artifact node because the file name is undefined');
+        this.name = name;
+
+        const fsPath = artifactData.getFilePath();
+        if (!fsPath)
+            throw new Error('Unable to create source artifact node because the file path is undefined');
+        this.fsPath = fsPath;
     }
 
-    getTreeItem(): vscode.TreeItem {
-        let label = this._artifact.fileName();
-        if (!this._isEnabled) {
-            label = QbsUtils.strikeLine(label);
-        }
-        const item = new vscode.TreeItem(label);
-        item.resourceUri = vscode.Uri.file(this._artifact.filePath());
-        item.command = {
-            command: 'vscode.open',
-            title: localize('open.file', 'Open file'),
-            arguments: [item.resourceUri]
-        };
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.getLabel());
+        item.id = this.getId();
+        item.resourceUri = vscode.Uri.file(this.fsPath);
+        item.command = QbsBaseNode.createOpenFileCommand(item.resourceUri);
         return item;
     }
 
-    getChildren(): QbsBaseNode[] { return []; }
+    public getChildren(): QbsBaseNode[] { return []; }
+
+    private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
+    private getId(): string { return `${this.parentId}:${this.fsPath}`; }
 }

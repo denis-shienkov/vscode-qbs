@@ -1,6 +1,8 @@
 .vscode-test/
+.vscode/
 node_modules/
 out/
 package-lock.json
 *nls.*.json
 *.vsix
+*.lock

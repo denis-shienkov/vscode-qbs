@@ -1,60 +1,109 @@
 import * as vscode from 'vscode';
 
-import * as QbsUtils from '../qbsutils';
+import { QbsBaseNode, QbsBaseNodeContext } from './qbsbasenode';
+import { QbsBuildSystemFilesNode } from './qbsbuildsystemfilesnode';
+import { QbsLocationNode } from './qbslocationnode';
+import { QbsProductNode } from './qbsproductnode';
+import { QbsProtocolLocationData } from '../protocol/qbsprotocollocationdata';
+import { QbsProtocolProductData } from '../protocol/qbsprotocolproductdata';
+import { QbsProtocolProjectData } from '../protocol/qbsprotocolprojectdata';
 
-import {QbsBaseNode} from './qbsbasenode';
-import {QbsBuildSystemFilesNode} from './qbsbuildsystemfilesnode';
-import {QbsLocationNode} from './qbslocationnode';
-import {QbsProductNode} from './qbsproductnode';
+enum QbsProjectNodeIcon {
+    RootProduct = 'root-folder',
+    SubProduct = 'folder',
+}
 
-import {QbsProjectData} from '../datatypes/qbsprojectdata';
-
+/** The data type encapsulates the Qbs project object to display in the project tree. */
 export class QbsProjectNode extends QbsBaseNode {
-    constructor(
-        private readonly _project: QbsProjectData,
-        private readonly _isRoot: boolean,
-        private readonly _showDisabledNodes: boolean) {
-        super(_project.id());
+    private readonly name: string
+    private readonly location: QbsProtocolLocationData
+    private readonly fsPath: string
+    private readonly products: QbsProtocolProductData[]
+    private readonly subprojects: QbsProtocolProjectData[]
+    private readonly dependencies: string[]
+    private readonly isEnabled: boolean
+
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        private readonly projectData: QbsProtocolProjectData,
+        private readonly isRoot: boolean,
+        private readonly parentId: string) {
+        super(resourcesPath, showDisabledNodes);
+
+        const name = this.projectData.getName();
+        if (!name)
+            throw new Error('Unable to create project node because the name is undefined');
+        this.name = name;
+
+        const location = this.projectData.getLocation();
+        if (!location)
+            throw new Error('Unable to create project node because the location is undefined');
+        this.location = location;
+
+        const fsPath = this.location.getFilePath();
+        if (!fsPath)
+            throw new Error('Unable to create project node because the file path is undefined');
+        this.fsPath = fsPath;
+
+        this.products = this.projectData.getProducts()
+            .filter(productData => this.checkIsProductVisible(productData));
+        this.subprojects = this.projectData.getSubProjects()
+            .filter(projectData => this.checkIsSubProjectVisible(projectData));
+        this.isEnabled = this.projectData.getIsEnabled() || false;
+
+        this.dependencies = this.projectData.getAllRecursiveProducts()
+            .filter(productData => productData.getFullDisplayName())
+            .map(productData => productData.getFullDisplayName() || '');
     }
 
-    getTreeItem(): vscode.TreeItem {
-        const collapsible = this._isRoot ? vscode.TreeItemCollapsibleState.Expanded
-                                         : vscode.TreeItemCollapsibleState.Collapsed;
-        let label = this._project.name();
-        if (!this._project.isEnabled()) {
-            label = QbsUtils.strikeLine(label);
-        }
-        const item = new vscode.TreeItem(label, collapsible);
-        item.iconPath = new vscode.ThemeIcon('project');
-        item.contextValue = this._isRoot ? 'root-project-node' : 'sub-project-node';
+    // TODO: For build command!
+    public getDependentProductNames(): string[] { return this.dependencies; }
+
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.getLabel(), this.getCollapsibleState());
+        item.id = this.getId();
+        item.contextValue = this.getContextValue();
+        item.iconPath = new vscode.ThemeIcon(this.getIcon());
         return item;
     }
 
-    getChildren(): QbsBaseNode[] {
-        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._project.location(), true, this._project.isEnabled()) ];
-
-        const products = this._project.products();
-        products.forEach(product => {
-            if (!this._showDisabledNodes && !product.isEnabled()) {
-                return;
-            } else {
-                nodes.push(new QbsProductNode(product, this._showDisabledNodes));
-            }
-        });
-
-        const projects = this._project.subProjects();
-        projects.forEach(project => {
-            nodes.push(new QbsProjectNode(project, false, this._showDisabledNodes));
-        });
-
-        if (this._isRoot) {
-            nodes.push(new QbsBuildSystemFilesNode(this._project));
-        }
-
-        return nodes;
+    public getChildren(): QbsBaseNode[] {
+        let childrenNodes: QbsBaseNode[] = [
+            ...[new QbsLocationNode(
+                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true, this.getId())],
+            ...this.products.map(productData => new QbsProductNode(
+                this.resourcesPath, this.showDisabledNodes, productData, this.getId())),
+            ...this.subprojects.map(projectData => new QbsProjectNode(
+                this.resourcesPath, this.showDisabledNodes, projectData, false, this.getId()))
+        ];
+        if (this.isRoot)
+            childrenNodes.push(new QbsBuildSystemFilesNode(
+                this.resourcesPath, this.showDisabledNodes, this.projectData));
+        return childrenNodes;
     }
 
-    dependentProductNames(): string[] {
-        return this._project.allProducts().map(product => product.fullDisplayName());
+    private checkIsProductVisible(productData: QbsProtocolProductData): boolean {
+        return (!this.showDisabledNodes && !productData.getIsEnabled()) ? false : true;
     }
+
+    private checkIsSubProjectVisible(projectData: QbsProtocolProjectData): boolean {
+        return (!this.showDisabledNodes && !projectData.getIsEnabled()) ? false : true;
+    }
+
+    private getCollapsibleState(): vscode.TreeItemCollapsibleState {
+        return (this.isRoot) ? vscode.TreeItemCollapsibleState.Expanded
+            : vscode.TreeItemCollapsibleState.Collapsed;
+    }
+
+    private getContextValue(): string {
+        return (this.isRoot) ? QbsBaseNodeContext.RootProject : QbsBaseNodeContext.SubProject
+    }
+
+    private getIcon(): string {
+        return (this.isRoot) ? QbsProjectNodeIcon.RootProduct : QbsProjectNodeIcon.SubProduct;
+    }
+
+    private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
+    private getId(): string { return `${this.parentId}:${this.name}:${this.fsPath}`; }
 }

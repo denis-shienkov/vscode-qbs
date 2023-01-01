@@ -1,5 +1,0 @@
-{
-    "qbs.session.resolve.progress.title": "Сканирование проекта",
-    "qbs.session.resolve.progress.completed.title": "Сканирование проекта успешно завершено",
-    "qbs.session.resolve.progress.failed.title": "Сканирование проекта завершено с ошибками"
-}

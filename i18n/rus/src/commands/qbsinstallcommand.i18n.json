@@ -1,5 +1,0 @@
-{
-    "qbs.session.install.progress.title": "Установка проекта",
-    "qbs.session.install.progress.completed.title": "Установка проекта успешно завершена",
-    "qbs.session.install.progress.failed.title": "Установка проекта завершена с ошибками"
-}

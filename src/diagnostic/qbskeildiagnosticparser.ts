@@ -1,134 +1,118 @@
 import * as vscode from 'vscode';
 
-import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
-import * as QbsUtils from '../qbsutils';
-
-import {QbsDiagnosticParser} from './qbsdiagnosticutils';
-
-const ARM_CC_REGEXP = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#\d+):\s(.+)$/;
-const ARM_CLANG_REGEXP = /^(.+\.\S+):(\d+):(\d+):\s(fatal error|error|warning):\s(.+)/;
-const MCS_COMPILER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
-const MCS_ASSEMBLER_REGEXP = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\s(\d+)\s\((.+),\sLINE\s\d+\):\s(.+)$/;
+import { QbsDiagnosticParser, QbsDiagnosticParserSeverity } from './qbsdiagnosticparser';
+import { QbsToolchain } from '../protocol/qbsprotocolqbsmoduledata';
+import { substractOne } from '../qbsutils';
 
 export class QbsKeilDiagnosticParser extends QbsDiagnosticParser {
-    constructor(type: string) {
-        super(type);
-    }
+    private readonly armCcCompilerRegexp = /"(.+\.\S+)",\sline\s(\d+):\s(Error|Warning):\s+(#\d+):\s(.+)$/;
+    private readonly armClangCompilerRegexp = /^(.+\.\S+):(\d+):(\d+):\s(fatal error|error|warning):\s(.+)/;
+    private readonly mcsCompilerRegexp = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\sLINE\s(\d+)\sOF\s(.+\.\S+):\s(.+)$/;
+    private readonly mcsAssemblerRegexp = /^\*{3}\s(ERROR|WARNING)\s(.+)\sIN\s(\d+)\s\((.+),\sLINE\s\d+\):\s(.+)$/;
 
-    parseLines(lines: string[]) {
-        for (const line of lines) {
-            this.parseLine(line);
-        }
-    }
+    public constructor() { super(QbsToolchain.Keil); }
 
-    private parseLine(line: string) {
-        line = QbsUtils.trimLine(line);
-
-        if (this.parseArmCCCompilerMessage(line)) {
+    protected parseLine(line: string): void {
+        if (this.parseArmCCCompilerMessage(line))
             return;
-        } else if (this.parseArmClangCompilerMessage(line)) {
+        else if (this.parseArmClangCompilerMessage(line))
             return;
-        } else if (this.parseMcsCompilerMessage(line)) {
+        else if (this.parseMcsCompilerMessage(line))
             return;
-        } else if (this.parseMcsAssemblerMessage(line)) {
+        else if (this.parseMcsAssemblerMessage(line))
             return;
-        }
     }
 
     private parseArmCCCompilerMessage(line: string): boolean {
-        const matches = ARM_CC_REGEXP.exec(line);
-        if (!matches) {
+        const matches = this.armCcCompilerRegexp.exec(line);
+        if (!matches)
             return false;
-        }
 
-        const [, file, linestr, severity, code, message] = matches;
-        const lineno = QbsDiagnosticUtils.substractOne(linestr);
-        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const [, fsPath, linestr, severity, code, message] = matches;
+        const lineNo = substractOne(linestr);
+        const range = new vscode.Range(lineNo, 0, lineNo, 999);
         const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
+            source: this.toolchainType,
             severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
             message,
             range,
             code
         };
 
-        this.insertDiagnostic(file, diagnostic);
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         return true;
     }
 
     private parseArmClangCompilerMessage(line: string): boolean {
-        const matches = ARM_CLANG_REGEXP.exec(line);
-        if (!matches) {
+        const matches = this.armClangCompilerRegexp.exec(line);
+        if (!matches)
             return false;
-        }
 
-        const [, file, linestr, columnstr, severity, message] = matches;
-        const lineno = QbsDiagnosticUtils.substractOne(linestr);
-        const columnno = QbsDiagnosticUtils.substractOne(columnstr);
-        const range = new vscode.Range(lineno, columnno, lineno, columnno);
+        const [, fsPath, linestr, columnstr, severity, message] = matches;
+        const lineNo = substractOne(linestr);
+        const columnNo = substractOne(columnstr);
+        const range = new vscode.Range(lineNo, columnNo, lineNo, columnNo);
         const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
+            source: this.toolchainType,
             severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
             message,
             range
         };
 
-        this.insertDiagnostic(file, diagnostic);
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         return true;
     }
 
     private parseMcsCompilerMessage(line: string): boolean {
-        const matches = MCS_COMPILER_REGEXP.exec(line);
-        if (!matches) {
+        const matches = this.mcsCompilerRegexp.exec(line);
+        if (!matches)
             return false;
-        }
 
-        const [, severity, code, linestr, file, message] = matches;
-        const lineno = QbsDiagnosticUtils.substractOne(linestr);
-        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const [, severity, code, linestr, fsPath, message] = matches;
+        const lineNo = substractOne(linestr);
+        const range = new vscode.Range(lineNo, 0, lineNo, 999);
         const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
+            source: this.toolchainType,
             severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
             message,
             range,
             code
         };
 
-        this.insertDiagnostic(file, diagnostic);
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         return true;
     }
 
     private parseMcsAssemblerMessage(line: string): boolean {
-        const matches = MCS_ASSEMBLER_REGEXP.exec(line);
-        if (!matches) {
+        const matches = this.mcsAssemblerRegexp.exec(line);
+        if (!matches)
             return false;
-        }
 
-        const [, severity, code, linestr, file, message] = matches;
-        const lineno = QbsDiagnosticUtils.substractOne(linestr);
-        const range = new vscode.Range(lineno, 0, lineno, 999);
+        const [, severity, code, linestr, fsPath, message] = matches;
+        const lineNo = substractOne(linestr);
+        const range = new vscode.Range(lineNo, 0, lineNo, 999);
         const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
+            source: this.toolchainType,
             severity: QbsKeilDiagnosticParser.encodeSeverity(severity),
             message,
             range,
             code
         };
 
-        this.insertDiagnostic(file, diagnostic);
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         return true;
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
         const s = severity.toLowerCase();
         switch (s) {
-        case 'error':
-        case 'fatal error':
-            return vscode.DiagnosticSeverity.Error;
-        case 'warning':
-            return vscode.DiagnosticSeverity.Warning;
-        default:
-            return vscode.DiagnosticSeverity.Information;
+            case QbsDiagnosticParserSeverity.Error:
+            case QbsDiagnosticParserSeverity.FatalError:
+                return vscode.DiagnosticSeverity.Error;
+            case QbsDiagnosticParserSeverity.Warning:
+                return vscode.DiagnosticSeverity.Warning;
+            default:
+                return vscode.DiagnosticSeverity.Information;
         }
     }
 }

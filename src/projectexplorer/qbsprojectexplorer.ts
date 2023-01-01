@@ -1,79 +1,88 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 
-import {QbsBaseNode} from './qbsbasenode';
-import {QbsProjectNode} from './qbsprojectnode';
-
-import {QbsSession} from '../qbssession';
-import {QbsSettingsEvent} from '../qbssettings';
-
-async function openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position) {
-    await vscode.workspace.openTextDocument(uri).then(async (doc) => {
-        await vscode.window.showTextDocument(doc).then(async (editor) => {
-            editor.selections = [new vscode.Selection(pos, pos)];
-            const range = new vscode.Range(pos, pos);
-            editor.revealRange(range);
-        });
-    });
-}
+import { QbsBaseNode } from './qbsbasenode';
+import { QbsCommandKey } from '../datatypes/qbscommandkey';
+import { QbsProjectManager } from '../qbsprojectmanager';
+import { QbsProjectNode } from './qbsprojectnode';
+import { QbsProtocolProjectData } from '../protocol/qbsprotocolprojectdata';
+import { QbsSettings } from '../qbssettings';
 
 class QbsProjectDataProvider implements vscode.TreeDataProvider<QbsBaseNode> {
-    private _showDisabledNodes: boolean = false;
-    private _onDidChangeTreeData = new vscode.EventEmitter<void>();
-    readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+    private projectData?: QbsProtocolProjectData;
+    private readonly treeDataChanged = new vscode.EventEmitter<void>();
+    private readonly resourcesPath: string
 
+    public readonly onDidChangeTreeData: vscode.Event<void> = this.treeDataChanged.event;
 
-    constructor(private readonly _session: QbsSession) {
-        _session.onProjectResolved(async () => this._onDidChangeTreeData.fire());
-
-        _session.settings().onChanged(async (event) => {
-            if (event === QbsSettingsEvent.ProjectTreeUpdateRequired) {
-                this._showDisabledNodes = _session.settings().showDisabledProjectItems();
-                this._onDidChangeTreeData.fire();
-            }
-        });
-
-        this._showDisabledNodes = _session.settings().showDisabledProjectItems();
+    public constructor(context: vscode.ExtensionContext) {
+        this.resourcesPath = path.join(context.extensionPath, 'res');
     }
 
-    getTreeItem(node: QbsBaseNode): vscode.TreeItem {
-        return node.getTreeItem();
+    public getTreeItem(element: QbsBaseNode): vscode.TreeItem {
+        return element.getTreeItem();
     }
 
-    getChildren(node?: QbsBaseNode): QbsBaseNode[] {
-        if (node) {
-            return node.getChildren();
-        }
-
-        const project = this._session.project()?.data();
-        if (!project) {
+    public getChildren(element?: QbsBaseNode): QbsBaseNode[] {
+        if (element)
+            return element.getChildren();
+        else if (!this.projectData || this.projectData.getIsEmpty())
             return [];
-        }
 
-        if (!this._showDisabledNodes && !project.isEnabled()) {
+        const showDisabledNodes = QbsSettings.getShowDisabledProjectItems();
+        if (!showDisabledNodes && !this.projectData.getIsEnabled())
             return [];
-        }
 
-        return [ new QbsProjectNode(project, true, this._showDisabledNodes) ];
+        return [new QbsProjectNode(this.resourcesPath, showDisabledNodes, this.projectData, true, 'root-id')];
+    }
+
+    public refresh(projectData?: QbsProtocolProjectData) {
+        if (projectData)
+            this.projectData = projectData;
+        this.treeDataChanged.fire();
     }
 }
 
 export class QbsProjectExplorer implements vscode.Disposable {
-    private _viewer: vscode.TreeView<QbsBaseNode>;
+    private disposable?: vscode.Disposable;
+    private provider: QbsProjectDataProvider = new QbsProjectDataProvider(this.context);
 
-    constructor(session: QbsSession) {
-        const treeDataProvider = new QbsProjectDataProvider(session);
-        this._viewer = vscode.window.createTreeView('qbs-project', {
-            treeDataProvider,
-            showCollapseAll: true
-        });
+    public constructor(private readonly context: vscode.ExtensionContext) {
+        vscode.window.registerTreeDataProvider('qbs-project', this.provider);
+
+        this.registerCommandsHandlers(context);
+        this.subscribeTreeUpdateEvents();
     }
 
-    async subscribeCommands(ctx: vscode.ExtensionContext) {
-        ctx.subscriptions.push(vscode.commands.registerCommand('qbs.openTextDocumentAtPosition',
+    public async registerCommandsHandlers(context: vscode.ExtensionContext) {
+        context.subscriptions.push(vscode.commands.registerCommand(
+            QbsCommandKey.OpenTextDocumentAtPosition,
             async (uri: vscode.Uri, pos: vscode.Position) => {
-                await openTextDocumentAtPosition(uri, pos);
+                await this.openTextDocumentAtPosition(uri, pos);
+            }));
+    }
+
+    private subscribeTreeUpdateEvents() {
+        QbsSettings.observeSetting(QbsSettings.SettingKey.ShowDisabledProjectItems,
+            () => { this.provider.refresh(); });
+
+        QbsProjectManager.getInstance().onProjectOpen((async () => {
+            this.disposable = QbsProjectManager.getInstance()
+                .getProject()?.onProjectDataChanged(async (projectData) => {
+                    this.provider.refresh(projectData);
+                });
         }));
     }
 
-    dispose() { this._viewer.dispose(); }
+    public dispose() { this.disposable?.dispose(); }
+
+    private async openTextDocumentAtPosition(uri: vscode.Uri, pos: vscode.Position) {
+        await vscode.workspace.openTextDocument(uri).then(async (doc) => {
+            await vscode.window.showTextDocument(doc).then(async (editor) => {
+                editor.selections = [new vscode.Selection(pos, pos)];
+                const range = new vscode.Range(pos, pos);
+                editor.revealRange(range);
+            });
+        });
+    }
 }

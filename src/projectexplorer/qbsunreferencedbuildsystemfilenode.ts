@@ -1,26 +1,22 @@
 import * as vscode from 'vscode';
-import * as nls from 'vscode-nls';
 
-import {QbsBaseNode} from './qbsbasenode';
+import { QbsBaseNode } from './qbsbasenode';
 
-const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
-
+/** The data type encapsulates the Qbs unreferenced build file object to display in the project tree. */
 export class QbsUnreferencedBuildSystemFileNode extends QbsBaseNode {
-    constructor(
-        private readonly _filePath: string) {
-        super(_filePath);
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        private readonly fsPath: string) {
+        super(resourcesPath, showDisabledNodes);
     }
 
-    getTreeItem(): vscode.TreeItem {
-        const item = new vscode.TreeItem(this._filePath);
-        item.resourceUri = vscode.Uri.file(this._filePath);
-        item.command = {
-            command: 'vscode.open',
-            title: localize('open.file', 'Open file'),
-            arguments: [item.resourceUri]
-        };
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.fsPath);
+        item.resourceUri = vscode.Uri.file(this.fsPath);
+        item.command = QbsBaseNode.createOpenFileCommand(item.resourceUri);
         return item;
     }
 
-    getChildren(): QbsBaseNode[] { return []; }
+    public getChildren(): QbsBaseNode[] { return []; }
 }

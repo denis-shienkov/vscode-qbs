@@ -1,8 +1,8 @@
 {
     "name": "qbs-tools",
-    "displayName": "QBS",
-    "description": "QBS support in Visual Studio Code",
-    "version": "1.0.7",
+    "displayName": "Qbs",
+    "description": "Qbs tools support for Visual Studio Code",
+    "version": "2.0.0",
     "publisher": "qbs-community",
     "author": {
         "name": "Denis Shienkov"
@@ -40,6 +40,10 @@
                 "extensions": [
                     ".qbs"
                 ],
+                "icon": {
+                    "light": "res/cube.svg",
+                    "dark": "res/cube.svg"
+                },
                 "configuration": "./qbs-language-configuration.json"
             }
         ],
@@ -52,182 +56,183 @@
         ],
         "commands": [
             {
-                "command": "qbs.openTextDocumentAtPosition",
-                "title": "%qbs-tools.command.qbs.open.text.document.pos.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.detectProfiles",
-                "title": "%qbs-tools.command.qbs.detect.profiles.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.restoreProject",
-                "title": "%qbs-tools.command.qbs.restore.project.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.autoRestartSession",
-                "title": "%qbs-tools.command.qbs.autorestart.session.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.startSession",
-                "title": "%qbs-tools.command.qbs.start.session.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.stopSession",
-                "title": "%qbs-tools.command.qbs.stop.session.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectProject",
-                "title": "%qbs-tools.command.qbs.select.project.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectProfile",
-                "title": "%qbs-tools.command.qbs.select.profile.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectConfiguration",
-                "title": "%qbs-tools.command.qbs.select.configuration.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectBuild",
-                "title": "%qbs-tools.command.qbs.select.build.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectRun",
-                "title": "%qbs-tools.command.qbs.select.run.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.selectDebugger",
-                "title": "%qbs-tools.command.qbs.select.debugger.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.resolveWithForceProbesExecution",
-                "title": "%qbs-tools.command.qbs.resolveforceprobes.title%",
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.resolve",
-                "title": "%qbs-tools.command.qbs.resolve.title%",
-                "icon": {
-                    "dark": "res/dark/resolve-icon.svg",
-                    "light": "res/light/resolve-icon.svg"
-                },
-                "category": "QBS"
-            },
-            {
-                "command": "qbs.build",
-                "title": "%qbs-tools.command.qbs.build.title%",
+                "command": "qbs.buildProduct",
+                "title": "%qbs-tools.command.qbs.buildProduct.title%",
                 "icon": {
                     "dark": "res/dark/build-icon.svg",
                     "light": "res/light/build-icon.svg"
                 },
-                "category": "QBS"
+                "category": "Qbs"
             },
             {
-                "command": "qbs.clean",
-                "title": "%qbs-tools.command.qbs.clean.title%",
-                "category": "QBS"
+                "command": "qbs.cancelOperation",
+                "title": "%qbs-tools.command.qbs.cancelOperation.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.install",
-                "title": "%qbs-tools.command.qbs.install.title%",
-                "category": "QBS"
+                "command": "qbs.cleanProduct",
+                "title": "%qbs-tools.command.qbs.cleanProduct.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.rebuild",
-                "title": "%qbs-tools.command.qbs.rebuild.title%",
-                "category": "QBS"
+                "command": "qbs.debugProduct",
+                "title": "%qbs-tools.command.qbs.debugProduct.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.cancel",
-                "title": "%qbs-tools.command.qbs.cancel.title%",
-                "category": "QBS"
+                "command": "qbs.editBuildConfigurations",
+                "title": "%qbs-tools.command.qbs.editBuildConfigurations.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.getRunEnvironment",
-                "title": "%qbs-tools.command.qbs.getrunenv.title%",
-                "category": "QBS"
+                "command": "qbs.editLaunchConfigurations",
+                "title": "%qbs-tools.command.qbs.editLaunchConfigurations.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.run",
-                "title": "%qbs-tools.command.qbs.run.title%",
-                "category": "QBS"
+                "command": "qbs.installProduct",
+                "title": "%qbs-tools.command.qbs.installProduct.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.loadProject",
+                "title": "%qbs-tools.command.qbs.loadProject.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.rebuildProduct",
+                "title": "%qbs-tools.command.qbs.rebuildProduct.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.resolveProject",
+                "title": "%qbs-tools.command.qbs.resolveProject.title%",
+                "icon": {
+                    "dark": "res/dark/resolve-icon.svg",
+                    "light": "res/light/resolve-icon.svg"
+                },
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.resolveProjectWithForceProbesExecution",
+                "title": "%qbs-tools.command.qbs.resolveProjectWithForceProbesExecution.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.restartSession",
+                "title": "%qbs-tools.command.qbs.restartSession.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.restoreProject",
+                "title": "%qbs-tools.command.qbs.restoreProject.title%",
+                "category": "Qbs"
             },
             {
                 "command": "qbs.runProduct",
                 "title": "%qbs-tools.command.qbs.runProduct.title%",
-                "category": "QBS"
+                "category": "Qbs"
             },
             {
-                "command": "qbs.debug",
-                "title": "%qbs-tools.command.qbs.debug.title%",
-                "category": "QBS"
+                "command": "qbs.saveProject",
+                "title": "%qbs-tools.command.qbs.saveProject.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.buildProduct",
-                "title": "%qbs-tools.command.qbs.build.title%",
-                "category": "QBS"
+                "command": "qbs.scanBuildConfigurations",
+                "title": "%qbs-tools.command.qbs.scanBuildConfigurations.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.cleanProduct",
-                "title": "%qbs-tools.command.qbs.clean.title%",
-                "category": "QBS"
+                "command": "qbs.scanBuildProfiles",
+                "title": "%qbs-tools.command.qbs.scanBuildProfiles.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.buildSubProject",
-                "title": "%qbs-tools.command.qbs.build.title%",
-                "category": "QBS"
+                "command": "qbs.scanLaunchConfigurations",
+                "title": "%qbs-tools.command.qbs.scanLaunchConfigurations.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.cleanSubProject",
-                "title": "%qbs-tools.command.qbs.clean.title%",
-                "category": "QBS"
+                "command": "qbs.selectBuildConfiguration",
+                "title": "%qbs-tools.command.qbs.selectBuildConfiguration.title%",
+                "category": "Qbs"
             },
             {
-                "command": "qbs.editConfiguration",
-                "title": "%qbs-tools.command.qbs.edit.configuration.title%",
-                "category": "QBS"
+                "command": "qbs.selectBuildProduct",
+                "title": "%qbs-tools.command.qbs.selectBuildProduct.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.selectBuildProfile",
+                "title": "%qbs-tools.command.qbs.selectBuildProfile.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.selectLaunchConfiguration",
+                "title": "%qbs-tools.command.qbs.selectLaunchConfiguration.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.selectRunProduct",
+                "title": "%qbs-tools.command.qbs.selectRunProduct.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.startSession",
+                "title": "%qbs-tools.command.qbs.startSession.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.stopSession",
+                "title": "%qbs-tools.command.qbs.stopSession.title%",
+                "category": "Qbs"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "qbs.openTextDocumentAtPosition",
-                    "when": "never"
+                    "command": "qbs.buildProduct",
+                    "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.buildProduct",
-                    "when": "never"
+                    "command": "qbs.cancelOperation",
+                    "when": "qbs:extension-activated"
                 },
                 {
                     "command": "qbs.cleanProduct",
-                    "when": "never"
+                    "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.buildSubProject",
-                    "when": "never"
+                    "command": "qbs.editBuildConfigurations",
+                    "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.cleanSubProject",
-                    "when": "never"
+                    "command": "qbs.editLaunchConfigurations",
+                    "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.getRunEnvironment",
-                    "when": "never"
+                    "command": "qbs.installProduct",
+                    "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.detectProfiles",
+                    "command": "qbs.loadProject",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.rebuildProduct",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.resolveProject",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.resolveProjectWithForceProbesExecution",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.restartSession",
                     "when": "qbs:extension-activated"
                 },
                 {
@@ -235,7 +240,39 @@
                     "when": "qbs:extension-activated"
                 },
                 {
-                    "command": "qbs.autoRestartSession",
+                    "command": "qbs.saveProject",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.scanBuildConfigurations",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.scanBuildProfiles",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.scanLaunchConfigurations",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectBuildConfiguration",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectBuildProduct",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectBuildProfile",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectLaunchConfiguration",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.selectRunProduct",
                     "when": "qbs:extension-activated"
                 },
                 {
@@ -245,95 +282,31 @@
                 {
                     "command": "qbs.stopSession",
                     "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectProject",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectProfile",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectConfiguration",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectBuild",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectRun",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.selectDebugger",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.resolveWithForceProbesExecution",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.resolve",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.build",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.clean",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.install",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.rebuild",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.cancel",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.run",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.debug",
-                    "when": "qbs:extension-activated"
-                },
-                {
-                    "command": "qbs.editConfiguration",
-                    "when": "qbs:extension-activated"
                 }
             ],
             "view/title": [
                 {
-                    "command": "qbs.resolve",
+                    "command": "qbs.resolveProject",
                     "when": "view == qbs-project && qbs:extension-activated",
                     "group": "navigation@1"
                 },
                 {
-                    "command": "qbs.build",
+                    "command": "qbs.buildProduct",
                     "when": "view == qbs-project && qbs:extension-activated",
                     "group": "navigation@2"
                 },
                 {
-                    "command": "qbs.clean",
+                    "command": "qbs.cleanProduct",
                     "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 },
                 {
-                    "command": "qbs.resolveWithForceProbesExecution",
+                    "command": "qbs.resolveProjectWithForceProbesExecution",
                     "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 },
                 {
-                    "command": "qbs.rebuild",
+                    "command": "qbs.rebuildProduct",
                     "when": "view == qbs-project && qbs:extension-activated",
                     "group": "1_outline"
                 }
@@ -341,12 +314,12 @@
             "view/item/context": [
                 {
                     "command": "qbs.cleanProduct",
-                    "when": "viewItem == product-node",
+                    "when": "viewItem == product-node || viewItem == sub-project-node",
                     "group": "product_context@1"
                 },
                 {
                     "command": "qbs.buildProduct",
-                    "when": "viewItem == product-node",
+                    "when": "viewItem == product-node || viewItem == sub-project-node",
                     "group": "product_context@2"
                 },
                 {
@@ -355,20 +328,15 @@
                     "group": "product_context@3"
                 },
                 {
-                    "command": "qbs.cleanSubProject",
-                    "when": "viewItem == sub-project-node",
-                    "group": "project_context@1"
-                },
-                {
-                    "command": "qbs.buildSubProject",
-                    "when": "viewItem == sub-project-node",
-                    "group": "project_context@2"
+                    "command": "qbs.debugProduct",
+                    "when": "viewItem == product-node",
+                    "group": "product_context@4"
                 }
             ]
         },
         "configuration": {
             "type": "object",
-            "title": "QBS Tools",
+            "title": "Qbs Tools",
             "properties": {
                 "qbs.qbsPath": {
                     "type": "string",
@@ -494,7 +462,7 @@
             "activitybar": [
                 {
                     "id": "qbs-sidebar",
-                    "title": "QBS",
+                    "title": "Qbs",
                     "icon": "res/qbs-view-icon.svg"
                 }
             ]

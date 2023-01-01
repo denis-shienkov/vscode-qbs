@@ -1,5 +1,0 @@
-{
-    "qbs.profile.description": "Архитектура \"{0}\", тип \"{1}\"",
-    "qbs.profile.detect.label": "Обнаружение профилей",
-    "qbs.profile.detect.description": "Обнаружение доступных профилей"
-}

@@ -1,0 +1,4 @@
+{
+    "qbs.buildconfigurationmanager.scan.select.description": "Сканировать доступные конфигурации сборки",
+    "qbs.buildconfigurationmanager.scan.select.label": "[Сканировать конфигурации сборки]"
+}

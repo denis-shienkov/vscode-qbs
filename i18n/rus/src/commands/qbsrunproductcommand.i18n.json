@@ -1,6 +1,0 @@
-{
-    "qbs.product.name.missed.error.message": "Имя продукта отсутствует, пересканируйте продукт.",
-    "qbs.product.missed.error.message": "Продукт не найден, пересканируйте проект.",
-    "qbs.product.notexecutable.error.message": "Продукт является не выполняемым, пересканируйте проект.",
-    "qbs.product.executable.missed.error.message": "Исполняемый файл продукта отсутствует, пересоберите продукт."
-}

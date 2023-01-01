@@ -1,0 +1,12 @@
+{
+    "qbs.buildprofile.unknown.architecture": "неизвестно",
+    "qbs.buildprofile.unknown.type": "неизвестно",
+    "qbs.buildprofilemanager.scan.log.finished": "Сканирование профилей сборки завершено",
+    "qbs.buildprofilemanager.scan.log.started": "Запуск сканирования профилей сборки...",
+    "qbs.buildprofilemanager.scan.progress.completed.message": "Успешно завершено",
+    "qbs.buildprofilemanager.scan.progress.failed.message": "Завершено с ошибкой: {0}",
+    "qbs.buildprofilemanager.scan.progress.title": "Сканирование профилей сборки",
+    "qbs.buildprofilemanager.scan.select.description": "Сканировать доступные профили сборки",
+    "qbs.buildprofilemanager.scan.select.label": "[Сканировать профили сборки]",
+    "qbs.buildprofilemanager.select.description": "Архитектура \"{0}\", тип \"{1}\""
+}

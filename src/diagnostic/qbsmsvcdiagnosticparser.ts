@@ -1,71 +1,60 @@
 import * as vscode from 'vscode';
 
-import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
-import * as QbsUtils from '../qbsutils';
-
-import {QbsDiagnosticParser} from './qbsdiagnosticutils';
-
-const REGEX = /^\s*(\d+>)?\s*([^\s>].*)\((\d+|\d+,\d+|\d+,\d+,\d+,\d+)\)\s*:\s+((?:fatal )?error|warning|info)\s+(\w{1,2}\d+)\s*:\s*(.*)$/;
+import { QbsDiagnosticParser, QbsDiagnosticParserSeverity } from './qbsdiagnosticparser';
+import { QbsToolchain } from '../protocol/qbsprotocolqbsmoduledata';
+import { substractOne } from '../qbsutils';
 
 export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
-    constructor(type: string) {
-        super(type);
-    }
+    private readonly compilerRegexp = /^\s*(\d+>)?\s*([^\s>].*)\((\d+|\d+,\d+|\d+,\d+,\d+,\d+)\)\s*:\s+((?:fatal )?error|warning|info)\s+(\w{1,2}\d+)\s*:\s*(.*)$/;
 
-    parseLines(lines: string[]) {
-        for (const line of lines) {
-            this.parseLine(line);
-        }
-    }
+    public constructor() { super(QbsToolchain.Msvc); }
 
-    private parseLine(line: string) {
-        line = QbsUtils.trimLine(line);
-        const matches = REGEX.exec(line);
-        if (!matches) {
+    protected parseLine(line: string) {
+        const matches = this.compilerRegexp.exec(line);
+        if (!matches)
             return;
-        }
 
-        const [, , file, location, severity, code, message] = matches;
+        const [, , fsPath, location, severity, code, message] = matches;
         const range = (() => {
             const parts = location.split(',');
-            const n0 = QbsDiagnosticUtils.substractOne(parts[0]);
+            const n0 = substractOne(parts[0]);
             if (parts.length === 1) {
                 return new vscode.Range(n0, 0, n0, 999);
             } else if (parts.length === 2) {
-                const n1 = QbsDiagnosticUtils.substractOne(parts[1]);
+                const n1 = substractOne(parts[1]);
                 return new vscode.Range(n0, n1, n0, n1);
             } else if (parts.length === 4) {
-                const n1 = QbsDiagnosticUtils.substractOne(parts[1]);
-                const n2 = QbsDiagnosticUtils.substractOne(parts[2]);
-                const n3 = QbsDiagnosticUtils.substractOne(parts[3]);
+                const n1 = substractOne(parts[1]);
+                const n2 = substractOne(parts[2]);
+                const n3 = substractOne(parts[3]);
                 return new vscode.Range(n0, n1, n2, n3);
             }
             throw new Error('Unable to determine location of MSVC diagnostic');
         })();
 
         const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
+            source: this.toolchainType,
             severity: QbsMsvcDiagnosticParser.encodeSeverity(severity),
             message,
             range,
             code
         };
 
-        this.insertDiagnostic(file, diagnostic);
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
         const s = severity.toLowerCase();
         switch (s) {
-        case 'error':
-        case 'fatal error':
-            return vscode.DiagnosticSeverity.Error;
-        case 'warning':
-            return vscode.DiagnosticSeverity.Warning;
-        case 'info':
-            return vscode.DiagnosticSeverity.Information;
-        default:
-            return vscode.DiagnosticSeverity.Hint;
+            case QbsDiagnosticParserSeverity.Error:
+            case QbsDiagnosticParserSeverity.FatalError:
+                return vscode.DiagnosticSeverity.Error;
+            case QbsDiagnosticParserSeverity.Warning:
+                return vscode.DiagnosticSeverity.Warning;
+            case QbsDiagnosticParserSeverity.Info:
+                return vscode.DiagnosticSeverity.Information;
+            default:
+                return vscode.DiagnosticSeverity.Hint;
         }
     }
 }

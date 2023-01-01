@@ -1,0 +1,7 @@
+{
+    "qbs.launchconfigurationmanager.auto.description": "Сыбрать автоматическую конфигурацию запуска",
+    "qbs.launchconfigurationmanager.auto.placeholder": "Авто",
+    "qbs.launchconfigurationmanager.scan.select.description": "Сканировать доступные конфигурации запуска",
+    "qbs.launchconfigurationmanager.scan.select.label": "[Сканировать конфигурации запуска]",
+    "qbs.launchconfigurationmanager.select.description": "Тип \"{0}\", запрос \"{1}\""
+}

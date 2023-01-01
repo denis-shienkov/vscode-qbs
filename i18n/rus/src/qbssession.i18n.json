@@ -1,6 +1,4 @@
 {
-    "qbs.session.status.started": "запущен",
-    "qbs.session.status.starting": "запускается",
-    "qbs.session.status.stopped": "остановлен",
-    "qbs.session.status.stopping": "останавливается"
+    "qbs.executable.missed.error.message": "Исполняемый файл Qbs не задан в конфигурации.",
+    "qbs.executable.not-found.error.message": "Исполняемый файл Qbs не найден."
 }

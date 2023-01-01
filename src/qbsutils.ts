@@ -1,42 +1,31 @@
-/**
- * @file This file contains a set of useful helper functions.
- */
-
-import * as vscode from 'vscode';
+import { createHash, BinaryLike } from "crypto";
+import * as fs from 'fs';
 import * as nls from 'vscode-nls';
 import * as path from 'path';
-import * as fs from 'fs';
-
-import {QbsConfigData} from './datatypes/qbsconfigdata';
+import * as vscode from 'vscode';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export function fixPathSeparators(path: string): string {
-    return path.replace(/\\/g, '/');
+export function getHash(input: BinaryLike) {
+    const hash = createHash('sha1');
+    hash.update(input);
+    return hash.digest('hex');
 }
 
-/**
- * Adds the quotes to the specified @c shell path and returns
- * the resulting string.
- */
+export function fixFsPathSeparators(fsPath: string): string { return fsPath.replace(/\\/g, '/'); }
+
+/** Adds the quotes to the specified @c shell path and returns the resulting string. */
 export function escapeShell(shell: string): string {
     if (shell == '') {
         return '""';
-    }
-    if (/[^\w@%\-+=:,./|]/.test(shell)) {
+    } else if (/[^\w@%\-+=:,./|]/.test(shell)) {
         shell = shell.replace(/"/g, '\\"');
         return `"${shell}"`;
     }
     return shell;
 }
 
-export function setContextValue(key: string, value: any): Thenable<void> {
-    return vscode.commands.executeCommand('setContext', key, value);
-}
-
-export function trimLine(line: string): string {
-    return line.replace(/[\n\r]/g, '');
-}
+export function trimLine(line: string): string { return line.replace(/[\n\r]/g, ''); }
 
 export function strikeLine(text: string, canStrike = (char: string) => true): string {
     return text.split('')
@@ -44,27 +33,25 @@ export function strikeLine(text: string, canStrike = (char: string) => true): st
         .join('')
 }
 
-export function isChildOf(filePath: string, parentDirectory: string) {
-    const relative = path.relative(parentDirectory, filePath);
-    return relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+export function isChildOf(fsPath: string, parentDirectory: string): boolean {
+    const relative = path.relative(parentDirectory, fsPath);
+    return !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
-export function isEmpty(text?: string) {
-    return (!text || text.length === 0);
-}
+export function isEmpty(text?: string) { return (!text || text.length === 0); }
 
-export function ensureDirectoryExistence(filePath: string) {
-    var directory = path.dirname(filePath);
+export function ensureDirectoryExistence(fsPath: string) {
+    var directory = path.dirname(fsPath);
     if (fs.existsSync(directory))
         return;
     ensureDirectoryExistence(directory);
     fs.mkdirSync(directory);
 }
 
-export function ensureFileCreated(filePath: string, callback?: (ws: fs.WriteStream) => boolean) {
-    if (!fs.existsSync(filePath)) {
-        ensureDirectoryExistence(filePath);
-        const ws = fs.createWriteStream(filePath);
+export function ensureFileCreated(fsPath: string, callback?: (ws: fs.WriteStream) => boolean) {
+    if (!fs.existsSync(fsPath)) {
+        ensureDirectoryExistence(fsPath);
+        const ws = fs.createWriteStream(fsPath);
         if (callback)
             callback(ws);
         ws.close();
@@ -73,7 +60,7 @@ export function ensureFileCreated(filePath: string, callback?: (ws: fs.WriteStre
 
 export function msToTime(msecs: number): string {
     function addZ(n: number): string {
-        return (n < 10? '0' : '') + n;
+        return (n < 10 ? '0' : '') + n;
     }
 
     let s = Math.round(msecs);
@@ -85,41 +72,6 @@ export function msToTime(msecs: number): string {
     var hrs = (s - mins) / 60;
 
     return addZ(hrs) + ':' + addZ(mins) + ':' + addZ(secs) + "." + ms;
-  }
-
-export function getDefaultConfigurations(): QbsConfigData[] {
-    return [
-        {
-            "name": "release",
-            "displayName": "Release",
-            "description": "Build with optimizations.",
-            "properties": {
-                "qbs.buildVariant": "release"
-            }
-        },
-        {
-            "name": "debug",
-            "displayName": "Debug",
-            "description": "Build with debug information.",
-            "properties": {
-                "qbs.buildVariant": "debug"
-            }
-        },
-        {
-            "name": "profiling",
-            "displayName": "Profiling",
-            "description": "Build with optimizations and debug information.",
-            "properties": {
-                "qbs.buildVariant": "profiling"
-            }
-        }
-    ];
-}
-
-export function writeDefaultConfigurations(ws: fs.WriteStream): boolean {
-    ws.write(JSON.stringify(getDefaultConfigurations(), null, 4));
-
-    return true;
 }
 
 export async function trySaveAll(): Promise<boolean> {
@@ -137,4 +89,8 @@ export async function trySaveAll(): Promise<boolean> {
             isCloseAffordance: true,
         });
     return (chosen !== undefined) && (chosen.title === yesButtonTitle);
+}
+
+export function substractOne(num: number | string): number {
+    return (typeof num === 'string') ? substractOne(parseInt(num)) : Math.max(0, num - 1);
 }

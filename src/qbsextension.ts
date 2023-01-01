@@ -1,52 +1,67 @@
 import * as vscode from 'vscode';
 
-import * as QbsCommands from './commands/qbscommands';
-import {QbsCommandKey} from './commands/qbscommandkey';
+import { QbsBuildConfigurationManager } from './qbsbuildconfigurationmanager';
+import { QbsBuildProfileManager } from './qbsbuildprofilemanager';
+import { QbsBuildSystem } from './qbsbuildsystem';
+import { QbsCommandKey } from './datatypes/qbscommandkey';
+import { QbsCppCodeModel } from './qbscppcodemodel';
+import { QbsDiagnosticManager } from './diagnostic/qbsdiagnosticmanager';
+import { QbsLaunchConfigurationManager } from './qbslaunchconfigurationmanager';
+import { QbsOutputLogger } from './qbsoutputlogger';
+import { QbsProjectExplorer } from './projectexplorer/qbsprojectexplorer';
+import { QbsProjectManager } from './qbsprojectmanager';
+import { QbsStatusBar } from './qbsstatusbar';
 
-import * as QbsUtils from './qbsutils';
-
-import {QbsCpp} from './qbscpp';
-import {QbsSessionLogger} from './qbssessionlogger';
-import {QbsSession} from './qbssession';
-import {QbsStatusBar} from './qbsstatusbar';
-
-import {QbsDiagnostic} from './diagnostic/qbsdiagnostic'
-import {QbsProjectExplorer} from './projectexplorer/qbsprojectexplorer'
-
-const QBS_EXTENSION_ACTIVATED = 'qbs:extension-activated';
-
-let manager: QbsExtensionManager;
+let extensionManager: QbsExtensionManager;
 
 class QbsExtensionManager implements vscode.Disposable {
-    private _session: QbsSession = new QbsSession(this._ctx);
-    private _statusBar: QbsStatusBar = new QbsStatusBar(this._session);
-    private _logger: QbsSessionLogger = new QbsSessionLogger(this._session);
-    private _diagnostic: QbsDiagnostic = new QbsDiagnostic(this._session);
-    private _cpp: QbsCpp = new QbsCpp(this._session);
-    private _explorer: QbsProjectExplorer = new QbsProjectExplorer(this._session);
+    private readonly buildConfigurationManager: QbsBuildConfigurationManager = new QbsBuildConfigurationManager(this.context);
+    private readonly buildProfileManager: QbsBuildProfileManager = new QbsBuildProfileManager(this.context);
+    private readonly launchConfigurationManager: QbsLaunchConfigurationManager = new QbsLaunchConfigurationManager(this.context);
+    private readonly buildSystem: QbsBuildSystem = new QbsBuildSystem(this.context);
+    private readonly outputLogger: QbsOutputLogger = new QbsOutputLogger();
+    private readonly projectManager: QbsProjectManager = new QbsProjectManager(this.context);
+    private readonly projectExplorer: QbsProjectExplorer = new QbsProjectExplorer(this.context);
+    private readonly statusBar: QbsStatusBar = new QbsStatusBar();
+    private readonly cppCodeModel: QbsCppCodeModel = new QbsCppCodeModel();
+    private readonly diagnosticManager: QbsDiagnosticManager = new QbsDiagnosticManager();
 
-    constructor(private readonly _ctx: vscode.ExtensionContext) {
-        QbsCommands.subscribeCommands(_ctx, this._session);
-        this._explorer.subscribeCommands(_ctx);
-    }
+    public constructor(private readonly context: vscode.ExtensionContext) { }
 
-    dispose() {
-        this._explorer.dispose();
-        this._cpp.dispose();
-        this._logger.dispose();
-        this._diagnostic.dispose();
-        this._statusBar.dispose();
-        this._session.dispose();
+    public dispose(): void {
+        this.buildConfigurationManager.dispose();
+        this.buildProfileManager.dispose();
+        this.buildSystem.dispose();
+        this.cppCodeModel.dispose();
+        this.diagnosticManager.dispose();
+        this.launchConfigurationManager.dispose();
+        this.outputLogger.dispose();
+        this.projectExplorer.dispose();
+        this.projectManager.dispose();
+        this.statusBar.dispose();
     }
 }
 
-export async function activate(ctx: vscode.ExtensionContext) {
+function setContextValue(key: string, value: any): Thenable<void> {
+    return vscode.commands.executeCommand('setContext', key, value);
+}
+
+export enum QbsExtensionKey {
+    Activated = 'qbs:extension-activated',
+    Id = 'ms-vscode.qbs-tools',
+}
+
+export async function activate(context: vscode.ExtensionContext) {
     console.log('Extension "qbs-tools" is now active!');
-    QbsUtils.setContextValue(QBS_EXTENSION_ACTIVATED, true);
-    manager = new QbsExtensionManager(ctx);
-    await vscode.commands.executeCommand(QbsCommandKey.AutoRestartSession);
+    await setContextValue(QbsExtensionKey.Activated, true);
+    extensionManager = new QbsExtensionManager(context);
+    await vscode.commands.executeCommand(QbsCommandKey.RestartSession);
+    await vscode.commands.executeCommand(QbsCommandKey.ScanBuildProfiles);
+    await vscode.commands.executeCommand(QbsCommandKey.ScanBuildConfigurations);
+    await vscode.commands.executeCommand(QbsCommandKey.ScanLaunchConfigurations);
+    await vscode.commands.executeCommand(QbsCommandKey.RestoreProject);
 }
 
 export async function deactivate() {
-    manager.dispose();
+    extensionManager.dispose();
 }

@@ -1,0 +1,7 @@
+{
+    "qbs.product.executable.missed.error.message": "Продукт не имеет выполняемого файла, пересоберите пробукт.",
+    "qbs.product.missed.error.message": "Продукт не найден, пересканируйте проект.",
+    "qbs.product.name.missed.error.message": "Отсутствует имя продукта, выберите продукт для запуска.",
+    "qbs.product.notexecutable.error.message": "Продукт не является выполняемым, пересканируйте проект.",
+    "qbs.select.build.product.placeholder": "ВСЕ"
+}

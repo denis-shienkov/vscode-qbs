@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 
-import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
-import * as QbsUtils from '../qbsutils';
-
-import {QbsDiagnosticParser} from './qbsdiagnosticutils';
-
-const REGEX = /^(.*):(\d+):(\d+):\s+(?:fatal )?(\w*)(?:\sfatale)?\s?:\s+(.*)/;
+import { QbsDiagnosticParser, QbsDiagnosticParserSeverity } from './qbsdiagnosticparser';
+import { QbsToolchain } from '../protocol/qbsprotocolqbsmoduledata';
+import { substractOne } from '../qbsutils';
 
 interface QbsDiagnosticBacktrace {
     rootInstantiation: string;
@@ -13,66 +10,50 @@ interface QbsDiagnosticBacktrace {
 }
 
 export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
-    private _relatedInformation?: vscode.DiagnosticRelatedInformation[];
-    private _backtrace?: QbsDiagnosticBacktrace;
+    private relatedInformation?: vscode.DiagnosticRelatedInformation[];
+    private backtrace?: QbsDiagnosticBacktrace;
+    private readonly compilerRegexp = /^(.*):(\d+):(\d+):\s+(?:fatal )?(\w*)(?:\sfatale)?\s?:\s+(.*)/;
 
-    constructor(type: string) {
-        super(type);
-    }
+    public constructor() { super(QbsToolchain.Gcc); }
 
-    parseLines(lines: string[]) {
-        for (const line of lines) {
-            this.parseLine(line);
-        }
-    }
-
-    private parseLine(line: string) {
-        line = QbsUtils.trimLine(line);
-        if (this.checkOnInstantiationOf(line)) {
+    protected parseLine(line: string): void {
+        if (this.checkOnInstantiationOf(line))
             return;
-        } else if (this.checkOnRequiredFrom(line)) {
+        else if (this.checkOnRequiredFrom(line))
             return;
-        } else if (this.checkOnBacktraceLimitNotes(line)) {
+        else if (this.checkOnBacktraceLimitNotes(line))
             return;
-        }
 
-        const matches = REGEX.exec(line);
-        if (!matches) {
+        const matches = this.compilerRegexp.exec(line);
+        if (!matches)
             return;
-        }
 
-        const [, file, linestr, columnstr, severity, message] = matches;
-        if (file && linestr && columnstr && severity && message) {
-            const lineno = QbsDiagnosticUtils.substractOne(linestr);
-            const column = QbsDiagnosticUtils.substractOne(columnstr);
+        const [, fsPath, linestr, columnstr, severity, message] = matches;
+        if (fsPath && linestr && columnstr && severity && message) {
+            const lineno = substractOne(linestr);
+            const column = substractOne(columnstr);
             const range = new vscode.Range(lineno, column, lineno, 999);
-            if (severity === 'note' && this._relatedInformation) {
-                const location = new vscode.Location(vscode.Uri.file(file), range);
-                this._relatedInformation.push({
-                    location,
-                    message
-                });
+            if (severity === 'note' && this.relatedInformation) {
+                const location = new vscode.Location(vscode.Uri.file(fsPath), range);
+                this.relatedInformation.push({ location, message });
             }
             const relatedInformation: vscode.DiagnosticRelatedInformation[] = [];
-            if (this._backtrace) {
-                const location = new vscode.Location(vscode.Uri.file(file), range);
-                relatedInformation.push({
-                    location,
-                    message: this._backtrace.rootInstantiation
-                });
-                relatedInformation.push(...this._backtrace.requiredFrom);
-                this._backtrace = undefined;
+            if (this.backtrace) {
+                const location = new vscode.Location(vscode.Uri.file(fsPath), range);
+                relatedInformation.push({ location, message: this.backtrace.rootInstantiation });
+                relatedInformation.push(...this.backtrace.requiredFrom);
+                this.backtrace = undefined;
             }
 
             const diagnostic: vscode.Diagnostic = {
-                source: this.type(),
+                source: this.toolchainType,
                 severity: QbsGccDiagnosticParser.encodeSeverity(severity),
                 message,
                 range,
                 relatedInformation
             };
 
-            this.insertDiagnostic(file, diagnostic);
+            this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         }
     }
 
@@ -81,41 +62,30 @@ export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
         if (!matches)
             return false;
         const [, , message] = matches;
-        this._backtrace = {
-            rootInstantiation: message,
-            requiredFrom: []
-        };
+        this.backtrace = { rootInstantiation: message, requiredFrom: [] };
         return true;
     }
 
     private checkOnRequiredFrom(line: string): boolean {
-        if (!this._backtrace)
+        if (!this.backtrace)
             return false;
         const matches = /(.*):(\d+):(\d+):(  +required from.+)/.exec(line);
         if (!matches)
             return false;
 
         const [, file, linestr, column, message] = matches;
-        const lineNo = QbsDiagnosticUtils.substractOne(linestr);
+        const lineNo = substractOne(linestr);
         const range = new vscode.Range(lineNo, parseInt(column), lineNo, 999);
         const location = new vscode.Location(vscode.Uri.file(file), range);
-        this._backtrace.requiredFrom.push({
-            location,
-            message
-        });
+        this.backtrace.requiredFrom.push({ location, message });
         return true;
-
     }
 
-    private checkOnBacktraceLimitNotes(line: string) {
+    private checkOnBacktraceLimitNotes(line: string): boolean {
         const matches = /note: \((.*backtrace-limit.*)\)/.exec(line);
-        if (matches && this._relatedInformation && this._relatedInformation.length > 0) {
-            const message = matches[1];
-            const prevRelated = this._relatedInformation[0];
-            this._relatedInformation.push({
-                location: prevRelated.location,
-                message
-            });
+        if (matches && this.relatedInformation && this.relatedInformation.length > 0) {
+            const prevRelated = this.relatedInformation[0];
+            this.relatedInformation.push({ location: prevRelated.location, message: matches[1] });
             return true;
         }
         return false;
@@ -124,16 +94,16 @@ export class QbsGccDiagnosticParser extends QbsDiagnosticParser {
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
         const s = severity.toLowerCase();
         switch (s) {
-        case 'error':
-            return vscode.DiagnosticSeverity.Error;
-        case 'warning':
-            return vscode.DiagnosticSeverity.Warning;
-        case 'info':
-        case 'note':
-        case 'remark':
-            return vscode.DiagnosticSeverity.Information;
-        default:
-            return vscode.DiagnosticSeverity.Hint;
+            case QbsDiagnosticParserSeverity.Error:
+                return vscode.DiagnosticSeverity.Error;
+            case QbsDiagnosticParserSeverity.Warning:
+                return vscode.DiagnosticSeverity.Warning;
+            case QbsDiagnosticParserSeverity.Info:
+            case QbsDiagnosticParserSeverity.Note:
+            case QbsDiagnosticParserSeverity.Remark:
+                return vscode.DiagnosticSeverity.Information;
+            default:
+                return vscode.DiagnosticSeverity.Hint;
         }
     }
 }

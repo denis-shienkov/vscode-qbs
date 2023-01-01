@@ -1,38 +1,32 @@
 import * as vscode from 'vscode';
 
-import * as QbsDiagnosticUtils from './qbsdiagnosticutils';
-
-import {QbsMessageItemResponse} from '../datatypes/qbsmessageresponse';
-
-import {QbsDiagnosticParser} from './qbsdiagnosticutils';
+import { QbsDiagnosticParser } from './qbsdiagnosticparser';
+import { QbsProtocolMessageItemResponse } from '../protocol/qbsprotocolmessageresponse';
+import { substractOne } from '../qbsutils';
 
 export class QbsQbsDiagnosticParser extends QbsDiagnosticParser {
-    constructor() {
-        super('qbs');
-    }
+    public constructor() { super('qbs'); }
 
-    parseLines(lines: string[]) {
+    public parseLine(line: string): void {
         // We don't use this method for current parser.
     }
 
-    parseMessages(messages: QbsMessageItemResponse[], severity: vscode.DiagnosticSeverity) {
-        for (const message of messages) {
-            this.parseMessage(message, severity);
-        }
+    public parseMessages(messages: QbsProtocolMessageItemResponse[], severity: vscode.DiagnosticSeverity): void {
+        messages.forEach(message => this.parseMessage(message, severity));
     }
 
-    private parseMessage(message: QbsMessageItemResponse, severity: vscode.DiagnosticSeverity) {
-        const lineno = QbsDiagnosticUtils.substractOne(message._line);
-        const column = QbsDiagnosticUtils.substractOne(message._column);
-        const range = new vscode.Range(lineno, column, lineno, 999);
-
-        const diagnostic: vscode.Diagnostic = {
-            source: this.type(),
-            severity: severity,
-            message: message._description,
-            range
-        };
-
-        this.insertDiagnostic(message._filePath, diagnostic);
+    private parseMessage(message: QbsProtocolMessageItemResponse, severity: vscode.DiagnosticSeverity): void {
+        const lineNo = substractOne(message.lineNo);
+        const columnNo = substractOne(message.columnNo);
+        const range = new vscode.Range(lineNo, columnNo, lineNo, 999);
+        if (message.fsPath && message.description) {
+            const diagnostic: vscode.Diagnostic = {
+                source: this.toolchainType,
+                severity: severity,
+                message: message.description,
+                range
+            };
+            this.insertDiagnostic(vscode.Uri.file(message.fsPath), diagnostic);
+        }
     }
 }

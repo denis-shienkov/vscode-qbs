@@ -1,35 +1,70 @@
 import * as vscode from 'vscode';
 
-import * as QbsUtils from '../qbsutils';
+import { QbsBaseNode } from './qbsbasenode';
+import { QbsLocationNode } from './qbslocationnode';
+import { QbsProtocolGroupData } from '../protocol/qbsprotocolgroupdata';
+import { QbsProtocolSourceArtifactData } from '../protocol/qbsprotocolsourceartifactdata';
+import { QbsSourceArtifactNode } from './qbssourceartifactnode';
+import { QbsProtocolLocationData } from '../protocol/qbsprotocollocationdata';
 
-import {QbsBaseNode} from './qbsbasenode';
-import {QbsLocationNode} from './qbslocationnode';
-import {QbsSourceArtifactNode} from './qbssourceartifactnode';
+enum QbsPGroupNodeIcon {
+    Group = 'files',
+}
 
-import {QbsGroupData} from '../datatypes/qbsgroupdata';
-
+/** The data type encapsulates the Qbs files group object to display in the project tree. */
 export class QbsGroupNode extends QbsBaseNode {
-    constructor(private readonly _group: QbsGroupData) {
-        super(_group.id());
+    private readonly name: string
+    private readonly location: QbsProtocolLocationData
+    private readonly fsPath: string
+    private readonly sources: QbsProtocolSourceArtifactData[];
+    private readonly wildcards: QbsProtocolSourceArtifactData[];
+    private readonly isEnabled: boolean
+
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        groupData: QbsProtocolGroupData,
+        private readonly parentId: string) {
+        super(resourcesPath, showDisabledNodes);
+
+        const name = groupData.getName();
+        if (!name)
+            throw new Error('Unable to create group node because the name is undefined');
+        this.name = name;
+
+        const location = groupData.getLocation();
+        if (!location)
+            throw new Error('Unable to create group node because the location is undefined');
+        this.location = location;
+
+        const fsPath = location.getFilePath();
+        if (!fsPath)
+            throw new Error('Unable to create group node because the file path is undefined');
+        this.fsPath = fsPath;
+
+        this.sources = groupData.getSourceArtifacts();
+        this.wildcards = groupData.getSourceWildcardArtifacts();
+        this.isEnabled = groupData.getIsEnabled() || false;
     }
 
-    getTreeItem(): vscode.TreeItem {
-        let label = this._group.name();
-        if (!this._group.isEnabled()) {
-            label = QbsUtils.strikeLine(label);
-        }
-        const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
-        item.iconPath = new vscode.ThemeIcon('group-by-ref-type');
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.getLabel(), vscode.TreeItemCollapsibleState.Collapsed);
+        item.id = this.getId();
+        item.iconPath = new vscode.ThemeIcon(QbsPGroupNodeIcon.Group);
         return item;
     }
 
-    getChildren(): QbsBaseNode[] {
-        const isEnabled = this._group.isEnabled();
-        const nodes: QbsBaseNode[] = [ new QbsLocationNode(this._group.location(), true, isEnabled) ];
-        const sources = this._group.sourceArtifacts();
-        sources.forEach(source => nodes.push(new QbsSourceArtifactNode(source, isEnabled)));
-        const wildcards = this._group.sourceWildcardsArtifacts();
-        wildcards.forEach(wildcard => nodes.push(new QbsSourceArtifactNode(wildcard, isEnabled)));
-        return nodes;
+    public getChildren(): QbsBaseNode[] {
+        return [
+            ...[new QbsLocationNode(
+                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true, this.getId())],
+            ...this.sources.map(artifactData => new QbsSourceArtifactNode(
+                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled, this.getId())),
+            ...this.wildcards.map(artifactData => new QbsSourceArtifactNode(
+                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled, this.getId()))
+        ];
     }
+
+    private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
+    private getId(): string { return `${this.parentId}:${this.name}:${this.fsPath}`; }
 }

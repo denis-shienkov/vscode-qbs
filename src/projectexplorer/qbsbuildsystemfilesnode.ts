@@ -1,69 +1,91 @@
-import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
-import * as QbsUtils from '../qbsutils';
+import { isChildOf } from '../qbsutils';
+import { QbsBaseNode } from './qbsbasenode';
+import { QbsProtocolProjectData } from '../protocol/qbsprotocolprojectdata';
+import { QbsUnreferencedBuildSystemFileNode } from './qbsunreferencedbuildsystemfilenode';
 
-import {QbsBaseNode} from './qbsbasenode';
-import {QbsUnreferencedBuildSystemFileNode} from './qbsunreferencedbuildsystemfilenode';
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-import {QbsProjectData} from '../datatypes/qbsprojectdata';
-
-function referencedBuildSystemFiles(project: QbsProjectData): string[] {
-    const files: string[] = [];
-    files.push(project.location().filePath());
-
-    const subProjects = project.subProjects();
-    subProjects.forEach(subProject => {
-        const others = referencedBuildSystemFiles(subProject);
-        files.push(...others);
-    });
-
-    const products = project.products();
-    products.forEach(product => {
-        files.push(product.location().filePath());
-        const groups = product.groups();
-        groups.forEach(group => {
-            files.push(group.location().filePath());
-        });
-    });
-
-    return files;
+enum QbsBuildSystemFilesNodeIcon {
+    Qbs = 'folder-qbs.svg',
 }
 
-function unreferencedBuildSystemFiles(project: QbsProjectData): string[] {
-    const unreferencedFiles = project.buildSystemFiles();
-    const referencedFiles = referencedBuildSystemFiles(project);
-    const result: string[] = [];
-    for (const unreferencedFile of unreferencedFiles) {
-        const index = referencedFiles.indexOf(unreferencedFile);
-        if (index == -1) {
-            result.push(unreferencedFile);
-        }
-    }
-    return result;
-}
-
+/** The data type encapsulates the Qbs build system files (aka `*.qbs` files)
+ * to display in the project tree. */
 export class QbsBuildSystemFilesNode extends QbsBaseNode {
-    constructor(
-        private readonly _project: QbsProjectData) {
-        super('qbs-build-system-files');
+    private readonly buildSystemFiles: string[]
+
+    public constructor(
+        resourcesPath: string,
+        showDisabledNodes: boolean,
+        projectData: QbsProtocolProjectData) {
+        super(resourcesPath, showDisabledNodes);
+
+        const location = projectData.getLocation();
+        if (!location)
+            throw new Error('Unable to create build system files node because the location is undefined');
+        const fsPath = location.getFilePath();
+        if (!fsPath)
+            throw new Error('Unable to create build system files node because the file path is undefined');
+        const buildDirectory = projectData.getBuildDirectory();
+        if (!buildDirectory)
+            throw new Error('Unable to create build system files node because the build directory is undefined');
+
+        const projectDirectory = path.dirname(fsPath);
+        this.buildSystemFiles = QbsBuildSystemFilesNode.collectUnreferencedBuildSystemFiles(projectData)
+            .filter(fsPath => QbsBuildSystemFilesNode.fileIsChild(
+                fsPath, projectDirectory, buildDirectory));
     }
 
-    getTreeItem(): vscode.TreeItem {
-        const item = new vscode.TreeItem('Qbs files', vscode.TreeItemCollapsibleState.Collapsed);
+    public getTreeItem(): vscode.TreeItem {
+        const item = new vscode.TreeItem(this.getLabel());
+        item.id = this.getId();
+        item.iconPath = {
+            light: path.join(this.resourcesPath, 'light', QbsBuildSystemFilesNodeIcon.Qbs),
+            dark: path.join(this.resourcesPath, 'dark', QbsBuildSystemFilesNodeIcon.Qbs),
+        };
         return item;
     }
 
-    getChildren(): QbsBaseNode[] {
-        const nodes: QbsBaseNode[] = [];
-        const projectDir = path.dirname(this._project.location().filePath());
-        const buildDir = this._project.buildDirectory();
-        const files = unreferencedBuildSystemFiles(this._project);
-        files.forEach(file => {
-            if (QbsUtils.isChildOf(file, projectDir) && !QbsUtils.isChildOf(file, buildDir)) {
-                nodes.push(new QbsUnreferencedBuildSystemFileNode(file));
-            }
-        });
-        return nodes;
+    public getChildren(): QbsBaseNode[] {
+        return this.buildSystemFiles.map(fsPath => new QbsUnreferencedBuildSystemFileNode(
+            this.resourcesPath, this.showDisabledNodes, fsPath));
     }
+
+    private static collectReferencedBuildSystemFiles(projectData: QbsProtocolProjectData): string[] {
+        const fsPaths: string[] = [];
+        const fsPath = projectData.getLocation()?.getFilePath();
+        if (fsPath)
+            fsPaths.push(fsPath);
+        projectData.getSubProjects().forEach(subProjectData => {
+            const others = QbsBuildSystemFilesNode.collectReferencedBuildSystemFiles(subProjectData);
+            fsPaths.push(...others);
+        });
+        projectData.getProducts().forEach(productData => {
+            const fsPath = productData.getLocation()?.getFilePath();
+            if (fsPath)
+                fsPaths.push(fsPath);
+            productData.getGroups().forEach(groupData => {
+                const fsPath = groupData.getLocation()?.getFilePath();
+                if (fsPath)
+                    fsPaths.push(fsPath);
+            });
+        });
+        return fsPaths;
+    }
+
+    private static fileIsChild(fsPath: string, projectDir: string, buildDir: string): boolean {
+        return isChildOf(fsPath, projectDir) && !isChildOf(fsPath, buildDir);
+    }
+
+    private static collectUnreferencedBuildSystemFiles(projectData: QbsProtocolProjectData): string[] {
+        const fsPaths = QbsBuildSystemFilesNode.collectReferencedBuildSystemFiles(projectData);
+        return projectData.getBuildSystemFiles().filter(fsPath => { return !fsPaths.includes(fsPath); });
+    }
+
+    private getLabel(): string { return localize('qbs.build.system.files.entry', 'Qbs files'); }
+    private getId(): string { return 'qbs-build-system-files'; }
 }

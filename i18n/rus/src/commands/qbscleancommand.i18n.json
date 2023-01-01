@@ -1,5 +1,0 @@
-{
-    "qbs.session.clean.progress.title": "Очистка проекта",
-    "qbs.session.clean.progress.completed.title": "Очистка проекта успешно завершена",
-    "qbs.session.clean.progress.failed.title": "Очистка проекта завершена с ошибками"
-}
