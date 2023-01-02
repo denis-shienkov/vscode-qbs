@@ -188,7 +188,7 @@ class BuildProductButton extends Button {
         this.setCommand({
             title: 'build',
             command: QbsCommandKey.BuildProduct,
-            arguments: (fullName) ? [[fullName]] : []
+            arguments: (fullName) ? [[fullName]] : [[]]
         });
         this.setText();
     }

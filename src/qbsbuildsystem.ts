@@ -69,14 +69,18 @@ export class QbsBuildSystem implements vscode.Disposable {
     }
 
     public static getCommandProductNames(data: any): string[] {
-        if (data instanceof QbsProductNode)
+        if (data instanceof QbsProductNode) {
             return [data.getFullName()];
-        else if (data instanceof QbsProjectNode)
+        } else if (data instanceof QbsProjectNode) {
             return data.getDependentProductNames();
-        else if (typeof data === 'string')
-            return [data];
-        else
+        } else if (data instanceof Array) {
             return data;
+        } else if (typeof data === 'string') {
+            return [data];
+        } else {
+            const name = QbsProjectManager.getInstance().getProject()?.getBuildProductName();
+            return (name) ? [name] : [];
+        }
     }
 
     private registerCommandsHandlers(context: vscode.ExtensionContext): void {
