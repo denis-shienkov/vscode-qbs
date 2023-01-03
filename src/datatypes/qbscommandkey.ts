@@ -12,6 +12,7 @@ export enum QbsCommandKey {
     GetProductRunEnvironment = 'qbs.getProductRunEnvironment',
     InstallProduct = 'qbs.installProduct',
     LoadProject = 'qbs.loadProject',
+    OpenTextDocument = 'vscode.open',
     OpenTextDocumentAtPosition = 'qbs.openTextDocumentAtPosition',
     RebuildProduct = 'qbs.rebuildProduct',
     ResolveProject = 'qbs.resolveProject',
@@ -29,5 +30,6 @@ export enum QbsCommandKey {
     SelectLaunchConfiguration = 'qbs.selectLaunchConfiguration',
     SelectRunProduct = 'qbs.selectRunProduct',
     StartSession = 'qbs.startSession',
+    StartupCppCodeModel = 'qbs.startupCppCodeModel',
     StopSession = 'qbs.stopSession',
 }

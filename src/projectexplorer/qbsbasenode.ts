@@ -3,6 +3,7 @@ import * as nls from 'vscode-nls';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+import { QbsCommandKey } from '../datatypes/qbscommandkey';
 import { strikeLine } from '../qbsutils';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
@@ -39,7 +40,7 @@ export abstract class QbsBaseNode {
 
     protected static createOpenFileCommand(resourceUri: vscode.Uri): vscode.Command {
         return {
-            command: 'vscode.open',
+            command: QbsCommandKey.OpenTextDocument,
             title: localize('open.file', 'Open file'),
             arguments: [resourceUri]
         }
@@ -47,7 +48,7 @@ export abstract class QbsBaseNode {
 
     protected static createOpenFileAtPositionCommand(resourceUri: vscode.Uri, position: vscode.Position): vscode.Command {
         return {
-            command: 'vscode.open',
+            command: QbsCommandKey.OpenTextDocumentAtPosition,
             title: localize('open.file', 'Open file'),
             arguments: [resourceUri, position]
         }
