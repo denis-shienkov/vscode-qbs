@@ -84,8 +84,6 @@ export class QbsBuildSystem implements vscode.Disposable {
     }
 
     private registerCommandsHandlers(context: vscode.ExtensionContext): void {
-
-
         // Restart the session command.
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.RestartSession,
             async () => { await this.restartSession(); }));
