@@ -19,8 +19,7 @@ export class QbsLocationNode extends QbsBaseNode {
         showDisabledNodes: boolean,
         locationData: QbsProtocolLocationData,
         private readonly isEnabled: boolean,
-        private readonly isQbsFile: boolean,
-        private readonly parentId: string) {
+        private readonly isQbsFile: boolean) {
         super(resourcesPath, showDisabledNodes);
 
         const fsPath = locationData.getFilePath();
@@ -46,7 +45,7 @@ export class QbsLocationNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel());
-        item.id = this.getId();
+        item.id = this.uuid;
         item.resourceUri = vscode.Uri.file(this.fsPath);
         item.command = QbsBaseNode.createOpenFileAtPositionCommand(
             item.resourceUri, new vscode.Position(this.line - 1, this.column - 1));
@@ -61,6 +60,4 @@ export class QbsLocationNode extends QbsBaseNode {
             input += `:${this.line}`;
         return QbsBaseNode.createLabel(input, this.isEnabled);
     }
-
-    private getId(): string { return `${this.parentId}:${this.fsPath}:${this.line}:${this.column}`; }
 }

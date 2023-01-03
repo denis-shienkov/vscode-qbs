@@ -28,8 +28,7 @@ export class QbsProductNode extends QbsBaseNode {
     public constructor(
         resourcesPath: string,
         showDisabledNodes: boolean,
-        productData: QbsProtocolProductData,
-        private readonly parentId: string) {
+        productData: QbsProtocolProductData) {
         super(resourcesPath, showDisabledNodes);
 
         const name = productData.getName();
@@ -68,7 +67,7 @@ export class QbsProductNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel(), vscode.TreeItemCollapsibleState.Collapsed);
-        item.id = this.getId();
+        item.id = this.uuid;
         item.contextValue = QbsBaseNodeContext.Product;
         item.iconPath = this.getIcon();
         return item;
@@ -77,9 +76,9 @@ export class QbsProductNode extends QbsBaseNode {
     public getChildren(): QbsBaseNode[] {
         return [
             ...[new QbsLocationNode(
-                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true, this.getId())],
+                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true)],
             ...this.groups.map(groupData => new QbsGroupNode(
-                this.resourcesPath, this.showDisabledNodes, groupData, this.getId()))
+                this.resourcesPath, this.showDisabledNodes, groupData))
         ];
     }
 
@@ -90,7 +89,6 @@ export class QbsProductNode extends QbsBaseNode {
     }
 
     private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
-    private getId(): string { return `${this.parentId}:${this.fullName}:${this.fsPath}:${this.line}`; }
 
     private getIcon(): any {
         const other_product = {

@@ -42,7 +42,7 @@ export class QbsBuildSystemFilesNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel());
-        item.id = this.getId();
+        item.id = this.uuid;
         item.iconPath = {
             light: path.join(this.resourcesPath, 'light', QbsBuildSystemFilesNodeIcon.Qbs),
             dark: path.join(this.resourcesPath, 'dark', QbsBuildSystemFilesNodeIcon.Qbs),
@@ -87,5 +87,4 @@ export class QbsBuildSystemFilesNode extends QbsBaseNode {
     }
 
     private getLabel(): string { return localize('qbs.build.system.files.entry', 'Qbs files'); }
-    private getId(): string { return 'qbs-build-system-files'; }
 }

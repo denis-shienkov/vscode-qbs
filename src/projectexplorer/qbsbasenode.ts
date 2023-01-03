@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import * as nls from 'vscode-nls';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -21,6 +22,8 @@ export enum QbsBaseNodeTheme {
  * (e.g. project, product, artifaact and etc.), which are displayed
  * in the project tree. */
 export abstract class QbsBaseNode {
+    protected readonly uuid = uuidv4();
+
     public constructor(
         protected readonly resourcesPath: string,
         protected readonly showDisabledNodes: boolean) { }

@@ -12,8 +12,7 @@ export class QbsSourceArtifactNode extends QbsBaseNode {
         resourcesPath: string,
         showDisabledNodes: boolean,
         artifactData: QbsProtocolSourceArtifactData,
-        private readonly isEnabled: boolean,
-        private readonly parentId: string) {
+        private readonly isEnabled: boolean) {
         super(resourcesPath, showDisabledNodes);
 
         const name = artifactData.getFileName();
@@ -29,7 +28,7 @@ export class QbsSourceArtifactNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel());
-        item.id = this.getId();
+        item.id = this.uuid;
         item.resourceUri = vscode.Uri.file(this.fsPath);
         item.command = QbsBaseNode.createOpenFileCommand(item.resourceUri);
         return item;
@@ -38,5 +37,4 @@ export class QbsSourceArtifactNode extends QbsBaseNode {
     public getChildren(): QbsBaseNode[] { return []; }
 
     private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
-    private getId(): string { return `${this.parentId}:${this.fsPath}`; }
 }

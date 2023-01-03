@@ -13,6 +13,7 @@ export class QbsUnreferencedBuildSystemFileNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.fsPath);
+        item.id = this.uuid;
         item.resourceUri = vscode.Uri.file(this.fsPath);
         item.command = QbsBaseNode.createOpenFileCommand(item.resourceUri);
         return item;

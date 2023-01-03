@@ -27,8 +27,7 @@ export class QbsProjectNode extends QbsBaseNode {
         resourcesPath: string,
         showDisabledNodes: boolean,
         private readonly projectData: QbsProtocolProjectData,
-        private readonly isRoot: boolean,
-        private readonly parentId: string) {
+        private readonly isRoot: boolean) {
         super(resourcesPath, showDisabledNodes);
 
         const name = this.projectData.getName();
@@ -62,7 +61,7 @@ export class QbsProjectNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel(), this.getCollapsibleState());
-        item.id = this.getId();
+        item.id = this.uuid;
         item.contextValue = this.getContextValue();
         item.iconPath = new vscode.ThemeIcon(this.getIcon());
         return item;
@@ -71,11 +70,11 @@ export class QbsProjectNode extends QbsBaseNode {
     public getChildren(): QbsBaseNode[] {
         let childrenNodes: QbsBaseNode[] = [
             ...[new QbsLocationNode(
-                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true, this.getId())],
+                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true)],
             ...this.products.map(productData => new QbsProductNode(
-                this.resourcesPath, this.showDisabledNodes, productData, this.getId())),
+                this.resourcesPath, this.showDisabledNodes, productData)),
             ...this.subprojects.map(projectData => new QbsProjectNode(
-                this.resourcesPath, this.showDisabledNodes, projectData, false, this.getId()))
+                this.resourcesPath, this.showDisabledNodes, projectData, false))
         ];
         if (this.isRoot)
             childrenNodes.push(new QbsBuildSystemFilesNode(
@@ -105,5 +104,4 @@ export class QbsProjectNode extends QbsBaseNode {
     }
 
     private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
-    private getId(): string { return `${this.parentId}:${this.name}:${this.fsPath}`; }
 }

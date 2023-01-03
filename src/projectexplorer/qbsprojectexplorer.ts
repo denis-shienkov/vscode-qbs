@@ -33,7 +33,7 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<QbsBaseNode> {
         if (!showDisabledNodes && !this.projectData.getIsEnabled())
             return [];
 
-        return [new QbsProjectNode(this.resourcesPath, showDisabledNodes, this.projectData, true, 'root-id')];
+        return [new QbsProjectNode(this.resourcesPath, showDisabledNodes, this.projectData, true)];
     }
 
     public refresh(projectData?: QbsProtocolProjectData) {

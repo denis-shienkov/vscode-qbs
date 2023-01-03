@@ -23,8 +23,7 @@ export class QbsGroupNode extends QbsBaseNode {
     public constructor(
         resourcesPath: string,
         showDisabledNodes: boolean,
-        groupData: QbsProtocolGroupData,
-        private readonly parentId: string) {
+        groupData: QbsProtocolGroupData) {
         super(resourcesPath, showDisabledNodes);
 
         const name = groupData.getName();
@@ -49,7 +48,7 @@ export class QbsGroupNode extends QbsBaseNode {
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel(), vscode.TreeItemCollapsibleState.Collapsed);
-        item.id = this.getId();
+        item.id = this.uuid;
         item.iconPath = new vscode.ThemeIcon(QbsPGroupNodeIcon.Group);
         return item;
     }
@@ -57,14 +56,13 @@ export class QbsGroupNode extends QbsBaseNode {
     public getChildren(): QbsBaseNode[] {
         return [
             ...[new QbsLocationNode(
-                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true, this.getId())],
+                this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true)],
             ...this.sources.map(artifactData => new QbsSourceArtifactNode(
-                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled, this.getId())),
+                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled)),
             ...this.wildcards.map(artifactData => new QbsSourceArtifactNode(
-                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled, this.getId()))
+                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled))
         ];
     }
 
     private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }
-    private getId(): string { return `${this.parentId}:${this.name}:${this.fsPath}`; }
 }
