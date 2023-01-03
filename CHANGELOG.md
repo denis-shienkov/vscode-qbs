@@ -24,6 +24,8 @@ the build configurations selection entries.
 - Added new **Qbs: Scan Build Profiles** command which calls
 the Qbs executable to scan the available Qbs build profiles
 (aka toolchains).
+- Implemented compilation for single source file, selected from
+the project explorer tree.
 
 ## 1.0.7
 

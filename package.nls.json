@@ -2,6 +2,7 @@
     "qbs-tools.command.qbs.buildProduct.title": "Build",
     "qbs-tools.command.qbs.cancelOperation.title": "Cancel Operation",
     "qbs-tools.command.qbs.cleanProduct.title": "Clean",
+    "qbs-tools.command.qbs.compileOnly.title": "Compile",
     "qbs-tools.command.qbs.debugProduct.title": "Debug",
     "qbs-tools.command.qbs.editBuildConfigurations.title": "Edit Build Configurations",
     "qbs-tools.command.qbs.editLaunchConfigurations.title": "Edit Launch Configurations",

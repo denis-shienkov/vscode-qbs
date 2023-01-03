@@ -26,6 +26,7 @@ import { QbsProtocolRequest } from './protocol/qbsprotocolrequest';
 import { QbsProtocolResolveRequest } from './protocol/qbsprotocolresolverequest';
 import { QbsSession, QbsSessionState } from './qbssession';
 import { QbsSettings } from './qbssettings';
+import { QbsSourceArtifactNode } from './projectexplorer/qbssourceartifactnode';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -130,6 +131,13 @@ export class QbsBuildSystem implements vscode.Disposable {
                 const productNames = QbsBuildSystem.getCommandProductNames(data);
                 await this.rebuildWithProgress(productNames,
                     QbsBuildSystemTimeout.Progress, QbsBuildSystemTimeout.Progress);
+            }));
+
+        // Compile only command.
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CompileOnly,
+            async (sourceNode: QbsSourceArtifactNode) => {
+                const fsPath = sourceNode.getFsPath();
+                await this.compileOnlyWithProgress(fsPath, QbsBuildSystemTimeout.Progress);
             }));
     }
 
@@ -632,6 +640,106 @@ export class QbsBuildSystem implements vscode.Disposable {
             });
     }
 
+    private async compileOnlyWithProgress(fsPath: string, timeout: number): Promise<boolean> {
+        const request = this.createCompileOnlyRequest(fsPath);
+        if (!this.ensureRequestIsReady(request))
+            return false;
+        else if (!this.ensureClearOutputBeforeOperation())
+            return false;
+        else if (!request) // Extra checking to use the method `this.session.build(request)`.
+            return false;
+
+        return await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: localize('qbs.buildsystem.compile.progress.title', 'File compiling'),
+            cancellable: true
+        }, async (p, c) => {
+            const timestamp = performance.now();
+
+            this.logMessage(localize('qbs.buildsystem.compile.started.message', 'Compiling file...'));
+            this.prepareQbsDiagnostics();
+            this.prepareToolchainDiagnostics();
+
+            console.log('Send compile only request for file: ' + fsPath + ' and timeout: ' + timeout);
+            await this.session.build(request);
+            const disposables: Disposable[] = [];
+
+            return new Promise<boolean>(async (resolve) => {
+                let maxProgress: number = 0;
+                let progress: number = 0;
+                let description: string = '';
+                let oldPercentage: number = 0;
+
+                c.onCancellationRequested(async () => {
+                    await vscode.commands.executeCommand(QbsCommandKey.CancelOperation);
+                    resolve(false);
+                });
+
+                const updateReport = async (showPercentage: boolean = true) => {
+                    if (showPercentage) {
+                        const newPercentage = (progress > 0) ? Math.round((100 * progress) / maxProgress) : 0;
+                        const increment = newPercentage - oldPercentage;
+                        if (increment > 0) {
+                            oldPercentage = newPercentage;
+                            p.report({ increment });
+                        }
+                        const message = `${description} ${newPercentage} %`;
+                        p.report({ message });
+                    } else {
+                        const message = description;
+                        p.report({ message });
+                    }
+                };
+
+                disposables.push(this.session.onTaskStarted(async (result) => {
+                    description = result.description;
+                    maxProgress = result.maxProgress;
+                    progress = 0;
+                    await updateReport();
+                }));
+                disposables.push(this.session.onTaskMaxProgressChanged(async (result) => {
+                    maxProgress = result.maxProgress;
+                    await updateReport();
+                }));
+                disposables.push(this.session.onTaskProgressUpdated(async (result) => {
+                    progress = result.progress;
+                    await updateReport();
+                }));
+                disposables.push(this.session.onProjectBuilt(async (result) => {
+                    const elapsed = msToTime(performance.now() - timestamp);
+                    QbsProjectManager.getInstance().getProject()?.setProjectData(false, result.data);
+
+                    this.logMessageResponse(result.message);
+                    this.diagnoseQbsInformationMessages(result.message);
+                    this.submitQbsDiagnostics();
+                    this.submitToolchainDiagnostics();
+
+                    const success = (result.message) ? result.message.getIsEmpty() : false;
+                    console.log('Received compile only response with result: ' + success);
+
+                    if (success) {
+                        this.logMessage(localize('qbs.buildsystem.compile.completed.message',
+                            'File successfully compiled, elapsed time {0}', elapsed));
+                    } else {
+                        this.logMessage(localize('qbs.buildsystem.compile.failed.message',
+                            'Error compiling file, elapsed time {0}', elapsed));
+                    }
+
+                    description = (success) ? localize('qbs.buildsystem.compile.progress.completed.title',
+                        'File successfully compiled')
+                        : localize('qbs.buildsystem.compile.progress.failed.title',
+                            'File compiling failed');
+                    await updateReport(false);
+                    console.log('Waiting for compile only progress popup visible, within timeout: ' + timeout);
+                    setTimeout(() => { resolve(success); }, timeout);
+                }));
+            }).finally(() => {
+                console.log('Closing compile only progress popup and cleanup subscriptions');
+                disposables.forEach((d) => d.dispose());
+            });
+        });
+    }
+
     public async fetchProductRunEnvironment(productName: string): Promise<any> {
         return new Promise<any>(resolve => {
             const disposable = this.session.onRunEnvironmentReceived(async (result) => {
@@ -699,6 +807,19 @@ export class QbsBuildSystem implements vscode.Disposable {
         const logLevel = this.getLogLevelFromSettings();
         const request = new QbsProtocolCleanRequest(keepGoing, logLevel);
         request.setProducts(products);
+        return request;
+    }
+
+    private createCompileOnlyRequest(fsPath: string): QbsProtocolBuildRequest | undefined {
+        const ckeanInstallRoot = this.getCleanInstallRootFromSettings();
+        const commandEchoMode = this.getCommandEchoModeFromSettings();
+        const keepGoing = this.getKeepGoingFromSettings();
+        const logLevel = this.getLogLevelFromSettings();
+        const maxJobs = this.getMaxJobsFromSettings();
+        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs);
+        request.setChangedFiles([fsPath]);
+        request.setFilesToConsider([fsPath]);
+        request.setActiveFileTags(['obj', 'hpp']);
         return request;
     }
 

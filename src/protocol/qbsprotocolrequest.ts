@@ -19,6 +19,18 @@ export abstract class QbsProtocolRequest {
         this.data[QbsProtocolDataKey.BuildRoot] = buildRoot;
     }
 
+    public setActiveFileTags(tags: string[]) {
+        this.data[QbsProtocolDataKey.ActiveFileTags] = tags;
+    }
+
+    public setChangedFiles(fsPaths: string[]) {
+        this.data[QbsProtocolDataKey.ChangedFiles] = fsPaths;
+    }
+
+    public setFilesToConsider(fsPaths: string[]) {
+        this.data[QbsProtocolDataKey.FilesToConsider] = fsPaths;
+    }
+
     public setCleanInstallRoot(cleanInstallRoot?: boolean) {
         if (cleanInstallRoot)
             this.data[QbsProtocolDataKey.CleanInstallRoot] = cleanInstallRoot;

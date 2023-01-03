@@ -75,6 +75,11 @@
                 "category": "Qbs"
             },
             {
+                "command": "qbs.compileOnly",
+                "title": "%qbs-tools.command.qbs.compileOnly.title%",
+                "category": "Qbs"
+            },
+            {
                 "command": "qbs.debugProduct",
                 "title": "%qbs-tools.command.qbs.debugProduct.title%",
                 "category": "Qbs"
@@ -331,6 +336,11 @@
                     "command": "qbs.debugProduct",
                     "when": "viewItem == product-node",
                     "group": "product_context@4"
+                },
+                {
+                    "command": "qbs.compileOnly",
+                    "when": "viewItem == source-artifact-node",
+                    "group": "product_context@5"
                 }
             ]
         },

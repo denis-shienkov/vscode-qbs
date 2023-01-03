@@ -1,12 +1,14 @@
 /** Helper enumeration for wrapping the data keys for the Qbs's protocol
  * data requests or responses. */
 export enum QbsProtocolDataKey {
+    ActiveFileTags = 'active-file-tags',
     ApiCompatLevel = 'api-compat-level',
     ApiLevel = 'api-level',
     Arguments = 'arguments',
     BuildDirectory = 'build-directory',
     BuildRoot = 'build-root',
     BuildSystemFiles = 'build-system-files',
+    ChangedFiles = 'changed-files',
     CleanInstallRoot = 'clean-install-root',
     Column = 'column',
     CommandDescription = 'command-description',
@@ -24,6 +26,7 @@ export enum QbsProtocolDataKey {
     FilePath = 'file-path',
     FilesAdded = 'files-added',
     FilesRemoved = 'files-removed',
+    FilesToConsider = 'files-to-consider',
     FileTags = 'file-tags',
     ForceProbeExecution = 'force-probe-execution',
     FullDisplayName = 'full-display-name',

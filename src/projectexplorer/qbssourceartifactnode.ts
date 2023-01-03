@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { QbsBaseNode } from './qbsbasenode';
+import { QbsBaseNode, QbsBaseNodeContext } from './qbsbasenode';
 import { QbsProtocolSourceArtifactData } from '../protocol/qbsprotocolsourceartifactdata';
 
 /** The data type encapsulates the Qbs source artifact object to display in the project tree. */
@@ -26,9 +26,13 @@ export class QbsSourceArtifactNode extends QbsBaseNode {
         this.fsPath = fsPath;
     }
 
+    // TODO: For build command!
+    public getFsPath(): string { return this.fsPath; }
+
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel());
         item.id = this.uuid;
+        item.contextValue = QbsBaseNodeContext.SourceArtifact;
         item.resourceUri = vscode.Uri.file(this.fsPath);
         item.command = QbsBaseNode.createOpenFileCommand(item.resourceUri);
         return item;

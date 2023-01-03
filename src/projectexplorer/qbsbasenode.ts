@@ -11,6 +11,7 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 export enum QbsBaseNodeContext {
     Product = 'product-node',
     RootProject = 'root-project-node',
+    SourceArtifact = 'source-artifact-node',
     SubProject = 'sub-project-node',
 }
 

@@ -4,6 +4,7 @@ export enum QbsCommandKey {
     BuildProduct = 'qbs.buildProduct',
     CancelOperation = 'qbs.cancelOperation',
     CleanProduct = 'qbs.cleanProduct',
+    CompileOnly = 'qbs.compileOnly',
     DebugProduct = 'qbs.debugProduct',
     EditBuildConfigurations = 'qbs.editBuildConfigurations',
     EditLaunchConfigurations = 'qbs.editLaunchConfigurations',

@@ -2,6 +2,7 @@
     "qbs-tools.command.qbs.buildProduct.title": "Собрать",
     "qbs-tools.command.qbs.cancelOperation.title": "Отмена операции",
     "qbs-tools.command.qbs.cleanProduct.title": "Очистить",
+    "qbs-tools.command.qbs.compileOnly.title": "Собрать",
     "qbs-tools.command.qbs.debugProduct.title": "Отладить",
     "qbs-tools.command.qbs.editBuildConfigurations.title": "Редактировать конфигурацию сборки",
     "qbs-tools.command.qbs.editLaunchConfigurations.title": "Редактировать конфигурацию запуска",
