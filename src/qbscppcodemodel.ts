@@ -2,6 +2,7 @@ import * as cpt from 'vscode-cpptools';
 import * as vscode from 'vscode';
 
 import { QbsArchitecture } from './protocol/qbsprotocolqbsmoduledata';
+import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsExtensionKey } from './qbsextension';
 import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsProtocolCppModuleData } from './protocol/qbsprotocolcppmoduledata';
@@ -29,7 +30,8 @@ export class QbsCppCodeModel implements cpt.CustomConfigurationProvider {
     private configurations = new Map<string, cpt.SourceFileConfiguration>();
     private disposable?: vscode.Disposable;
 
-    public constructor() {
+    public constructor(context: vscode.ExtensionContext) {
+        this.registerCommandsHandlers(context);
         this.subscribeCppUpdateEvents();
     }
 
@@ -41,17 +43,29 @@ export class QbsCppCodeModel implements cpt.CustomConfigurationProvider {
     // From the cpt.CustomConfigurationProvider interface.
 
     public async canProvideConfiguration(uri: vscode.Uri): Promise<boolean> {
-        return this.configurations.has(uri.toString());
+        const has = this.configurations.has(uri.toString());
+        console.log('Can provide Cpptools configuration for ' + uri.toString() + ', ' + has);
+        return has;
     }
 
-    public async provideConfigurations(uris: vscode.Uri[]): Promise<cpt.SourceFileConfigurationItem[]> {
-        return (uris.filter(uri => this.configurations.get(uri.toString()))
+    public async provideConfigurations(
+        uris: vscode.Uri[],
+        token?: vscode.CancellationToken): Promise<cpt.SourceFileConfigurationItem[]> {
+        const configurations = (uris.filter(uri => this.configurations.get(uri.toString()))
             .map(uri => {
                 return <cpt.SourceFileConfigurationItem>{
                     uri,
                     configuration: this.configurations.get(uri.toString())
                 };
             }));
+        if (token?.isCancellationRequested) {
+            console.log('Cpptools timed out waiting for intellisense configurations. Requesting a refresh.');
+            this.toolsApi?.didChangeCustomConfiguration(this);
+            return [];
+        } else {
+            console.log('Return ' + configurations.length + ' Cpptools configurations.');
+            return configurations;
+        }
     }
 
     public async canProvideBrowseConfiguration(): Promise<boolean> { return false; }
@@ -59,35 +73,39 @@ export class QbsCppCodeModel implements cpt.CustomConfigurationProvider {
     public async canProvideBrowseConfigurationsPerFolder(): Promise<boolean> { return false; }
     public async provideFolderBrowseConfiguration(uri: vscode.Uri): Promise<cpt.WorkspaceBrowseConfiguration> { return { browsePath: [] }; }
 
+    private registerCommandsHandlers(context: vscode.ExtensionContext): void {
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.StartupCppCodeModel,
+            async () => { await this.startup(); }));
+    }
+
     private subscribeCppUpdateEvents(): void {
         QbsProjectManager.getInstance().onProjectOpen((async () => {
-            this.disposable = QbsProjectManager.getInstance().getProject()?.onProjectDataChanged(async (projectData) => {
-                this.setup(projectData);
-            });
+            this.disposable = QbsProjectManager.getInstance().getProject()?.onProjectDataChanged(
+                async (projectData) => { this.update(projectData); });
         }));
     }
 
-    private async setup(projectData?: QbsProtocolProjectData): Promise<void> {
-        if (!projectData || projectData.getIsEmpty())
-            return;
+    private async startup(): Promise<void> {
         if (!this.toolsApi)
             this.toolsApi = await cpt.getCppToolsApi(cpt.Version.v4);
-        if (!this.toolsApi)
+        if (!this.toolsApi) {
+            vscode.window.showWarningMessage('Unable to get the MS Cpptools API. Intellisense may behave incorrectly.');
             return; // OOPS
-
-        this.buildSourceFileConfigurations(projectData);
-
-        // Ensure that the provider is already registered.
+        }
         if (!this.alreadyRegistered) {
             this.toolsApi.registerCustomConfigurationProvider(this);
             this.alreadyRegistered = true;
         }
 
-        if (this.toolsApi.notifyReady) {
+        if (this.toolsApi.notifyReady)
             this.toolsApi.notifyReady(this);
-        } else {
-            this.toolsApi.didChangeCustomConfiguration(this);
-        }
+    }
+
+    private async update(projectData?: QbsProtocolProjectData): Promise<void> {
+        if (!projectData || projectData.getIsEmpty())
+            return;
+        this.buildSourceFileConfigurations(projectData);
+        this.toolsApi?.didChangeCustomConfiguration(this);
     }
 
     private async buildSourceFileConfigurations(projectData: QbsProtocolProjectData) {
@@ -307,7 +325,7 @@ export class QbsCppCodeModel implements cpt.CustomConfigurationProvider {
 
             const compilerDefines = [];
             for (var defineByLanguage in definesByLanguage) {
-                compilerDefines.push(defineByLanguage + "=" + definesByLanguage[defineByLanguage]);
+                compilerDefines.push(defineByLanguage + '=' + definesByLanguage[defineByLanguage]);
             }
             return compilerDefines;
         };
