@@ -1,3 +1,4 @@
+import { timeStamp } from 'console';
 import * as vscode from 'vscode';
 
 import { trimLine } from '../qbsutils';
@@ -17,7 +18,10 @@ export abstract class QbsDiagnosticParser {
 
     public constructor(protected readonly toolchainType: string) { }
 
-    public parseLines(lines: string[]): void { lines.forEach(line => this.parseLine(trimLine(line))); }
+    public parseLines(lines: string[]): void {
+        lines.forEach(line => this.parseLine(trimLine(line)));
+        this.parseLine(''); // Trigger fake last empty line.
+    }
     public clearDiagnistics(): void { this.diagnostics.clear(); }
 
     public getDiagnostics() {

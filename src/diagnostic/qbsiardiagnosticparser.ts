@@ -8,7 +8,8 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private diagnostic?: vscode.Diagnostic;
     private fsPath?: string;
     private readonly compilerRegexp = /^"(.+\.\S+)",(\d+)\s+(Fatal error|Error|Warning)\[(\S+)\]:\s*$/;
-    private readonly assemblerRegext = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
+    private readonly assemblerRegexp = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
+    private readonly linkerRegexp = /^(Error)\[(\S+)\]:\s(.+)$/;
 
     public constructor() { super(QbsToolchain.Iar); }
 
@@ -17,52 +18,23 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
             return;
         else if (this.parseAssemblerMessage(line))
             return;
-    }
+        else if (this.parseLinkerMessage(line))
+            return;
 
-    private parseFirstMessagePart(line: string): boolean {
-        const matches = this.compilerRegexp.exec(line);
-        if (!matches)
-            return false;
-
-        const [, file, linestr, severity, code, message] = matches;
-        const lineNo = substractOne(linestr);
-        const range = new vscode.Range(lineNo, 0, lineNo, 999);
-        const diagnostic: vscode.Diagnostic = {
-            source: this.toolchainType,
-            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message,
-            range,
-            code
-        };
-        this.diagnostic = diagnostic;
-        this.fsPath = file;
-        return true;
-    }
-
-    private parseLastMessagePart(line: string): boolean {
-        const matches = /^\s+(.+)$/.exec(line);
-        if (!matches || !this.diagnostic)
-            return false;
-        this.diagnostic.message = matches[1];
-        return true;
+        if (!this.parseDescription(line))
+            this.commitDiagnostic();
     }
 
     private parseCompilerMessage(line: string): boolean {
         if (!this.diagnostic) {
-            if (this.parseFirstMessagePart(line))
+            if (this.parseCompilerLocation(line))
                 return true;
-        } else if (this.fsPath) {
-            if (this.parseLastMessagePart(line))
-                this.insertDiagnostic(vscode.Uri.file(this.fsPath), this.diagnostic);
-            this.diagnostic = undefined;
-            this.fsPath = undefined;
-            return true;
         }
         return false;
     }
 
     private parseAssemblerMessage(line: string): boolean {
-        const matches = this.assemblerRegext.exec(line);
+        const matches = this.assemblerRegexp.exec(line);
         if (!matches)
             return false;
 
@@ -79,6 +51,73 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
 
         this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
         return false;
+    }
+
+    private parseLinkerMessage(line: string): boolean {
+        if (!this.diagnostic) {
+            if (this.parseLinkerLocation(line))
+                return true;
+        }
+        return false;
+    }
+
+    private parseCompilerLocation(line: string): boolean {
+        const matches = this.compilerRegexp.exec(line);
+        if (!matches)
+            return false;
+
+        const [, file, linestr, severity, code,] = matches;
+        const lineNo = substractOne(linestr);
+        const range = new vscode.Range(lineNo, 0, lineNo, 999);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.toolchainType,
+            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+            message: '',
+            range,
+            code
+        };
+        this.diagnostic = diagnostic;
+        this.fsPath = file;
+        return true;
+    }
+
+    private parseLinkerLocation(line: string): boolean {
+        const matches = this.linkerRegexp.exec(line);
+        if (!matches)
+            return false;
+
+        const [, severity, code, message] = matches;
+        const range = new vscode.Range(0, 0, 0, 0);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.toolchainType,
+            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+            message: message + ' ',
+            range,
+            code
+        };
+        this.diagnostic = diagnostic;
+        // FIXME: How to use diagnostic without of a file path?
+        // Related issue: https://github.com/microsoft/vscode/issues/112145
+        this.fsPath = ' ';
+        return true;
+    }
+
+    private parseDescription(line: string): boolean {
+        if (!this.diagnostic)
+            return false;
+        const matches = /^\s{10}(.+)$/.exec(line);
+        if (!matches)
+            return false;
+        this.diagnostic.message += matches[1] + ' ';
+        return true;
+    }
+
+    private commitDiagnostic(): void {
+        if (this.diagnostic && this.fsPath) {
+            this.insertDiagnostic(vscode.Uri.file(this.fsPath), this.diagnostic);
+            this.diagnostic = undefined;
+            this.fsPath = undefined;
+        }
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
