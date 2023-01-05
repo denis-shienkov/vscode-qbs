@@ -236,7 +236,7 @@ class RunProductButton extends Button {
             this.disposable2?.dispose();
             const project = QbsProjectManager.getInstance().getProject();
             this.disposable1 = project?.onLaunchProductNameChanged(async () => this.update());
-            this.disposable2 = project?.onProjectDataChanged(async () => this.update());
+            this.disposable2 = project?.onOperationCompleted(async () => this.update());
             this.update();
         });
         this.update();
@@ -283,7 +283,7 @@ class DebugProductButton extends Button {
             this.disposable2?.dispose();
             const project = QbsProjectManager.getInstance().getProject();
             this.disposable1 = project?.onLaunchProductNameChanged(async () => this.update());
-            this.disposable2 = project?.onProjectDataChanged(async () => this.update());
+            this.disposable2 = project?.onOperationCompleted(async () => this.update());
             this.update();
         });
         this.update();

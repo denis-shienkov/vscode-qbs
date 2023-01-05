@@ -402,6 +402,7 @@ export class QbsBuildSystem implements vscode.Disposable {
                 disposables.push(this.session.onProjectBuilt(async (result) => {
                     const elapsed = msToTime(performance.now() - timestamp);
                     QbsProjectManager.getInstance().getProject()?.setProjectData(false, result.data);
+                    QbsProjectManager.getInstance().getProject()?.notifyOperationCompleted();
 
                     this.logMessageResponse(result.message);
                     this.diagnoseQbsInformationMessages(result.message);
@@ -599,6 +600,7 @@ export class QbsBuildSystem implements vscode.Disposable {
                 }));
                 disposables.push(this.session.onProjectCleaned(async (result) => {
                     const elapsed = msToTime(performance.now() - timestamp);
+                    QbsProjectManager.getInstance().getProject()?.notifyOperationCompleted();
 
                     this.logMessageResponse(result);
                     this.diagnoseQbsInformationMessages(result);

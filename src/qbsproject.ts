@@ -19,6 +19,7 @@ export class QbsProject implements vscode.Disposable {
     private launchProductName?: string;
     private debuggerName?: string;
 
+    private readonly operationCompleted: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     private readonly projectDataChanged: vscode.EventEmitter<QbsProtocolProjectData | undefined>
         = new vscode.EventEmitter<QbsProtocolProjectData | undefined>();
 
@@ -28,12 +29,13 @@ export class QbsProject implements vscode.Disposable {
     private readonly launchProductNameChanged: vscode.EventEmitter<string | undefined> = new vscode.EventEmitter<string | undefined>();
     private readonly debuggerNameChanged: vscode.EventEmitter<string | undefined> = new vscode.EventEmitter<string | undefined>();
 
-    public readonly onProjectDataChanged: vscode.Event<QbsProtocolProjectData | undefined> = this.projectDataChanged.event;
-    public readonly onProfileNameChanged: vscode.Event<string | undefined> = this.profileNameChanged.event;
-    public readonly onConfigurationNameChanged: vscode.Event<string | undefined> = this.configurationNameChanged.event;
     public readonly onBuildProductNameChanged: vscode.Event<string | undefined> = this.buildProductNameChanged.event;
-    public readonly onLaunchProductNameChanged: vscode.Event<string | undefined> = this.launchProductNameChanged.event;
+    public readonly onConfigurationNameChanged: vscode.Event<string | undefined> = this.configurationNameChanged.event;
     public readonly onDebuggerNameChanged: vscode.Event<string | undefined> = this.debuggerNameChanged.event;
+    public readonly onLaunchProductNameChanged: vscode.Event<string | undefined> = this.launchProductNameChanged.event;
+    public readonly onProfileNameChanged: vscode.Event<string | undefined> = this.profileNameChanged.event;
+    public readonly onOperationCompleted: vscode.Event<void> = this.operationCompleted.event;
+    public readonly onProjectDataChanged: vscode.Event<QbsProtocolProjectData | undefined> = this.projectDataChanged.event;
 
     public constructor(private readonly fsPath: string) { }
 
@@ -64,6 +66,8 @@ export class QbsProject implements vscode.Disposable {
     public getAllRecursiveProducts(): QbsProtocolProductData[] {
         return this.projectData?.getAllRecursiveProducts() || [];
     }
+
+    public notifyOperationCompleted(): void { this.operationCompleted.fire(); }
 
     public setProjectData(fromResolve: boolean, projectData?: QbsProtocolProjectData): void {
         console.log("Set project data: " + (!projectData?.getIsEmpty()) + " from resolve request: " + fromResolve);
