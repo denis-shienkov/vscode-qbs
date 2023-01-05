@@ -27,6 +27,8 @@ the Qbs executable to scan the available Qbs build profiles
 - Implemented compilation for single source file, selected from
 the project explorer tree.
 - Added new `installAfterBuild` Qbs extension setting.
+- Right now it is possible to select the default build profile
+from the build profiles selector.
 
 ## 1.0.7
 

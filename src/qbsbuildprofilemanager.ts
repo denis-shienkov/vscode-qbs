@@ -17,10 +17,11 @@ export class QbsBuildProfileManager implements vscode.Disposable {
     private profiles: QbsProtocolProfileData[] = [];
     private defaultProfileName: string = '';
     private updated: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
-    private profileSelected: vscode.EventEmitter<QbsProtocolProfileData> = new vscode.EventEmitter<QbsProtocolProfileData>();
+    private profileSelected: vscode.EventEmitter<QbsProtocolProfileData | undefined>
+        = new vscode.EventEmitter<QbsProtocolProfileData | undefined>();
 
     readonly onUpdated: vscode.Event<void> = this.updated.event;
-    readonly onProfileSelected: vscode.Event<QbsProtocolProfileData> = this.profileSelected.event;
+    readonly onProfileSelected: vscode.Event<QbsProtocolProfileData | undefined> = this.profileSelected.event;
 
     public static getInstance(): QbsBuildProfileManager { return QbsBuildProfileManager.instance; }
 
@@ -51,14 +52,24 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
     private async selectProfile(): Promise<void> {
         interface QbsProfileQuickPickItem extends vscode.QuickPickItem {
-            profile: QbsProtocolProfileData | undefined;
+            profile?: QbsProtocolProfileData;
+            isDefault?: boolean;
         }
         const items: QbsProfileQuickPickItem[] = [
-            ...[{
-                label: localize('qbs.buildprofilemanager.scan.select.label', '[Scan build profiles]'),
-                description: localize('qbs.buildprofilemanager.scan.select.description', 'Scan available build profiles'),
-                profile: undefined
-            }],
+            ...[
+                {
+                    label: localize('qbs.buildprofilemanager.scan.select.label', '[Scan build profiles]'),
+                    description: localize('qbs.buildprofilemanager.scan.select.description', 'Scan available build profiles'),
+                    profile: undefined
+                },
+                {
+                    label: localize('qbs.buildprofilemanager.default.select.label', 'Default'),
+                    description: localize('qbs.buildprofilemanager.default.select.description',
+                        'Default profile "{0}"', this.defaultProfileName),
+                    profile: undefined,
+                    isDefault: true
+                }
+            ],
             ...this.profiles.map((profile) => {
                 const label = profile.getName();
                 const description = this.getProfileDescription(profile);
@@ -69,9 +80,9 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         const chosen = await vscode.window.showQuickPick(items);
         if (!chosen) // Choose was canceled by the user.
             return;
-        else if (!chosen.profile) // Scan profiles item was choosed by the user.
+        else if (!chosen.profile && !chosen.isDefault) // Scan profiles item was choosed by the user.
             await this.scanProfilesWithProgress();
-        else // Profile was choosed by the user.
+        else // Profile was choosed by the user (or default or selected).
             this.profileSelected.fire(chosen.profile);
     }
 

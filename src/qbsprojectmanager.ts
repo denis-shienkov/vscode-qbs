@@ -112,7 +112,7 @@ export class QbsProjectManager implements vscode.Disposable {
     // Selectet build profile.
     private subscribeBuildProfilesChanges() {
         QbsBuildProfileManager.getInstance().onProfileSelected(async (profile) => {
-            this.project?.setProfileName(profile.getName());
+            this.project?.setProfileName(profile?.getName());
         });
     }
 
