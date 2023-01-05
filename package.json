@@ -348,22 +348,40 @@
             "type": "object",
             "title": "Qbs Tools",
             "properties": {
-                "qbs.qbsPath": {
-                    "type": "string",
-                    "default": "qbs",
-                    "description": "%qbs-tools.configuration.qbs.qbsPath.description%",
+                "qbs.autoResolve": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.autoResolve.description%",
                     "scope": "resource"
                 },
-                "qbs.settingsDirectory": {
+                "qbs.buildBeforeRun": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
+                    "scope": "resource"
+                },
+                "qbs.buildConfigurationsFilePath": {
                     "type": "string",
-                    "default": "",
-                    "description": "%qbs-tools.configuration.qbs.settingsDirectory.description%",
+                    "default": "${sourceDirectory}/.vscode/qbs-configurations.json",
+                    "description": "%qbs-tools.configuration.qbs.buildConfigurationsFilePath.description%",
                     "scope": "resource"
                 },
                 "qbs.buildDirectory": {
                     "type": "string",
                     "default": "${sourceDirectory}/build/${profileName}_${configurationName}",
                     "description": "%qbs-tools.configuration.qbs.buildDirectory.description%",
+                    "scope": "resource"
+                },
+                "qbs.cleanInstallRoot": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.cleanInstallRoot.description%",
+                    "scope": "resource"
+                },
+                "qbs.clearOutputBeforeOperation": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.clearOutputBeforeOperation.description%",
                     "scope": "resource"
                 },
                 "qbs.commandEchoMode": {
@@ -378,30 +396,6 @@
                     "description": "%qbs-tools.configuration.qbs.commandEchoMode.description%",
                     "scope": "resource"
                 },
-                "qbs.maxBuildJobs": {
-                    "type": "number",
-                    "default": 0,
-                    "description": "%qbs-tools.configuration.qbs.maxBuildJobs.description%",
-                    "scope": "resource"
-                },
-                "qbs.keepGoing": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%qbs-tools.configuration.qbs.keepGoing.description%",
-                    "scope": "resource"
-                },
-                "qbs.forceProbes": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
-                    "scope": "resource"
-                },
-                "qbs.cleanInstallRoot": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%qbs-tools.configuration.qbs.cleanInstallRoot.description%",
-                    "scope": "resource"
-                },
                 "qbs.errorHandlingMode": {
                     "type": "string",
                     "default": "relaxed",
@@ -410,6 +404,24 @@
                         "strict"
                     ],
                     "description": "%qbs-tools.configuration.qbs.errorHandlingMode.description%",
+                    "scope": "resource"
+                },
+                "qbs.forceProbes": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
+                    "scope": "resource"
+                },
+                "qbs.keepGoing": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%qbs-tools.configuration.qbs.keepGoing.description%",
+                    "scope": "resource"
+                },
+                "qbs.launchFilePath": {
+                    "type": "string",
+                    "default": "${sourceDirectory}/.vscode/launch.json",
+                    "description": "%qbs-tools.configuration.qbs.launchFilePath.description%",
                     "scope": "resource"
                 },
                 "qbs.logLevel": {
@@ -424,28 +436,16 @@
                     "description": "%qbs-tools.configuration.qbs.logLevel.description%",
                     "scope": "resource"
                 },
-                "qbs.launchFilePath": {
+                "qbs.maxBuildJobs": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "%qbs-tools.configuration.qbs.maxBuildJobs.description%",
+                    "scope": "resource"
+                },
+                "qbs.qbsPath": {
                     "type": "string",
-                    "default": "${sourceDirectory}/.vscode/launch.json",
-                    "description": "%qbs-tools.configuration.qbs.launchFilePath.description%",
-                    "scope": "resource"
-                },
-                "qbs.showDisabledProjectItems": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
-                    "scope": "resource"
-                },
-                "qbs.configurationsFilePath": {
-                    "type": "string",
-                    "default": "${sourceDirectory}/.vscode/qbs-configurations.json",
-                    "description": "%qbs-tools.configuration.qbs.configurationsFilePath.description%",
-                    "scope": "resource"
-                },
-                "qbs.clearOutputBeforeOperation": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%qbs-tools.configuration.qbs.clearOutputBeforeOperation.description%",
+                    "default": "qbs",
+                    "description": "%qbs-tools.configuration.qbs.qbsPath.description%",
                     "scope": "resource"
                 },
                 "qbs.saveBeforeBuild": {
@@ -454,16 +454,16 @@
                     "description": "%qbs-tools.configuration.qbs.saveBeforeBuild.description%",
                     "scope": "resource"
                 },
-                "qbs.autoResolve": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%qbs-tools.configuration.qbs.autoResolve.description%",
+                "qbs.settingsDirectory": {
+                    "type": "string",
+                    "default": "",
+                    "description": "%qbs-tools.configuration.qbs.settingsDirectory.description%",
                     "scope": "resource"
                 },
-                "qbs.buildBeforeRun": {
+                "qbs.showDisabledProjectItems": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%qbs-tools.configuration.qbs.buildBeforeRun.description%",
+                    "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
                     "scope": "resource"
                 }
             }

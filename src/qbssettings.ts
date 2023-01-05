@@ -17,7 +17,7 @@ export namespace QbsSettings {
     /** Set of all unique Qbs extension settings sections defined in the `package.json` file. */
     export enum SettingKey {
         AutoResolve = 'autoResolve',
-        BuildBeforeRun = 'BuildBeforeRun',
+        BuildBeforeRun = 'buildBeforeRun',
         BuildConfigurationsFilePath = 'buildConfigurationsFilePath',
         BuildDirectory = 'buildDirectory',
         CleanInstallRoot = 'cleanInstallRoot',
