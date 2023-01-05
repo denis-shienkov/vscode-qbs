@@ -25,6 +25,7 @@ export namespace QbsSettings {
         CommandEchoMode = 'commandEchoMode',
         ErrorHandlingMode = 'errorHandlingMode',
         ForceProbes = 'forceProbes',
+        InstallAfterBuild = 'installAfterBuild',
         KeepGoing = 'keepGoing',
         LaunchFilePath = 'launchFilePath',
         LogLevel = 'logLevel',
@@ -105,6 +106,8 @@ export namespace QbsSettings {
     export function getAutoResolve(): boolean { return getBoolean(SettingKey.AutoResolve, true); }
 
     export function getBuildBeforeRun(): boolean { return getBoolean(SettingKey.BuildBeforeRun, true); }
+
+    export function getInstallAfterBuild(): boolean { return getBoolean(SettingKey.InstallAfterBuild, true); }
 
     export function substituteFsPath(fsPath: string, projectName?: string, profileName?: string, configurationName?: string) {
         fsPath = fsPath.replace(QbsSubstitutionPattern.SourceDirectory, getSourceRootDirectory());

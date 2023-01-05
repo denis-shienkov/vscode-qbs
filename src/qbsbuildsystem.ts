@@ -789,7 +789,9 @@ export class QbsBuildSystem implements vscode.Disposable {
         const keepGoing = this.getKeepGoingFromSettings();
         const logLevel = this.getLogLevelFromSettings();
         const maxJobs = this.getMaxJobsFromSettings();
-        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs);
+        const install = this.getInstallFromSettings();
+        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
+        request.setInstall(install);
         request.setProducts(products);
         return request;
     }
@@ -816,7 +818,8 @@ export class QbsBuildSystem implements vscode.Disposable {
         const keepGoing = this.getKeepGoingFromSettings();
         const logLevel = this.getLogLevelFromSettings();
         const maxJobs = this.getMaxJobsFromSettings();
-        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs);
+        const install = this.getInstallFromSettings();
+        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
         request.setChangedFiles([fsPath]);
         request.setFilesToConsider([fsPath]);
         request.setActiveFileTags(['obj', 'hpp']);
@@ -906,6 +909,7 @@ export class QbsBuildSystem implements vscode.Disposable {
     private getDryRunFromSettings(buildRoot: string): boolean { return !fs.existsSync(buildRoot); }
     private getErrorHandlingModeFromSettings(): QbsProtocolErrorHandlingMode { return QbsSettings.getErrorHandlingMode(); }
     private getForceProbeExecutionFromSettings(): boolean { return QbsSettings.getForceProbes(); }
+    private getInstallFromSettings(): boolean { return QbsSettings.getInstallAfterBuild(); }
     private getKeepGoingFromSettings(): boolean { return QbsSettings.getKeepGoing(); }
     private getLogLevelFromSettings(): QbsProtocolLogLevel { return QbsSettings.getLogLevel(); }
     private getMaxJobsFromSettings(): number { return QbsSettings.getMaxJobs(); }

@@ -412,6 +412,12 @@
                     "description": "%qbs-tools.configuration.qbs.forceProbes.description%",
                     "scope": "resource"
                 },
+                "qbs.installAfterBuild": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.installAfterBuild.description%",
+                    "scope": "resource"
+                },
                 "qbs.keepGoing": {
                     "type": "boolean",
                     "default": false,

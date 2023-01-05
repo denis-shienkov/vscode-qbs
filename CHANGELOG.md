@@ -26,6 +26,7 @@ the Qbs executable to scan the available Qbs build profiles
 (aka toolchains).
 - Implemented compilation for single source file, selected from
 the project explorer tree.
+- Added new `installAfterBuild` Qbs extension setting.
 
 ## 1.0.7
 

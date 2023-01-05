@@ -24,6 +24,7 @@ for more information about variable expansion.
 | `qbs.configurationsFilePath` | Specify location to the build configurations `qbs-configurations.json` file. | `${sourceDirectory}/.vscode/qbs-configurations.json` | Yes. |
 | `qbs.errorHandlingMode` | Specifies how Qbs should deal with issues in project files, such as assigning to an unknown property. | `relaxed` | No. |
 | `qbs.forceProbes` | Forces [re-execution](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-force-op-op-probe-op-op-execution) of all Probe items' configure scripts, rather than using the cached data. | `false` | No. |
+| `qbs.installAfterBuild` | Installs the products after building. | `true` | No. |
 | `qbs.keepGoing` | Keeps [going](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-keep-op-op-going-op-op-op-op-k) when errors occur, if at all possible. | `false` | No. |
 | `qbs.launchFilePath` | Specify location to the debugger configuration in the `launch.json` file. | `${sourceDirectory}/.vscode/launch.json` | Yes. |
 | `qbs.logLevel` | Uses the specified [log level](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-log-op-op-level-op-lt-op-level-op-gt-op). | `info` | No. |
