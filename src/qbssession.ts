@@ -23,7 +23,12 @@ import { QbsProtocolTaskStartedResponse } from './protocol/qbsprotocoltaskstarte
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
-export enum QbsSessionState { Started, Starting, Stopped, Stopping }
+export enum QbsSessionState {
+    Started = 'started',
+    Starting = 'starting',
+    Stopped = 'stopped',
+    Stopping = 'stoping',
+}
 
 export class QbsSessionProjectData {
     public constructor(

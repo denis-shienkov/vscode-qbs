@@ -193,14 +193,16 @@ export class QbsBuildSystem implements vscode.Disposable {
     }
 
     private async restartSession(): Promise<void> {
+        console.log('Restarting session...');
+        let disposable: vscode.Disposable;
         return await new Promise<void>(async (resolve) => {
             let restartRequired: boolean = false;
-            const subscription = this.session.onStateChanged(async (state) => {
-                if (state === QbsSessionState.Stopped) {
+            disposable = this.session.onStateChanged(async (st) => {
+                if (st === QbsSessionState.Stopped) {
                     if (restartRequired) {
                         restartRequired = false;
+                        console.log('Starting session from state ' + st);
                         await vscode.commands.executeCommand(QbsCommandKey.StartSession);
-                        await subscription.dispose();
                         resolve();
                     }
                 }
@@ -208,17 +210,19 @@ export class QbsBuildSystem implements vscode.Disposable {
 
             const st = this.session.getState();
             if (st === QbsSessionState.Started || st === QbsSessionState.Starting) {
+                console.log('Stopping session from state ' + st);
                 restartRequired = true;
-                vscode.commands.executeCommand(QbsCommandKey.StopSession);
-                subscription.dispose();
-                resolve();
+                await vscode.commands.executeCommand(QbsCommandKey.StopSession);
             } else if (st === QbsSessionState.Stopping) {
                 restartRequired = true;
             } else if (st === QbsSessionState.Stopped) {
-                vscode.commands.executeCommand(QbsCommandKey.StartSession);
-                subscription.dispose();
+                console.log('Starting session from state ' + st);
+                await vscode.commands.executeCommand(QbsCommandKey.StartSession);
                 resolve();
             }
+        }).finally(() => {
+            console.log('Cleanup resources after session restart');
+            disposable.dispose();
         });
     }
 
