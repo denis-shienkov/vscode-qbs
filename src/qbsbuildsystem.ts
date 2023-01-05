@@ -830,7 +830,7 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private ensureRequestIsReady(request?: QbsProtocolRequest): boolean {
         if (!request) {
-            vscode.window.showErrorMessage(localize('qbs.buildsystem.noproject.message',
+            vscode.window.showWarningMessage(localize('qbs.buildsystem.noproject.message',
                 'Unable to start operation due to the project is not selected.'));
             return false;
         }
