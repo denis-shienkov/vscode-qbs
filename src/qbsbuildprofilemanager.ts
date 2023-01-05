@@ -61,10 +61,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
             }],
             ...this.profiles.map((profile) => {
                 const label = profile.getName();
-                const { arch, type } = this.getProfileDetails(profile.getQbs())
-                const description = localize('qbs.buildprofilemanager.select.description',
-                    'Architecture "{0}", type "{1}"',
-                    arch, type);
+                const description = this.getProfileDescription(profile);
                 return { label, description, profile };
             })
         ];
@@ -175,7 +172,14 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                     // Merges two datas into one data, with keeping a keys.
                     const mergeData = (a: any, b: any) =>
                         [...Object.keys(a), ...Object.keys(b)].reduce((combined: any, key) => {
-                            combined[key] = { ...a[key], ...b[key] };
+                            const ak = a[key];
+                            const bk = b[key];
+                            if (typeof ak === 'string')
+                                combined[key] = ak;
+                            else if (typeof bk === 'string')
+                                combined[key] = bk;
+                            else
+                                combined[key] = { ...ak, ...bk };
                             return combined;
                         }, {});
 
@@ -225,9 +229,23 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         return String(data).split(/\r?\n/).filter(line => line).map(line => trimLine(line));
     }
 
-    private getProfileDetails(qbsProps?: QbsProtocolQbsModuleData) {
-        const arch = qbsProps?.getArchitecture() || localize('qbs.buildprofile.unknown.architecture', 'unknown');
-        const type = qbsProps?.getToolchainType() || localize('qbs.buildprofile.unknown.type', 'unknown');
-        return { arch, type };
+    private getProfileDescription(profile?: QbsProtocolProfileData): string {
+        const qbsProps = profile?.getQbs();
+        if (qbsProps) {
+            const arch = qbsProps?.getArchitecture() || localize('qbs.buildprofile.unknown', 'unknown');
+            const type = qbsProps?.getToolchainType() || localize('qbs.buildprofile.unknown', 'unknown');
+            if (arch && type) {
+                return localize('qbs.buildprofilemanager.select.description1',
+                    'Architecture "{0}", type "{1}"', arch, type);
+            }
+        } else {
+            const name = profile?.getBaseProfileName();
+            if (name) {
+                return localize('qbs.buildprofilemanager.select.description2',
+                    'Base profile "{0}"', name);
+            }
+
+        }
+        return '';
     }
 }

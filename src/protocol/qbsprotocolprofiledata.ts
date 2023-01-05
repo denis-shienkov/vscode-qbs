@@ -19,6 +19,10 @@ export class QbsProtocolProfileData {
         return (data) ? new QbsProtocolCppModuleData(data) : undefined;
     }
 
+    public getBaseProfileName(): string | undefined {
+        return this.data[QbsProtocolDataKey.BaseProfile]
+    }
+
     public toMap(): any {
         let map: any = {};
         map[this.name] = this.data;

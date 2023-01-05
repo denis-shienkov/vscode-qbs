@@ -5,6 +5,7 @@ export enum QbsProtocolDataKey {
     ApiCompatLevel = 'api-compat-level',
     ApiLevel = 'api-level',
     Arguments = 'arguments',
+    BaseProfile = 'baseProfile',
     BuildDirectory = 'build-directory',
     BuildRoot = 'build-root',
     BuildSystemFiles = 'build-system-files',
