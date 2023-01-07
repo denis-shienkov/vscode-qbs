@@ -1,5 +1,9 @@
 # What's New?
 
+## 2.0.1
+
+- Fixed the documentation links.
+
 ## 2.0.0
 
 - The extension code has been completely refactored, which may
