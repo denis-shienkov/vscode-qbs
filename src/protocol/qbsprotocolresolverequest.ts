@@ -12,8 +12,7 @@ export class QbsProtocolResolveRequest extends QbsProtocolRequest {
         dryRun: boolean,
         errorHandlingMode: QbsProtocolErrorHandlingMode,
         forceProbeExecution: boolean,
-        logLevel: QbsProtocolLogLevel,
-        settingsDirectory: string) {
+        logLevel: QbsProtocolLogLevel) {
         super();
         this.setBuildRoot(buildRoot);
         this.setDataMode(QbsProtocolDataMode.OnlyChanged);
@@ -24,7 +23,6 @@ export class QbsProtocolResolveRequest extends QbsProtocolRequest {
         this.setLogLevel(logLevel);
         this.setModuleProperties(QbsProtocolModuleProperties.Exported);
         this.setOverrideBuildGraphData(true);
-        this.setSettingsDirectory(settingsDirectory);
         this.setType(QbsProtocolRequestType.Resolve);
     }
 }

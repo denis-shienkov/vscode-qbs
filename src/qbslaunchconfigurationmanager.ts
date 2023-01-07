@@ -8,6 +8,7 @@ import { ensureFileCreated } from './qbsutils';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsLaunchConfigurationData } from './datatypes/qbslaunchconfigurationdata';
 import { QbsLaunchConfigurationKey } from './datatypes/qbslaunchconfigurationkey';
+import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsSettings } from './qbssettings';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
@@ -18,6 +19,7 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
     private updated: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     private configurationSelected: vscode.EventEmitter<QbsLaunchConfigurationData | undefined> = new vscode.EventEmitter<QbsLaunchConfigurationData>();
     private fsLaunchConfigurationsWatcher?: chokidar.FSWatcher
+    private disposable?: vscode.Disposable;
 
     readonly onUpdated: vscode.Event<void> = this.updated.event;
     readonly onConfigurationSelected: vscode.Event<QbsLaunchConfigurationData | undefined> = this.configurationSelected.event;
@@ -26,16 +28,10 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
 
     public constructor(context: vscode.ExtensionContext) {
         QbsLaunchConfigurationManager.instance = this;
-
-        // Create default launch configurations file if this file not exists yet.
-        QbsLaunchConfigurationManager.ensureConfigurationsCreated();
-
-        // Register the commands related to the profile manager.
         this.registerCommandsHandlers(context);
-        this.subscribeSettingsChanges();
     }
 
-    public dispose(): void { this.fsLaunchConfigurationsWatcher?.close(); }
+    public dispose(): void { this.stop(); }
 
     public getConfigurations(): QbsLaunchConfigurationData[] { return this.configurations; }
 
@@ -43,18 +39,14 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
         return this.getConfigurations().find(configuration => configuration.getName() === configurationName);
     }
 
-    private registerCommandsHandlers(context: vscode.ExtensionContext): void {
-        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ScanLaunchConfigurations,
-            async () => { await this.scanConfigurations(); }));
-        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.SelectLaunchConfiguration,
-            async () => { await this.selectConfiguration(); }));
-        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.EditLaunchConfigurations,
-            async () => { await this.editConfigurations(); }));
-    }
-
-    private subscribeSettingsChanges(): void {
+    public async start(): Promise<void> {
         const subscribeLaunchConfigurationsChanged = async () => {
-            const fsPath = QbsSettings.substituteFsPath(QbsSettings.getLaunchFilePath());
+            const fsProjectPath = QbsProjectManager.getInstance().getProject()?.getFsPath();
+            if (!fsProjectPath)
+                return;
+            const fsPath = QbsLaunchConfigurationManager.getFullLaunchConfigurationsFilePath(fsProjectPath);
+            if (!fsPath)
+                return;
             console.log('Launch configurations file name changed to: ' + fsPath);
             this.fsLaunchConfigurationsWatcher = chokidar.watch(fsPath, { ignoreInitial: true });
             this.fsLaunchConfigurationsWatcher.on('change', () => {
@@ -63,14 +55,36 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
             });
         }
 
-        QbsSettings.observeSetting(QbsSettings.SettingKey.LaunchFilePath,
+        this.disposable?.dispose();
+        this.disposable = QbsSettings.observeSetting(QbsSettings.SettingKey.LaunchFilePath,
             async () => subscribeLaunchConfigurationsChanged());
-        subscribeLaunchConfigurationsChanged();
+        await subscribeLaunchConfigurationsChanged();
+    }
+
+    public async stop(): Promise<void> {
+        await this.fsLaunchConfigurationsWatcher?.close();
+        await this.disposable?.dispose();
+    }
+
+    public async restart(): Promise<void> {
+        await this.stop();
+        await this.start();
+    }
+
+    private registerCommandsHandlers(context: vscode.ExtensionContext): void {
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ScanLaunchConfigurations,
+            async () => { await this.scanConfigurations(); }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.SelectLaunchConfiguration,
+            async () => { await this.selectConfiguration(); }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.EditLaunchConfigurations,
+            async () => { await QbsLaunchConfigurationManager.editConfigurations(); }));
     }
 
     private async scanConfigurations(): Promise<void> {
         return new Promise<QbsLaunchConfigurationData[]>((resolve) => {
             const fsPath = QbsLaunchConfigurationManager.ensureConfigurationsCreated();
+            if (!fsPath)
+                return;
             console.log('Start reading launch configurations from: ' + fsPath);
             fs.readFile(fsPath, (error, data) => {
                 if (error) {
@@ -134,16 +148,22 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
         }
     }
 
-    private async editConfigurations(): Promise<void> {
+    private static async editConfigurations(): Promise<void> {
         // Create if not exists yet, and then show the `qbs-configurations.json` file.
         const fsPath = QbsLaunchConfigurationManager.ensureConfigurationsCreated();
+        if (!fsPath)
+            return;
         const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
         await vscode.window.showTextDocument(doc);
     }
 
-    private static ensureConfigurationsCreated(): string {
-        let fsPath = QbsSettings.getLaunchFilePath()
-        fsPath = QbsSettings.substituteFsPath(fsPath);
+    private static ensureConfigurationsCreated(): string | undefined {
+        const fsProjectPath = QbsProjectManager.getInstance().getProject()?.getFsPath();
+        if (!fsProjectPath)
+            return;
+        const fsPath = QbsLaunchConfigurationManager.getFullLaunchConfigurationsFilePath(fsProjectPath);
+        if (!fsPath)
+            return;
         ensureFileCreated(fsPath, QbsLaunchConfigurationManager.writeDefaultConfigurations);
         return fsPath;
     }
@@ -161,5 +181,21 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
     private static writeDefaultConfigurations(ws: fs.WriteStream): boolean {
         ws.write(JSON.stringify(QbsLaunchConfigurationManager.getDefaultConfigurations(), null, 4));
         return true;
+    }
+
+    private static getFullLaunchConfigurationsFilePath(fsProjectPath: string): string | undefined {
+        const sourceRoot = QbsSettings.getSourceRootDirectory(fsProjectPath);
+        if (!sourceRoot) {
+            vscode.window.showWarningMessage(localize('qbs.launchconfigurationmanager.noworkspace.message',
+                'Unable get the launch configurations file because no any workspace folder is open.'));
+            return;
+        }
+        const fsPath = QbsSettings.getLaunchFilePath();
+        if (!fsPath) {
+            vscode.window.showWarningMessage(localize('qbs.launchconfigurationmanager.nofspath.message',
+                'Unable to get the launch configurations file because its path is not set in Qbs extension settings.'));
+            return;
+        }
+        return QbsSettings.substituteSourceRoot(fsPath, sourceRoot);
     }
 }

@@ -62,8 +62,6 @@ export async function activate(context: vscode.ExtensionContext) {
     await vscode.commands.executeCommand(QbsCommandKey.StartupCppCodeModel);
     await vscode.commands.executeCommand(QbsCommandKey.RestartSession);
     await vscode.commands.executeCommand(QbsCommandKey.ScanBuildProfiles);
-    await vscode.commands.executeCommand(QbsCommandKey.ScanBuildConfigurations);
-    await vscode.commands.executeCommand(QbsCommandKey.ScanLaunchConfigurations);
     await vscode.commands.executeCommand(QbsCommandKey.RestoreProject);
 }
 

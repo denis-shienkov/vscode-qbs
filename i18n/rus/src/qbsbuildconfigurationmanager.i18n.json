@@ -1,4 +1,6 @@
 {
+    "qbs.buildconfigurationmanager.nofspath.message": "Невозможно получить файл конфигураций сборки т.к. путь к нему не установлен в настройках расширения Qbs.",
+    "qbs.buildconfigurationmanager.noworkspace.message": "Невозможно получить файл конфигураций сборки т.к. нет ни одной открытой папки в рабочей области.",
     "qbs.buildconfigurationmanager.scan.select.description": "Сканировать доступные конфигурации сборки",
     "qbs.buildconfigurationmanager.scan.select.label": "[Сканировать конфигурации сборки]"
 }

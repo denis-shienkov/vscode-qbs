@@ -210,9 +210,9 @@ export class QbsSession implements vscode.Disposable {
     /** Requests the path to the Qbs executable file stored in the extension  configuration and
      * checks for its presence in the file system. Depending on the result, displays an appropriate
      * message box and then returns the ensuring result. */
-    private static async ensureQbsPathIsSet(qbsPath: string): Promise<boolean> {
+    private static async ensureQbsPathIsSet(qbsPath?: string): Promise<boolean> {
         if (qbsPath === 'qbs')
-            qbsPath = await which(qbsPath);
+            qbsPath = await this.which(qbsPath);
         if (!qbsPath) {
             await vscode.window.showErrorMessage(localize('qbs.executable.missed.error.message',
                 'Qbs executable not set in settings.'));
@@ -223,5 +223,18 @@ export class QbsSession implements vscode.Disposable {
             return false;
         }
         return true;
+    }
+
+    private static async which(name: string): Promise<string | undefined> {
+        return new Promise<string | undefined>(resolve => {
+            which(name, (error, path) => {
+                if (error) {
+                    console.error('Unable to run "which qbs" command, error: ' + error.message);
+                    resolve(undefined);
+                } else {
+                    resolve(path);
+                }
+            });
+        });
     }
 }

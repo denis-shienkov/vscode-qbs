@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { fixFsPathSeparators } from './qbsutils';
+import { isChildOf } from './qbsutils';
 import { QbsProtocolCommandEchoMode } from './protocol/qbsprotocolcommandechomode';
 import { QbsProtocolErrorHandlingMode } from './protocol/qbsprotocolerrorhandlingmode';
 import { QbsProtocolLogLevel } from './protocol/qbsprotocolloglevel';
@@ -36,8 +36,8 @@ export namespace QbsSettings {
         ShowDisabledProjectItems = 'showDisabledProjectItems',
     }
 
-    export function observeSetting(field: SettingKey, callback: () => void): void {
-        vscode.workspace.onDidChangeConfiguration(event => {
+    export function observeSetting(field: SettingKey, callback: () => void): vscode.Disposable {
+        return vscode.workspace.onDidChangeConfiguration(event => {
             if (event.affectsConfiguration(qbsSettingsSection + '.' + field.toString()))
                 callback();
         });
@@ -109,12 +109,29 @@ export namespace QbsSettings {
 
     export function getInstallAfterBuild(): boolean { return getBoolean(SettingKey.InstallAfterBuild, true); }
 
-    export function substituteFsPath(fsPath: string, projectName?: string, profileName?: string, configurationName?: string) {
-        fsPath = fsPath.replace(QbsSubstitutionPattern.SourceDirectory, getSourceRootDirectory());
-        fsPath = fsPath.replace(QbsSubstitutionPattern.ProjectName, projectName || qbsUnknownEntryPath);
-        fsPath = fsPath.replace(QbsSubstitutionPattern.ProfileName, profileName || qbsUnknownEntryPath);
-        fsPath = fsPath.replace(QbsSubstitutionPattern.ConfigurationName, configurationName || qbsUnknownEntryPath);
-        return fixFsPathSeparators(fsPath);
+    export function substituteSourceRoot(fsPath: string, sourceRoot: string): string {
+        return fsPath.replace(QbsSubstitutionPattern.SourceDirectory, sourceRoot);
+    }
+
+    export function substituteProjectName(fsPath: string, projectName: string): string {
+        return fsPath.replace(QbsSubstitutionPattern.ProjectName, projectName);
+    }
+
+    export function substituteBuildProfileName(fsPath: string, profileName: string): string {
+        return fsPath.replace(QbsSubstitutionPattern.ProfileName, profileName);
+    }
+
+    export function substituteBuildConfigurationName(fsPath: string, configurationName: string): string {
+        return fsPath.replace(QbsSubstitutionPattern.ConfigurationName, configurationName);
+    }
+
+    export function getSourceRootDirectory(fsPath: string): string | undefined {
+        for (var workspaceFolder of vscode.workspace.workspaceFolders || []) {
+            const directory = workspaceFolder.uri.fsPath;
+            if (isChildOf(fsPath, directory))
+                return directory;
+        }
+        console.log('Unable to get the source root directory because the workspace folder is not selected yet');
     }
 
     // Private part.
@@ -126,7 +143,6 @@ export namespace QbsSettings {
     const qbsDefaultBuildDirectoryPath = `${QbsSubstitutionPattern.SourceDirectory}/build/${QbsSubstitutionPattern.ProfileName}_${QbsSubstitutionPattern.ConfigurationName}`;
     const qbsDefaultLaunchFilePath = `${QbsSubstitutionPattern.SourceDirectory}/.vscode/launch.json`;
     const qbsDefaultBuildConfigurationsFilePath = `${QbsSubstitutionPattern.SourceDirectory}/.vscode/qbs-configurations.json`;
-    const qbsUnknownEntryPath = 'unknown';
 
     function getSettings(): vscode.WorkspaceConfiguration {
         return vscode.workspace.getConfiguration(qbsSettingsSection);
@@ -138,10 +154,5 @@ export namespace QbsSettings {
 
     function getString(key: string, placeholder: string): string {
         return getSettings().get<string>(key, placeholder);
-    }
-
-    function getSourceRootDirectory(): string {
-        return (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
-            ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
     }
 }

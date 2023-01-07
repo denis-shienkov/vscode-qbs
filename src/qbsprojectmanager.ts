@@ -256,48 +256,48 @@ export class QbsProjectManager implements vscode.Disposable {
             } else if (toolchain.indexOf('gcc') !== -1) {
                 configuration.setType(QbsLaunchConfigurationType.Gdb);
 
-                const getFsDebugger = (toolchainPath: string, debuggerName: string): string => {
+                const getFsDebugger = async (toolchainPath: string, debuggerName: string): Promise<string | undefined> => {
                     const ext = (process.platform === 'win32') ? '.exe' : '';
-                    let fsPath = path.join(toolchainPath, debuggerName + ext);
+                    let fsPath: string | undefined = path.join(toolchainPath, debuggerName + ext);
                     if (!fs.existsSync(fsPath))
-                        fsPath = which.sync(debuggerName + ext);
+                        fsPath = await QbsProjectManager.which(debuggerName + ext);
                     return fsPath;
                 };
 
-                const setupMi = (toolchainDir: string, debuggerName: string, miMode: string): boolean => {
-                    const fsPath = getFsDebugger(toolchainDir, debuggerName);
-                    if (fsPath)
+                const setupMi = async (toolchainDir: string, debuggerName: string, miMode: string): Promise<boolean> => {
+                    const fsPath = await getFsDebugger(toolchainDir, debuggerName);
+                    if (!fsPath)
                         return false;
                     configuration?.setMiMode(miMode);
                     configuration?.setMiDebuggerPath(fsPath);
                     return true;
                 }
 
-                const setupDebugger = (): boolean => {
+                const setupDebugger = async (): Promise<boolean> => {
                     const compilerDirectory = path.dirname(compilerPath);
 
                     // Check for the LLDB-MI debugger executable.
-                    if (setupMi(compilerDirectory, 'lldb-mi', 'lldb'))
+                    if (await setupMi(compilerDirectory, 'lldb-mi', 'lldb'))
                         return true;
 
                     // Check for the LLDB-MI installed by CppTools.
                     const cpptoolsExtension = vscode.extensions.getExtension('ms-vscode.cpptools');
                     const fsPath = cpptoolsExtension ? path.join(
                         cpptoolsExtension.extensionPath, 'debugAdapters', 'lldb-mi', 'bin') : undefined;
-                    if (fsPath && setupMi(fsPath, 'lldb-mi', 'lldb'))
+                    if (fsPath && await setupMi(fsPath, 'lldb-mi', 'lldb'))
                         return true;
 
                     // Check for the GDB debugger executable.
-                    if (setupMi(compilerDirectory, 'gdb', 'gdb'))
+                    if (await setupMi(compilerDirectory, 'gdb', 'gdb'))
                         return true;
 
                     // Check for the LLDB debugger executable.
-                    if (setupMi(compilerDirectory, 'lldb', 'lldb'))
+                    if (await setupMi(compilerDirectory, 'lldb', 'lldb'))
                         return true;
                     return false;
                 }
 
-                if (!setupDebugger())
+                if (!await setupDebugger())
                     throw new Error('Unable to start auto debugging session because the debugger is undefined');
             }
         }
@@ -352,6 +352,15 @@ export class QbsProjectManager implements vscode.Disposable {
     private async openProject(fsPath: string): Promise<void> {
         this.project = new QbsProject(fsPath);
         await this.loadProject();
+
+        // Reload the build configurations for this new loaded project.
+        await QbsBuildConfigurationManager.getInstance().restart();
+        await vscode.commands.executeCommand(QbsCommandKey.ScanBuildConfigurations);
+
+        // Reload the launch configurations for this new loaded project.
+        await QbsLaunchConfigurationManager.getInstance().restart();
+        await vscode.commands.executeCommand(QbsCommandKey.ScanLaunchConfigurations);
+
         this.projectOpen.fire();
     }
 
@@ -398,5 +407,18 @@ export class QbsProjectManager implements vscode.Disposable {
      * extension in the current workspace directory. */
     private static async getWorkspaceProjects(): Promise<string[]> {
         return (await vscode.workspace.findFiles('*.qbs')).map(uri => uri.fsPath);
+    }
+
+    private static async which(name: string): Promise<string | undefined> {
+        return new Promise<string | undefined>(resolve => {
+            which(name, (error, path) => {
+                if (error) {
+                    console.error('Unable to run "which ' + name + 'bs" command, error: ' + error.message);
+                    resolve(undefined);
+                } else {
+                    resolve(path);
+                }
+            });
+        });
     }
 }

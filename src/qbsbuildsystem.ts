@@ -10,6 +10,7 @@ import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsDiagnosticManager } from './diagnostic/qbsdiagnosticmanager';
 import { QbsOutputLogger } from './qbsoutputlogger';
 import { QbsProductNode } from './projectexplorer/qbsproductnode';
+import { QbsProject } from './qbsproject';
 import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsProjectNode } from './projectexplorer/qbsprojectnode';
 import { QbsProtocolBuildRequest } from './protocol/qbsprotocolbuildrequest';
@@ -143,20 +144,20 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private subscribeSessionMessages(): void {
         // Handle the command description messages from the Qbs session.
-        this.session.onCommandDescriptionReceived(async (response) => this.logMessageResponse(response));
+        this.session.onCommandDescriptionReceived(async (response) => QbsBuildSystem.logMessageResponse(response));
 
         // Handle the log/warning/error messages from the Qbs session.
         this.session.onLogMessageReceived(async (response) => {
-            this.logMessageResponse(response);
-            this.diagnoseQbsInformationMessages(response);
+            QbsBuildSystem.logMessageResponse(response);
+            QbsBuildSystem.diagnoseQbsInformationMessages(response);
         });
         this.session.onWarningMessageReceived(async (response) => {
-            this.logMessageResponse(response);
-            this.diagnoseQbsWarningMessages(response);
+            QbsBuildSystem.logMessageResponse(response);
+            QbsBuildSystem.diagnoseQbsWarningMessages(response);
         });
         this.session.onErrorMessageReceived(async (response) => {
-            this.logMessageResponse(response);
-            this.diagnoseQbsErrorMessages(response);
+            QbsBuildSystem.logMessageResponse(response);
+            QbsBuildSystem.diagnoseQbsErrorMessages(response);
         });
 
         // Handle messages from the Qbs session process output (std/err).
@@ -166,18 +167,18 @@ export class QbsBuildSystem implements vscode.Disposable {
                 return;
 
             const shell = `${result.executable} ${result.arguments.join(' ')}`;
-            this.logMessage(shell);
+            QbsBuildSystem.logMessage(shell);
 
             const logStdMessages = (data: string[]) => {
                 if (data.length) {
                     const message = data.join('\n');
-                    this.logMessage(message);
+                    QbsBuildSystem.logMessage(message);
                 }
             }
 
             logStdMessages(result.stdError);
             logStdMessages(result.stdOutput);
-            this.diagnoseToolchainMessages(result);
+            QbsBuildSystem.diagnoseToolchainMessages(result);
         });
     }
 
@@ -236,11 +237,11 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private async resolveWithProgress(force: boolean, timeout: number): Promise<boolean> {
         const request = this.createResolveRequest(force);
-        if (!this.ensureRequestIsReady(request))
+        if (!QbsBuildSystem.ensureRequestIsReady(request))
             return false;
-        else if (!this.ensureSaveFilesBeforeBuild())
+        else if (!QbsBuildSystem.ensureSaveFilesBeforeBuild())
             return false;
-        else if (!this.ensureClearOutputBeforeOperation())
+        else if (!QbsBuildSystem.ensureClearOutputBeforeOperation())
             return false;
         else if (!request) // Extra checking to use the method `this.session.resolve(request)`.
             return false;
@@ -252,8 +253,8 @@ export class QbsBuildSystem implements vscode.Disposable {
         }, async (p, c) => {
             const timestamp = performance.now();
 
-            this.logMessage(localize('qbs.buildsystem.resolve.started.message', 'Resolving project...'));
-            this.prepareQbsDiagnostics();
+            QbsBuildSystem.logMessage(localize('qbs.buildsystem.resolve.started.message', 'Resolving project...'));
+            QbsBuildSystem.prepareQbsDiagnostics();
 
             console.log('Send resolve request with force execution: ' + force + ' and timeout: ' + timeout);
             await this.session.resolve(request);
@@ -287,7 +288,7 @@ export class QbsBuildSystem implements vscode.Disposable {
                 };
 
                 disposables.push(this.session.onTaskStarted(async (result) => {
-                    this.logMessage(result.description);
+                    QbsBuildSystem.logMessage(result.description);
                     description = result.description;
                     maxProgress = result.maxProgress;
                     progress = 0;
@@ -304,19 +305,20 @@ export class QbsBuildSystem implements vscode.Disposable {
                 disposables.push(this.session.onProjectResolved(async (result) => {
                     const elapsed = msToTime(performance.now() - timestamp);
                     QbsProjectManager.getInstance().getProject()?.setProjectData(true, result.data);
+                    QbsProjectManager.getInstance().getProject()?.notifyOperationCompleted();
 
-                    this.logMessageResponse(result.message);
-                    this.diagnoseQbsInformationMessages(result.message);
-                    this.submitQbsDiagnostics();
+                    QbsBuildSystem.logMessageResponse(result.message);
+                    QbsBuildSystem.diagnoseQbsInformationMessages(result.message);
+                    QbsBuildSystem.submitQbsDiagnostics();
 
                     const success = (result.message) ? result.message.getIsEmpty() : false;
                     console.log('Received resolve response with result: ' + success);
 
                     if (success) {
-                        this.logMessage(localize('qbs.buildsystem.resolve.completed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.resolve.completed.message',
                             'Project successfully resolved, elapsed time {0}', elapsed));
                     } else {
-                        this.logMessage(localize('qbs.buildsystem.resolve.failed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.resolve.failed.message',
                             'Error resolving project, elapsed time {0}', elapsed));
                     }
 
@@ -337,11 +339,11 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     public async buildWithProgress(productNames: string[], timeout: number): Promise<boolean> {
         const request = this.createBuildRequest(productNames);
-        if (!this.ensureRequestIsReady(request))
+        if (!QbsBuildSystem.ensureRequestIsReady(request))
             return false;
-        else if (!this.ensureSaveFilesBeforeBuild())
+        else if (!QbsBuildSystem.ensureSaveFilesBeforeBuild())
             return false;
-        else if (!this.ensureClearOutputBeforeOperation())
+        else if (!QbsBuildSystem.ensureClearOutputBeforeOperation())
             return false;
         else if (!request) // Extra checking to use the method `this.session.build(request)`.
             return false;
@@ -353,9 +355,9 @@ export class QbsBuildSystem implements vscode.Disposable {
         }, async (p, c) => {
             const timestamp = performance.now();
 
-            this.logMessage(localize('qbs.buildsystem.build.started.message', 'Building project...'));
-            this.prepareQbsDiagnostics();
-            this.prepareToolchainDiagnostics();
+            QbsBuildSystem.logMessage(localize('qbs.buildsystem.build.started.message', 'Building project...'));
+            QbsBuildSystem.prepareQbsDiagnostics();
+            QbsBuildSystem.prepareToolchainDiagnostics();
 
             console.log('Send build request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
@@ -408,19 +410,19 @@ export class QbsBuildSystem implements vscode.Disposable {
                     QbsProjectManager.getInstance().getProject()?.setProjectData(false, result.data);
                     QbsProjectManager.getInstance().getProject()?.notifyOperationCompleted();
 
-                    this.logMessageResponse(result.message);
-                    this.diagnoseQbsInformationMessages(result.message);
-                    this.submitQbsDiagnostics();
-                    this.submitToolchainDiagnostics();
+                    QbsBuildSystem.logMessageResponse(result.message);
+                    QbsBuildSystem.diagnoseQbsInformationMessages(result.message);
+                    QbsBuildSystem.submitQbsDiagnostics();
+                    QbsBuildSystem.submitToolchainDiagnostics();
 
                     const success = (result.message) ? result.message.getIsEmpty() : false;
                     console.log('Received build response with result: ' + success);
 
                     if (success) {
-                        this.logMessage(localize('qbs.buildsystem.build.completed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.build.completed.message',
                             'Project successfully built, elapsed time {0}', elapsed));
                     } else {
-                        this.logMessage(localize('qbs.buildsystem.build.failed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.build.failed.message',
                             'Error building project, elapsed time {0}', elapsed));
                     }
 
@@ -441,9 +443,9 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private async installWithProgress(productNames: string[], timeout: number): Promise<boolean> {
         const request = this.createInstallRequest(productNames);
-        if (!this.ensureRequestIsReady(request))
+        if (!QbsBuildSystem.ensureRequestIsReady(request))
             return false;
-        else if (!this.ensureClearOutputBeforeOperation())
+        else if (!QbsBuildSystem.ensureClearOutputBeforeOperation())
             return false;
         else if (!request) // Extra checking to use the method `this.session.install(request)`.
             return false;
@@ -455,8 +457,8 @@ export class QbsBuildSystem implements vscode.Disposable {
         }, async (p, c) => {
             const timestamp = performance.now();
 
-            this.logMessage(localize('qbs.buildsystem.install.started.message', 'Installing project...'));
-            this.prepareQbsDiagnostics();
+            QbsBuildSystem.logMessage(localize('qbs.buildsystem.install.started.message', 'Installing project...'));
+            QbsBuildSystem.prepareQbsDiagnostics();
 
             console.log('Send install request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
@@ -507,18 +509,18 @@ export class QbsBuildSystem implements vscode.Disposable {
                 disposables.push(this.session.onProjectInstalled(async (result) => {
                     const elapsed = msToTime(performance.now() - timestamp);
 
-                    this.logMessageResponse(result);
-                    this.diagnoseQbsInformationMessages(result);
-                    this.submitQbsDiagnostics();
+                    QbsBuildSystem.logMessageResponse(result);
+                    QbsBuildSystem.diagnoseQbsInformationMessages(result);
+                    QbsBuildSystem.submitQbsDiagnostics();
 
                     const success = (result) ? result.getIsEmpty() : false;
                     console.log('Received install response with result: ' + success);
 
                     if (success) {
-                        this.logMessage(localize('qbs.buildsystem.install.completed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.install.completed.message',
                             'Project successfully installed, elapsed time {0}', elapsed));
                     } else {
-                        this.logMessage(localize('qbs.buildsystem.install.failed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.install.failed.message',
                             'Error installing project, elapsed time {0}', elapsed));
                     }
 
@@ -539,9 +541,9 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private async cleanWithProgress(productNames: string[], timeout: number): Promise<boolean> {
         const request = this.createCleanRequest(productNames);
-        if (!this.ensureRequestIsReady(request))
+        if (!QbsBuildSystem.ensureRequestIsReady(request))
             return false;
-        else if (!this.ensureClearOutputBeforeOperation())
+        else if (!QbsBuildSystem.ensureClearOutputBeforeOperation())
             return false;
         else if (!request) // Extra checking to use the method `this.session.clean(request)`.
             return false;
@@ -553,8 +555,8 @@ export class QbsBuildSystem implements vscode.Disposable {
         }, async (p, c) => {
             const timestamp = performance.now();
 
-            this.logMessage(localize('qbs.buildsystem.clean.started.message', 'Cleaning project...'));
-            this.prepareQbsDiagnostics();
+            QbsBuildSystem.logMessage(localize('qbs.buildsystem.clean.started.message', 'Cleaning project...'));
+            QbsBuildSystem.prepareQbsDiagnostics();
 
             console.log('Send clean request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
@@ -606,18 +608,18 @@ export class QbsBuildSystem implements vscode.Disposable {
                     const elapsed = msToTime(performance.now() - timestamp);
                     QbsProjectManager.getInstance().getProject()?.notifyOperationCompleted();
 
-                    this.logMessageResponse(result);
-                    this.diagnoseQbsInformationMessages(result);
-                    this.submitQbsDiagnostics();
+                    QbsBuildSystem.logMessageResponse(result);
+                    QbsBuildSystem.diagnoseQbsInformationMessages(result);
+                    QbsBuildSystem.submitQbsDiagnostics();
 
                     const success = (result) ? result.getIsEmpty() : false;
                     console.log('Received clean response with result: ' + success);
 
                     if (success) {
-                        this.logMessage(localize('qbs.buildsystem.clean.completed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.clean.completed.message',
                             'Project successfully cleaned, elapsed time {0}', elapsed));
                     } else {
-                        this.logMessage(localize('qbs.buildsystem.clean.failed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.clean.failed.message',
                             'Error cleaning project, elapsed time {0}', elapsed));
                     }
 
@@ -648,9 +650,9 @@ export class QbsBuildSystem implements vscode.Disposable {
 
     private async compileOnlyWithProgress(fsPath: string, timeout: number): Promise<boolean> {
         const request = this.createCompileOnlyRequest(fsPath);
-        if (!this.ensureRequestIsReady(request))
+        if (!QbsBuildSystem.ensureRequestIsReady(request))
             return false;
-        else if (!this.ensureClearOutputBeforeOperation())
+        else if (!QbsBuildSystem.ensureClearOutputBeforeOperation())
             return false;
         else if (!request) // Extra checking to use the method `this.session.build(request)`.
             return false;
@@ -662,9 +664,9 @@ export class QbsBuildSystem implements vscode.Disposable {
         }, async (p, c) => {
             const timestamp = performance.now();
 
-            this.logMessage(localize('qbs.buildsystem.compile.started.message', 'Compiling file...'));
-            this.prepareQbsDiagnostics();
-            this.prepareToolchainDiagnostics();
+            QbsBuildSystem.logMessage(localize('qbs.buildsystem.compile.started.message', 'Compiling file...'));
+            QbsBuildSystem.prepareQbsDiagnostics();
+            QbsBuildSystem.prepareToolchainDiagnostics();
 
             console.log('Send compile only request for file: ' + fsPath + ' and timeout: ' + timeout);
             await this.session.build(request);
@@ -715,19 +717,19 @@ export class QbsBuildSystem implements vscode.Disposable {
                     const elapsed = msToTime(performance.now() - timestamp);
                     QbsProjectManager.getInstance().getProject()?.setProjectData(false, result.data);
 
-                    this.logMessageResponse(result.message);
-                    this.diagnoseQbsInformationMessages(result.message);
-                    this.submitQbsDiagnostics();
-                    this.submitToolchainDiagnostics();
+                    QbsBuildSystem.logMessageResponse(result.message);
+                    QbsBuildSystem.diagnoseQbsInformationMessages(result.message);
+                    QbsBuildSystem.submitQbsDiagnostics();
+                    QbsBuildSystem.submitToolchainDiagnostics();
 
                     const success = (result.message) ? result.message.getIsEmpty() : false;
                     console.log('Received compile only response with result: ' + success);
 
                     if (success) {
-                        this.logMessage(localize('qbs.buildsystem.compile.completed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.compile.completed.message',
                             'File successfully compiled, elapsed time {0}', elapsed));
                     } else {
-                        this.logMessage(localize('qbs.buildsystem.compile.failed.message',
+                        QbsBuildSystem.logMessage(localize('qbs.buildsystem.compile.failed.message',
                             'Error compiling file, elapsed time {0}', elapsed));
                     }
 
@@ -766,73 +768,116 @@ export class QbsBuildSystem implements vscode.Disposable {
     private createCancelRequst(): QbsProtocolCancelRequest { return new QbsProtocolCancelRequest(); }
 
     private createResolveRequest(forceResolve: boolean): QbsProtocolResolveRequest | undefined {
-        const project = QbsProjectManager.getInstance().getProject();
+        const project = QbsBuildSystem.getProject();
         if (!project)
             return;
-
-        const buildRoot = this.getBuildRootDirectoryFromSettings();
-        const dryRun = this.getDryRunFromSettings(buildRoot);
-        const errorHandlingMode = this.getErrorHandlingModeFromSettings();
-        const forceProbeExecution = (forceResolve) ? true : this.getForceProbeExecutionFromSettings();
-        const logLevel = this.getLogLevelFromSettings();
-        const settingsDirectory = this.getSettingsDirectoryFromSettings();
+        const buildRoot = QbsBuildSystem.getBuildRootDirectoryPathFromSettings();
+        if (!buildRoot)
+            return;
+        const dryRun = QbsBuildSystem.getDryRunFromSettings(buildRoot);
+        const errorHandlingMode = QbsBuildSystem.getErrorHandlingModeFromSettings();
+        const forceProbeExecution = forceResolve || QbsBuildSystem.getForceProbeExecutionFromSettings();
+        const logLevel = QbsBuildSystem.getLogLevelFromSettings();
         const request = new QbsProtocolResolveRequest(buildRoot, dryRun, errorHandlingMode,
-            forceProbeExecution, logLevel, settingsDirectory);
+            forceProbeExecution, logLevel);
 
-        request.setProjectFilePath(project?.getFsPath());
+        const settingsDirectory = QbsBuildSystem.getSettingsDirectoryPathFromSettings();
+        const fsPath = project.getFsPath();
+        const profileName = project.getProfileName(); // An undefined value means the default profile.
+        const configurationName = project.getConfigurationName(); // An undefined value means the debug configuration.
+
+        request.setSettingsDirectory(settingsDirectory);
+        request.setProjectFilePath(fsPath);
         request.setConfigurationName(project.getConfigurationName());
         request.setTopLevelProfile(project.getProfileName());
 
         // Find the current configuration by it's a name to get the overriden properties.
         const configuration = QbsBuildConfigurationManager.getInstance().findConfiguration(project.getConfigurationName());
-        request.setOverriddenProperties(configuration ? configuration.properties : undefined)
+        request.setOverriddenProperties(configuration ? configuration.properties : undefined);
+        console.log('Create resolve request:\n'
+            + '\tbuildRoot: ' + buildRoot + '\n'
+            + '\tdryRun: ' + dryRun + '\n'
+            + '\terrorHandlingMode: ' + errorHandlingMode + '\n'
+            + '\tforceProbeExecution: ' + forceProbeExecution + '\n'
+            + '\tlogLevel: ' + logLevel + '\n'
+            + '\tfsPath: ' + fsPath + '\n'
+            + '\tprofileName: ' + profileName + '\n'
+            + '\tconfigurationName: ' + configurationName
+        );
         return request;
     }
 
-    private createBuildRequest(products: string[]): QbsProtocolBuildRequest | undefined {
-        const ckeanInstallRoot = this.getCleanInstallRootFromSettings();
-        const commandEchoMode = this.getCommandEchoModeFromSettings();
-        const keepGoing = this.getKeepGoingFromSettings();
-        const logLevel = this.getLogLevelFromSettings();
-        const maxJobs = this.getMaxJobsFromSettings();
-        const install = this.getInstallFromSettings();
-        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
-        request.setInstall(install);
-        request.setProducts(products);
+    private createBuildRequest(productNames: string[]): QbsProtocolBuildRequest | undefined {
+        const cleanInstallRoot = QbsBuildSystem.getCleanInstallRootFromSettings();
+        const commandEchoMode = QbsBuildSystem.getCommandEchoModeFromSettings();
+        const keepGoing = QbsBuildSystem.getKeepGoingFromSettings();
+        const logLevel = QbsBuildSystem.getLogLevelFromSettings();
+        const maxJobs = QbsBuildSystem.getMaxJobsFromSettings();
+        const install = QbsBuildSystem.getInstallFromSettings();
+        const request = new QbsProtocolBuildRequest(cleanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
+        request.setProducts(productNames);
+        console.log('Create build request:\n'
+            + '\tcleanInstallRoot: ' + cleanInstallRoot + '\n'
+            + '\tcommandEchoMode: ' + commandEchoMode + '\n'
+            + '\tkeepGoing: ' + keepGoing + '\n'
+            + '\tlogLevel: ' + logLevel + '\n'
+            + '\tmaxJobs: ' + maxJobs + '\n'
+            + '\tinstall: ' + install + '\n'
+            + '\tproducts: ' + productNames
+        );
         return request;
     }
 
-    private createInstallRequest(products: string[]): QbsProtocolInstallRequest | undefined {
-        const keepGoing = this.getKeepGoingFromSettings();
-        const logLevel = this.getLogLevelFromSettings();
+    private createInstallRequest(productNames: string[]): QbsProtocolInstallRequest | undefined {
+        const keepGoing = QbsBuildSystem.getKeepGoingFromSettings();
+        const logLevel = QbsBuildSystem.getLogLevelFromSettings();
         const request = new QbsProtocolInstallRequest(keepGoing, logLevel);
-        request.setProducts(products);
+        request.setProducts(productNames);
+        console.log('Create install request:\n'
+            + '\tkeepGoing: ' + keepGoing + '\n'
+            + '\tlogLevel: ' + logLevel + '\n'
+            + '\tproducts: ' + productNames
+        );
         return request;
     }
 
-    private createCleanRequest(products: string[]): QbsProtocolCleanRequest | undefined {
-        const keepGoing = this.getKeepGoingFromSettings();
-        const logLevel = this.getLogLevelFromSettings();
+    private createCleanRequest(productNames: string[]): QbsProtocolCleanRequest | undefined {
+        const keepGoing = QbsBuildSystem.getKeepGoingFromSettings();
+        const logLevel = QbsBuildSystem.getLogLevelFromSettings();
         const request = new QbsProtocolCleanRequest(keepGoing, logLevel);
-        request.setProducts(products);
+        request.setProducts(productNames);
+        console.log('Create clean request:\n'
+            + '\tkeepGoing: ' + keepGoing + '\n'
+            + '\tlogLevel: ' + logLevel + '\n'
+            + '\tproducts: ' + productNames
+        );
         return request;
     }
 
     private createCompileOnlyRequest(fsPath: string): QbsProtocolBuildRequest | undefined {
-        const ckeanInstallRoot = this.getCleanInstallRootFromSettings();
-        const commandEchoMode = this.getCommandEchoModeFromSettings();
-        const keepGoing = this.getKeepGoingFromSettings();
-        const logLevel = this.getLogLevelFromSettings();
-        const maxJobs = this.getMaxJobsFromSettings();
-        const install = this.getInstallFromSettings();
-        const request = new QbsProtocolBuildRequest(ckeanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
+        const cleanInstallRoot = QbsBuildSystem.getCleanInstallRootFromSettings();
+        const commandEchoMode = QbsBuildSystem.getCommandEchoModeFromSettings();
+        const keepGoing = QbsBuildSystem.getKeepGoingFromSettings();
+        const logLevel = QbsBuildSystem.getLogLevelFromSettings();
+        const maxJobs = QbsBuildSystem.getMaxJobsFromSettings();
+        const install = QbsBuildSystem.getInstallFromSettings();
+        const request = new QbsProtocolBuildRequest(cleanInstallRoot, commandEchoMode, keepGoing, logLevel, maxJobs, install);
         request.setChangedFiles([fsPath]);
         request.setFilesToConsider([fsPath]);
         request.setActiveFileTags(['obj', 'hpp']);
+        console.log('Create compile only request:\n'
+            + '\tcleanInstallRoot: ' + cleanInstallRoot + '\n'
+            + '\tcommandEchoMode: ' + commandEchoMode + '\n'
+            + '\tkeepGoing: ' + keepGoing + '\n'
+            + '\tlogLevel: ' + logLevel + '\n'
+            + '\tmaxJobs: ' + maxJobs + '\n'
+            + '\tinstall: ' + install + '\n'
+            + '\tchanged files: ' + fsPath
+        );
         return request;
     }
 
-    private ensureRequestIsReady(request?: QbsProtocolRequest): boolean {
+    private static ensureRequestIsReady(request?: QbsProtocolRequest): boolean {
         if (!request) {
             vscode.window.showWarningMessage(localize('qbs.buildsystem.noproject.message',
                 'Unable to start operation due to the project is not selected.'));
@@ -841,8 +886,8 @@ export class QbsBuildSystem implements vscode.Disposable {
         return true;
     }
 
-    private ensureSaveFilesBeforeBuild(): boolean {
-        const needsSaveOpened = this.getSaveBeforeBuildFromSettings();
+    private static ensureSaveFilesBeforeBuild(): boolean {
+        const needsSaveOpened = QbsBuildSystem.getSaveBeforeBuildFromSettings();
         if (needsSaveOpened && !trySaveAll()) {
             vscode.window.showErrorMessage(localize('qbs.buildsystem.save.failed.message',
                 'Unable to save the open files.'));
@@ -851,14 +896,14 @@ export class QbsBuildSystem implements vscode.Disposable {
         return true;
     }
 
-    private ensureClearOutputBeforeOperation(): boolean {
-        const needsClearOutput = this.getClearOutputBeforeOperationFromSettings();
+    private static ensureClearOutputBeforeOperation(): boolean {
+        const needsClearOutput = QbsBuildSystem.getClearOutputBeforeOperationFromSettings();
         if (needsClearOutput)
             QbsOutputLogger.getInstance().clearOutput();
         return true;
     }
 
-    private logMessageResponse(response?: QbsProtocolMessageResponse): void {
+    private static logMessageResponse(response?: QbsProtocolMessageResponse): void {
         if (!response || response.getIsEmpty())
             return;
         const message = response.toString();
@@ -867,60 +912,94 @@ export class QbsBuildSystem implements vscode.Disposable {
         this.logMessage(message);
     }
 
-    private logMessage(message: string): void { QbsOutputLogger.getInstance().logOutput(message); }
+    private static logMessage(message: string): void { QbsOutputLogger.getInstance().logOutput(message); }
 
     // Route to diagnostics manager.
 
-    private diagnoseQbsInformationMessages(response?: QbsProtocolMessageResponse): void {
+    private static diagnoseQbsInformationMessages(response?: QbsProtocolMessageResponse): void {
         if (response)
             QbsDiagnosticManager.getInstance().handleQbsInformationMessages(response);
     }
 
-    private diagnoseQbsWarningMessages(response?: QbsProtocolMessageResponse): void {
+    private static diagnoseQbsWarningMessages(response?: QbsProtocolMessageResponse): void {
         if (response)
             QbsDiagnosticManager.getInstance().handleQbsWarningMessages(response);
     }
 
-    private diagnoseQbsErrorMessages(response?: QbsProtocolMessageResponse): void {
+    private static diagnoseQbsErrorMessages(response?: QbsProtocolMessageResponse): void {
         if (response)
             QbsDiagnosticManager.getInstance().handleQbsErrorMessages(response);
     }
 
-    private diagnoseToolchainMessages(response?: QbsProtocolProcessResponse): void {
+    private static diagnoseToolchainMessages(response?: QbsProtocolProcessResponse): void {
         if (response)
             QbsDiagnosticManager.getInstance().handleToolchainMessages(response);
     }
 
-    private prepareQbsDiagnostics(): void { QbsDiagnosticManager.getInstance().prepareQbsDiagnostics(); }
-    private submitQbsDiagnostics(): void { QbsDiagnosticManager.getInstance().submitQbsDiagnostics(); }
+    private static prepareQbsDiagnostics(): void { QbsDiagnosticManager.getInstance().prepareQbsDiagnostics(); }
+    private static submitQbsDiagnostics(): void { QbsDiagnosticManager.getInstance().submitQbsDiagnostics(); }
 
-    private prepareToolchainDiagnostics(): void {
+    private static prepareToolchainDiagnostics(): void {
         const projectData = QbsProjectManager.getInstance().getProject()?.getProjectData();
         if (projectData)
             QbsDiagnosticManager.getInstance().prepareToolchainDiagnostics(projectData);
     }
 
-    private submitToolchainDiagnostics(): void { QbsDiagnosticManager.getInstance().submitToolchainDiagnostics(); }
+    private static submitToolchainDiagnostics(): void { QbsDiagnosticManager.getInstance().submitToolchainDiagnostics(); }
 
-    // From the Qbs extension settings.
-    private getBuildRootDirectoryFromSettings(): string {
+    private static getProject(): QbsProject | undefined {
         const project = QbsProjectManager.getInstance().getProject();
-        return QbsSettings.substituteFsPath(QbsSettings.getBuildDirectory(), project?.getName(),
-            project?.getProfileName(), project?.getConfigurationName());
+        if (project)
+            return project;
+        vscode.window.showErrorMessage(localize('qbs.buildsystem.noproject.message',
+            `Unable to get the Qbs project because no any project is loaded.`));
     }
 
-    private getCleanInstallRootFromSettings(): boolean { return QbsSettings.getCleanInstallRoot(); }
-    private getClearOutputBeforeOperationFromSettings(): boolean { return QbsSettings.getClearOutputBeforeOperation(); }
-    private getCommandEchoModeFromSettings(): QbsProtocolCommandEchoMode { return QbsSettings.getCommandEchoMode(); }
-    private getDryRunFromSettings(buildRoot: string): boolean { return !fs.existsSync(buildRoot); }
-    private getErrorHandlingModeFromSettings(): QbsProtocolErrorHandlingMode { return QbsSettings.getErrorHandlingMode(); }
-    private getForceProbeExecutionFromSettings(): boolean { return QbsSettings.getForceProbes(); }
-    private getInstallFromSettings(): boolean { return QbsSettings.getInstallAfterBuild(); }
-    private getKeepGoingFromSettings(): boolean { return QbsSettings.getKeepGoing(); }
-    private getLogLevelFromSettings(): QbsProtocolLogLevel { return QbsSettings.getLogLevel(); }
-    private getMaxJobsFromSettings(): number { return QbsSettings.getMaxJobs(); }
-    private getSaveBeforeBuildFromSettings(): boolean { return QbsSettings.getSaveBeforeBuild(); }
-    private getSettingsDirectoryFromSettings(): string { return QbsSettings.substituteFsPath(QbsSettings.getSettingsDirectory()); }
+    private static getSourceRootDirectoryFromSettings(fsPath: string): string | undefined {
+        const result = QbsSettings.getSourceRootDirectory(fsPath);
+        if (result)
+            return result;
+        vscode.window.showWarningMessage(localize('qbs.buildsystem.nosourceroot.message',
+            'Unable get the source root directory path because no any workspace folder is open.'));
+    }
+
+    private static getFullPathFromSettings(fsPath: string): string | undefined {
+        const project = QbsBuildSystem.getProject();
+        if (!project)
+            return;
+        const sourceRoot = QbsBuildSystem.getSourceRootDirectoryFromSettings(project.getFsPath());
+        if (!sourceRoot)
+            return;
+        const projectName = project.getName();
+        const profileName = project.getProfileName() || 'default'; // The undefined build profile name means the `default` profile.
+        const configurationName = project.getConfigurationName() || 'debug'; // The undefined build configuration name means the `debug` configuration.
+
+        fsPath = QbsSettings.substituteSourceRoot(fsPath, sourceRoot);
+        fsPath = QbsSettings.substituteProjectName(fsPath, projectName);
+        fsPath = QbsSettings.substituteBuildProfileName(fsPath, profileName);
+        fsPath = QbsSettings.substituteBuildConfigurationName(fsPath, configurationName);
+        return fsPath;
+    }
+
+    private static getBuildRootDirectoryPathFromSettings(): string | undefined {
+        return QbsBuildSystem.getFullPathFromSettings(QbsSettings.getBuildDirectory());
+    }
+
+    private static getSettingsDirectoryPathFromSettings(): string | undefined {
+        return QbsBuildSystem.getFullPathFromSettings(QbsSettings.getSettingsDirectory());
+    }
+
+    private static getCleanInstallRootFromSettings(): boolean { return QbsSettings.getCleanInstallRoot(); }
+    private static getClearOutputBeforeOperationFromSettings(): boolean { return QbsSettings.getClearOutputBeforeOperation(); }
+    private static getCommandEchoModeFromSettings(): QbsProtocolCommandEchoMode { return QbsSettings.getCommandEchoMode(); }
+    private static getDryRunFromSettings(buildRoot: string): boolean { return !fs.existsSync(buildRoot); }
+    private static getErrorHandlingModeFromSettings(): QbsProtocolErrorHandlingMode { return QbsSettings.getErrorHandlingMode(); }
+    private static getForceProbeExecutionFromSettings(): boolean { return QbsSettings.getForceProbes(); }
+    private static getInstallFromSettings(): boolean { return QbsSettings.getInstallAfterBuild(); }
+    private static getKeepGoingFromSettings(): boolean { return QbsSettings.getKeepGoing(); }
+    private static getLogLevelFromSettings(): QbsProtocolLogLevel { return QbsSettings.getLogLevel(); }
+    private static getMaxJobsFromSettings(): number { return QbsSettings.getMaxJobs(); }
+    private static getSaveBeforeBuildFromSettings(): boolean { return QbsSettings.getSaveBeforeBuild(); }
 
     private static getTargets(products: string[]): string {
         return (products && (products.length > 0)) ? products.join(';') : localize('qbs.select.build.product.placeholder', 'ALL');

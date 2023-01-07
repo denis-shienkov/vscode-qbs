@@ -1,6 +1,8 @@
 {
     "qbs.launchconfigurationmanager.auto.description": "Сыбрать автоматическую конфигурацию запуска",
     "qbs.launchconfigurationmanager.auto.placeholder": "Авто",
+    "qbs.launchconfigurationmanager.nofspath.message": "Невозможно получить файл конфигураций запуска т.к. путь к нему не установлен в настройках расширения Qbs.",
+    "qbs.launchconfigurationmanager.noworkspace.message": "Невозможно получить файл конфигураций запуска т.к. нет ни одной открытой папки в рабочей области.",
     "qbs.launchconfigurationmanager.scan.select.description": "Сканировать доступные конфигурации запуска",
     "qbs.launchconfigurationmanager.scan.select.label": "[Сканировать конфигурации запуска]",
     "qbs.launchconfigurationmanager.select.description": "Тип \"{0}\", запрос \"{1}\""
