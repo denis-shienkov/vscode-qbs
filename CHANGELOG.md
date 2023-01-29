@@ -1,5 +1,10 @@
 # What's New?
 
+## 2.0.2
+
+- [#70](https://github.com/denis-shienkov/vscode-qbs/issues/70)
+Fixed scanning for build profiles on Mac OSX.
+
 ## 2.0.1
 
 - Fixed the documentation links.
