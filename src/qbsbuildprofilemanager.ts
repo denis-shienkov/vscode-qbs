@@ -164,53 +164,55 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         lines.forEach(line => {
             if (!defaultProfileName) {
                 const matches = /^defaultProfile:\s\"(.+)\"$/.exec(line);
-                if (matches)
-                    defaultProfileName = matches[1];
-            } else {
-                const matches = /^profiles.(.+):\s"(.+)"$/.exec(line);
                 if (matches) {
-                    // Builds the data map in a backwards order from the path parts array.
-                    const createData = (parts: any): any => {
-                        let count = parts.length;
-                        let data: any = {};
-                        while (--count > 0) {
-                            let tmp: any = {};
-                            tmp[parts[count]] = ((count + 1) === parts.length) ? value : data;
-                            data = tmp;
-                        }
-                        return data;
-                    }
-                    // Merges two datas into one data, with keeping a keys.
-                    const mergeData = (a: any, b: any) =>
-                        [...Object.keys(a), ...Object.keys(b)].reduce((combined: any, key) => {
-                            const ak = a[key];
-                            const bk = b[key];
-                            if (typeof ak === 'string')
-                                combined[key] = ak;
-                            else if (typeof bk === 'string')
-                                combined[key] = bk;
-                            else
-                                combined[key] = { ...ak, ...bk };
-                            return combined;
-                        }, {});
+                    defaultProfileName = matches[1];
+                    return;
+                }
+            }
 
-                    const path = matches[1];
-                    const value = matches[2];
-                    const parts = path.split('.');
-                    if (parts && (parts.length > 1)) {
-                        const name = parts[0];
-                        if (name !== profileName) {
-                            // New profile started, commit the current profile.
-                            if (profileName)
-                                profiles.push(new QbsProtocolProfileData(profileName, profileData));
-                            // Prepare to fill the new profile.
-                            profileName = name;
-                            const data = createData(parts);
-                            profileData = mergeData({}, data);
-                        } else {
-                            const data = createData(parts);
-                            profileData = mergeData(profileData, data);
-                        }
+            const matches = /^profiles.(.+):\s"(.+)"$/.exec(line);
+            if (matches) {
+                // Builds the data map in a backwards order from the path parts array.
+                const createData = (parts: any): any => {
+                    let count = parts.length;
+                    let data: any = {};
+                    while (--count > 0) {
+                        let tmp: any = {};
+                        tmp[parts[count]] = ((count + 1) === parts.length) ? value : data;
+                        data = tmp;
+                    }
+                    return data;
+                }
+                // Merges two datas into one data, with keeping a keys.
+                const mergeData = (a: any, b: any) =>
+                    [...Object.keys(a), ...Object.keys(b)].reduce((combined: any, key) => {
+                        const ak = a[key];
+                        const bk = b[key];
+                        if (typeof ak === 'string')
+                            combined[key] = ak;
+                        else if (typeof bk === 'string')
+                            combined[key] = bk;
+                        else
+                            combined[key] = { ...ak, ...bk };
+                        return combined;
+                    }, {});
+
+                const path = matches[1];
+                const value = matches[2];
+                const parts = path.split('.');
+                if (parts && (parts.length > 1)) {
+                    const name = parts[0];
+                    if (name !== profileName) {
+                        // New profile started, commit the current profile.
+                        if (profileName)
+                            profiles.push(new QbsProtocolProfileData(profileName, profileData));
+                        // Prepare to fill the new profile.
+                        profileName = name;
+                        const data = createData(parts);
+                        profileData = mergeData({}, data);
+                    } else {
+                        const data = createData(parts);
+                        profileData = mergeData(profileData, data);
                     }
                 }
             }
