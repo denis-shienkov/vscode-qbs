@@ -2,6 +2,7 @@
 .vscode/
 node_modules/
 out/
+build/
 package-lock.json
 *nls.*.json
 *.vsix
