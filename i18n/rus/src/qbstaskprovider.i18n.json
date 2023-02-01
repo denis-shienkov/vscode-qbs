@@ -1,0 +1,9 @@
+{
+    "qbs.taskprovider.build.command": "Собрать",
+    "qbs.taskprovider.clean.command": "Очистить",
+    "qbs.taskprovider.command.not.recognized": "{0} не распознанная команда.",
+    "qbs.taskprovider.install.command": "Установить",
+    "qbs.taskprovider.rebuild.command": "Пересобрать",
+    "qbs.taskprovider.resolve.command": "Сканировать",
+    "qbs.taskprovider.template.task": "Задача шаблона Qbs {0}"
+}

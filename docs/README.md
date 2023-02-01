@@ -39,3 +39,10 @@ with Qbs-based projects.
 [Build configurations and overriden properties](qbs-build-configurations.md)
 * [Create configurations](qbs-build-configurations.md#create-build-configurations)
 * [Override properties](qbs-build-configurations.md#specify-overriden-properties)
+
+[Configure tasks](qbs-tasks.md)
+* [Resolve with Qbs tools tasks](qbs-tasks.md#resolve-with-qbs-tools-tasks)
+* [Build with Qbs tools tasks](qbs-tasks.md#build-with-qbs-tools-tasks)
+* [Clean with Qbs tools tasks](qbs-tasks.md#clean-with-qbs-tools-tasks)
+* [Install with Qbs tools tasks](qbs-tasks.md#install-with-qbs-tools-tasks)
+* [Rebuild with Qbs tools tasks](qbs-tasks.md#rebuild-with-qbs-tools-tasks)

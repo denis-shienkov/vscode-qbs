@@ -194,6 +194,38 @@
                 "category": "Qbs"
             }
         ],
+        "taskDefinitions": [
+            {
+                "type": "qbs",
+                "required": [
+                    "command"
+                ],
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "description": "%qbs-tools.tasks.properties.label.description%"
+                    },
+                    "command": {
+                        "type": "string",
+                        "enum": [
+                            "build",
+                            "clean",
+                            "install",
+                            "rebuild",
+                            "resolve"
+                        ],
+                        "description": "%qbs-tools.tasks.properties.command.description%"
+                    },
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "%qbs-tools.tasks.properties.products.description%"
+                    }
+                }
+            }
+        ],
         "menus": {
             "commandPalette": [
                 {

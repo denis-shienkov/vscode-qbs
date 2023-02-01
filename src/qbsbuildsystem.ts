@@ -98,39 +98,39 @@ export class QbsBuildSystem implements vscode.Disposable {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ResolveProjectWithForceExecution,
             async () => {
                 // With force probes execution.
-                await this.resolveWithProgress(true, QbsBuildSystemTimeout.Progress);
+                return await this.resolveWithProgress(true, QbsBuildSystemTimeout.Progress);
             }));
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ResolveProject,
             async () => {
-                await this.resolveWithProgress(false, QbsBuildSystemTimeout.Progress);
+                return await this.resolveWithProgress(false, QbsBuildSystemTimeout.Progress);
             }));
 
         // Build commands.
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.BuildProduct,
             async (data) => {
                 const productNames = QbsBuildSystem.getCommandProductNames(data);
-                await this.buildWithProgress(productNames, QbsBuildSystemTimeout.Progress);
+                return await this.buildWithProgress(productNames, QbsBuildSystemTimeout.Progress);
             }));
 
         // Install commands.
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.InstallProduct,
             async (data) => {
                 const productNames = QbsBuildSystem.getCommandProductNames(data);
-                await this.installWithProgress(productNames, QbsBuildSystemTimeout.Progress);
+                return await this.installWithProgress(productNames, QbsBuildSystemTimeout.Progress);
             }));
 
         // Clean commands.
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CleanProduct,
             async (data) => {
                 const productNames = QbsBuildSystem.getCommandProductNames(data);
-                await this.cleanWithProgress(productNames, QbsBuildSystemTimeout.Progress);
+                return await this.cleanWithProgress(productNames, QbsBuildSystemTimeout.Progress);
             }));
 
         // Rebuild commands.
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.RebuildProduct,
             async (data) => {
                 const productNames = QbsBuildSystem.getCommandProductNames(data);
-                await this.rebuildWithProgress(productNames,
+                return await this.rebuildWithProgress(productNames,
                     QbsBuildSystemTimeout.Progress, QbsBuildSystemTimeout.Progress);
             }));
 
@@ -138,7 +138,7 @@ export class QbsBuildSystem implements vscode.Disposable {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CompileOnly,
             async (sourceNode: QbsSourceArtifactNode) => {
                 const fsPath = sourceNode.getFsPath();
-                await this.compileOnlyWithProgress(fsPath, QbsBuildSystemTimeout.Progress);
+                return await this.compileOnlyWithProgress(fsPath, QbsBuildSystemTimeout.Progress);
             }));
     }
 

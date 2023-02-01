@@ -43,5 +43,8 @@
     "qbs-tools.configuration.qbs.saveBeforeBuild.description": "Save open files before building.",
     "qbs-tools.configuration.qbs.settingsDirectory.description": "The settings directory. An empty value means the default directory.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Show disabled project items.",
-    "qbs-tools.configuration.views.qbs.project.description": "Project"
+    "qbs-tools.configuration.views.qbs.project.description": "Project",
+    "qbs-tools.tasks.properties.command.description": "Qbs command",
+    "qbs-tools.tasks.properties.label.description": "The name of the task",
+    "qbs-tools.tasks.properties.targets.description": "Qbs build products"
 }

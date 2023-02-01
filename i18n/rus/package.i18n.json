@@ -43,5 +43,8 @@
     "qbs-tools.configuration.qbs.saveBeforeBuild.description": "Сохранять открытые файлы перед сборкой.",
     "qbs-tools.configuration.qbs.settingsDirectory.description": "Каталог настроек. Пустое значение означает каталог по умолчанию.",
     "qbs-tools.configuration.qbs.showDisabledProjectItems.description": "Отображать отключенные элементы проекта.",
-    "qbs-tools.configuration.views.qbs.project.description": "Проект"
+    "qbs-tools.configuration.views.qbs.project.description": "Проект",
+    "qbs-tools.tasks.properties.command.description": "Команда Qbs",
+    "qbs-tools.tasks.properties.label.description": "Имя задачи",
+    "qbs-tools.tasks.properties.targets.description": "Продукты сборки Qbs"
 }

@@ -1,5 +1,10 @@
 # What's New?
 
+## 2.1.0
+
+- [#66](https://github.com/denis-shienkov/vscode-qbs/issues/66)
+Added support for resolve/build/clean/install/rebuild tasks.
+
 ## 2.0.2
 
 - [#70](https://github.com/denis-shienkov/vscode-qbs/issues/70)
