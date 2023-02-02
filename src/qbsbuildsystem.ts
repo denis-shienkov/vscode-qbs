@@ -1,4 +1,3 @@
-import { Disposable } from 'vscode-jsonrpc';
 import { performance } from 'perf_hooks';
 import * as fs from 'fs';
 import * as nls from 'vscode-nls';
@@ -258,7 +257,7 @@ export class QbsBuildSystem implements vscode.Disposable {
 
             console.log('Send resolve request with force execution: ' + force + ' and timeout: ' + timeout);
             await this.session.resolve(request);
-            const disposables: Disposable[] = [];
+            const disposables: vscode.Disposable[] = [];
 
             return new Promise<boolean>(async (resolve) => {
                 let maxProgress: number = 0;
@@ -362,7 +361,7 @@ export class QbsBuildSystem implements vscode.Disposable {
             console.log('Send build request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
             await this.session.build(request);
-            const disposables: Disposable[] = [];
+            const disposables: vscode.Disposable[] = [];
 
             return new Promise<boolean>(async (resolve) => {
                 let maxProgress: number = 0;
@@ -463,7 +462,7 @@ export class QbsBuildSystem implements vscode.Disposable {
             console.log('Send install request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
             await this.session.install(request);
-            const disposables: Disposable[] = [];
+            const disposables: vscode.Disposable[] = [];
 
             return new Promise<boolean>(async (resolve) => {
                 let maxProgress: number = 0;
@@ -561,7 +560,7 @@ export class QbsBuildSystem implements vscode.Disposable {
             console.log('Send clean request for products: '
                 + QbsBuildSystem.getTargets(productNames) + ' and timeout: ' + timeout);
             await this.session.clean(request);
-            const disposables: Disposable[] = [];
+            const disposables: vscode.Disposable[] = [];
 
             return new Promise<boolean>(async (resolve) => {
                 let maxProgress: number = 0;
@@ -670,7 +669,7 @@ export class QbsBuildSystem implements vscode.Disposable {
 
             console.log('Send compile only request for file: ' + fsPath + ' and timeout: ' + timeout);
             await this.session.build(request);
-            const disposables: Disposable[] = [];
+            const disposables: vscode.Disposable[] = [];
 
             return new Promise<boolean>(async (resolve) => {
                 let maxProgress: number = 0;
