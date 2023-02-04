@@ -6,13 +6,21 @@ import { substractOne } from '../qbsutils';
 
 export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
     private readonly compilerRegexp = /^\s*(\d+>)?\s*([^\s>].*)\((\d+|\d+,\d+|\d+,\d+,\d+,\d+)\)\s*:\s+((?:fatal )?error|warning|info)\s+(\w{1,2}\d+)\s*:\s*(.*)$/;
+    private readonly linkerRegexp = /^(?:\d+>)?(.+?[^\s])\s?:\s((?:fatal )?error)\s(LNK\d+):\s(.+)$/;
 
     public constructor() { super(QbsToolchain.Msvc); }
 
     protected parseLine(line: string) {
+        if (this.parseCompilerMessage(line))
+            return;
+        else if (this.parseLinkerMessage(line))
+            return;
+    }
+
+    private parseCompilerMessage(line: string): boolean {
         const matches = this.compilerRegexp.exec(line);
         if (!matches)
-            return;
+            return false;
 
         const [, , fsPath, location, severity, code, message] = matches;
         const range = (() => {
@@ -41,6 +49,27 @@ export class QbsMsvcDiagnosticParser extends QbsDiagnosticParser {
         };
 
         this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
+        return true;
+    }
+
+    private parseLinkerMessage(line: string): boolean {
+        const matches = this.linkerRegexp.exec(line);
+        if (!matches)
+            return false;
+
+        const [, fsPath, severity, code, message] = matches;
+        // Fake location because the linker does not provide a positions or columns in an object files.
+        const range = new vscode.Range(0, 0, 0, 0);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.toolchainType,
+            severity: QbsMsvcDiagnosticParser.encodeSeverity(severity),
+            message,
+            range,
+            code
+        };
+
+        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
+        return true;
     }
 
     private static encodeSeverity(severity: string): vscode.DiagnosticSeverity {
