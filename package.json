@@ -532,12 +532,14 @@
         "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
+        "@types/chai": "^4.2.15",
         "@types/mocha": "^10.0.1",
         "@types/node": "^16.11.7",
         "@types/uuid": "~9.0.0",
         "@types/vscode": "^1.73.1",
         "@types/which": "~2.0.0",
         "@vscode/test-electron": "^2.1.4",
+        "chai": "^4.3.0",
         "del": "^4.1.1",
         "glob": "^7.1.6",
         "gulp-filter": "^6.0.0",
