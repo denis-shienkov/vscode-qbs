@@ -105,10 +105,10 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private parseDescription(line: string): boolean {
         if (!this.diagnostic)
             return false;
-        const matches = /^\s{10}(.+)$/.exec(line);
+        const matches = /^\s{9,10}(.+)|(])$/.exec(line);
         if (!matches)
             return false;
-        this.diagnostic.message += matches[1];
+        this.diagnostic.message += matches[1] || matches[2];
         return true;
     }
 
