@@ -6,7 +6,7 @@ import { substractOne } from '../qbsutils';
 
 export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private diagnostic?: vscode.Diagnostic;
-    private fsPath?: string;
+    private fsPath: string = '';
     private readonly compilerRegexp = /^"(.+\.\S+)",(\d+)\s+(Fatal error|Error|Warning)\[(\S+)\]:\s*$/;
     private readonly assemblerRegexp = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
     private readonly linkerRegexp = /^(Error)\[(\S+)\]:\s(.+)$/;
@@ -72,7 +72,7 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
         const diagnostic: vscode.Diagnostic = {
             source: this.toolchainType,
             severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message: '',
+            message: '', // Will be available in the next line.
             range,
             code
         };
@@ -91,14 +91,14 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
         const diagnostic: vscode.Diagnostic = {
             source: this.toolchainType,
             severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message: message + ' ',
+            message,
             range,
             code
         };
         this.diagnostic = diagnostic;
         // FIXME: How to use diagnostic without of a file path?
         // Related issue: https://github.com/microsoft/vscode/issues/112145
-        this.fsPath = ' ';
+        this.fsPath = '';
         return true;
     }
 
@@ -108,15 +108,15 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
         const matches = /^\s{10}(.+)$/.exec(line);
         if (!matches)
             return false;
-        this.diagnostic.message += matches[1] + ' ';
+        this.diagnostic.message += matches[1];
         return true;
     }
 
     private commitDiagnostic(): void {
-        if (this.diagnostic && this.fsPath) {
+        if (this.diagnostic) {
             this.insertDiagnostic(vscode.Uri.file(this.fsPath), this.diagnostic);
             this.diagnostic = undefined;
-            this.fsPath = undefined;
+            this.fsPath = '';
         }
     }
 
