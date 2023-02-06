@@ -9,7 +9,7 @@ export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private fsPath: string = '';
     private readonly compilerRegexp = /^"(.+\.\S+)",(\d+)\s+(Fatal error|Error|Warning)\[(\S+)\]:\s*$/;
     private readonly assemblerRegexp = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
-    private readonly linkerRegexp = /^(Error)\[(\S+)\]:\s(.+)$/;
+    private readonly linkerRegexp = /^.*(Error)\[(\S+)\]:\s(.+)$/;
 
     public constructor() { super(QbsToolchain.Iar); }
 
