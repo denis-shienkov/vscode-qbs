@@ -170,7 +170,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                 }
             }
 
-            const matches = /^profiles.(.+):\s"(.+)"$/.exec(line);
+            const matches = /^profiles.(.+):\s(.+)$/.exec(line);
             if (matches) {
                 // Builds the data map in a backwards order from the path parts array.
                 const createData = (parts: any): any => {
@@ -213,6 +213,20 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                     } else {
                         const data = createData(parts);
                         profileData = mergeData(profileData, data);
+                    }
+                } else if (parts && (parts.length === 1)) {
+                    // E.g. for an empty profiles, created as `qbs-config profiles.empty undefined`,
+                    // and listed with `qbs-config --list` as:
+                    // ...
+                    // profiles.empty: undefined
+                    // ...
+                    const name = parts[0];
+                    if (name !== profileName) {
+                        // New profile started, commit the current profile.
+                        if (profileName)
+                            profiles.push(new QbsProtocolProfileData(profileName, profileData));
+                        profileName = name;
+                        profileData = value;
                     }
                 }
             }

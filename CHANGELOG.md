@@ -4,6 +4,9 @@
 
 - Implemented parsing for MSVC linker errors as diagnostic problems.
 - Improved parsing for IAR EW toolchain errors as diagnostic problems.
+- [#71](https://github.com/denis-shienkov/vscode-qbs/issues/71)
+Fixed scanning for empty build profiles (e.g. created as
+`qbs-config profiles.empty undefined`).
 
 ## 2.1.0
 
