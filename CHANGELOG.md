@@ -3,6 +3,7 @@
 ## 2.1.1
 
 - Implemented parsing for MSVC linker errors as diagnostic problems.
+- Improved parsing for IAR EW toolchain errors as diagnostic problems.
 
 ## 2.1.0
 
