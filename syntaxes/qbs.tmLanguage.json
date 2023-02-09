@@ -1,32 +1,32 @@
 {
-    "name": "QBS",
+    "name": "Qbs",
     "scopeName": "source.qbs",
     "patterns": [
         {
-            "description": "QBS block comment.",
+            "description": "Qbs block comment.",
             "name": "comment.block.qbs",
             "begin": "/\\*(?!/)",
             "end": "\\*/"
         },
         {
-            "description": "QBS line comment.",
+            "description": "Qbs line comment.",
             "name": "comment.line.qbs",
             "match": "//.*$"
         },
         {
-            "description": "QBS double quoted string.",
+            "description": "Qbs double quoted string.",
             "name": "string.quoted.double.single-line.qbs",
             "begin": "\"",
             "end": "\""
         },
         {
-            "description": "QBS single quoted string.",
+            "description": "Qbs single quoted string.",
             "name": "string.quoted.single.single-line.qbs",
             "begin": "'",
             "end": "'"
         },
         {
-            "description": "QBS simple statement import.",
+            "description": "Qbs simple statement import.",
             "name": "meta.import.qbs",
             "begin": "\\b(import)\\s+",
             "end": "$",
@@ -37,7 +37,7 @@
             },
             "patterns": [
                 {
-                    "description": "QBS complex statement import with double quoted JS/QBS path.",
+                    "description": "Qbs complex statement import with double quoted JS/Qbs path.",
                     "name": "meta.import.double-quoted-js-path.qbs",
                     "match": "(\"[^\"]+\")(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
                     "captures": {
@@ -53,7 +53,7 @@
                     }
                 },
                 {
-                    "description": "QBS complex statement with include single quoted JS/QBS path.",
+                    "description": "Qbs complex statement with include single quoted JS/Qbs path.",
                     "name": "meta.import.single-quoted-js-path.qbs",
                     "match": "('[^']+')(?:\\s+(as)\\s+([A-Z][\\w\\d]*))?",
                     "captures": {
@@ -71,17 +71,17 @@
             ]
         },
         {
-            "description": "QBS object entry.",
+            "description": "Qbs object entry.",
             "name": "support.class.qbs",
             "match": "\\b[A-Z]\\w*\\b"
         },
         {
-            "description": "QBS event handler (signal or property).",
+            "description": "Qbs event handler (signal or property).",
             "name": "entity.other.attribute-name.event-handler.qbs",
             "match": "(((^|\\{)\\s*)|\\b)on[A-Z]\\w*\\b"
         },
         {
-            "description": "QBS property definition.",
+            "description": "Qbs property definition.",
             "name": "meta.property.definition.qbs",
             "match": "^\\s*(?:(readonly)\\s+)?(property)\\s+(?:([\\w<>]+))\\s+(\\w+)",
             "captures": {
@@ -100,17 +100,17 @@
             }
         },
         {
-            "description": "QBS property.",
+            "description": "Qbs property.",
             "name": "entity.other.attribute-name.property.qbs",
             "match": "(?:\\w)\\s*[\\w\\.]*\\s*(?=\\:)"
         },
         {
-            "description": "QBS member of variable.",
+            "description": "Qbs member of variable.",
             "name": "entity.other.attribute-name.variable-member.qbs",
             "match": "(?<=\\.)\\b\\w*"
         },
         {
-            "description": "QBS JS keywords.",
+            "description": "Qbs JS keywords.",
             "name": "meta.keyword.qbs",
             "match": "(?:\\b|\\s+)(?:(true|false|null|undefined)|(var|void)|(on|as|enum|connect|break|case|catch|continue|debugger|default|delete|do|else|finally|for|if|in|instanceof|new|return|switch|this|throw|try|typeof|while|with))\\b",
             "captures": {
@@ -126,7 +126,7 @@
             }
         },
         {
-            "description": "QBS JS function definition.",
+            "description": "Qbs JS function definition.",
             "name": "meta.function.qbs",
             "match": "\\b(function)\\s+([\\w_]+)\\s*(?=\\()",
             "captures": {
@@ -139,12 +139,12 @@
             }
         },
         {
-            "description": "QBS JS function call.",
+            "description": "Qbs JS function call.",
             "name": "support.function.qbs",
             "match": "\\b[\\w_]+\\s*(?=\\()"
         },
         {
-            "description": "QBS JS variable.",
+            "description": "Qbs JS variable.",
             "name": "variable.parameter.qbs",
             "match": "\\b([a-z_]\\w*)\\b"
         }
