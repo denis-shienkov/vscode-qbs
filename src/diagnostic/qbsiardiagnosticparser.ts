@@ -4,119 +4,129 @@ import { QbsDiagnosticParser, QbsDiagnosticParserSeverity } from './qbsdiagnosti
 import { QbsToolchain } from '../protocol/qbsprotocolqbsmoduledata';
 import { substractOne } from '../qbsutils';
 
+enum ParserState {
+    Compiler,
+    Assembler,
+    Linker,
+    Details,
+}
+
 export class QbsIarDiagnosticParser extends QbsDiagnosticParser {
     private diagnostic?: vscode.Diagnostic;
     private fsPath: string = '';
-    private readonly compilerRegexp = /^"(.+\.\S+)",(\d+)\s+(Fatal error|Error|Warning)\[(\S+)\]:\s*$/;
-    private readonly assemblerRegexp = /^"(.+\.\S+)",(\d+)\s+(Error|Warning)\[(\d+)\]:\s(.+)$/;
-    private readonly linkerRegexp = /^.*(Error)\[(\S+)\]:\s(.+)$/;
+    private state: ParserState = ParserState.Compiler; // Assume, that the first message belongs to a compiler.
+    private readonly compilerRegexp = /^"(?<fsPath>.+\.\S+)",(?<line>\d+)\s+(?<severity>Fatal error|Error|Warning)\[(?<code>\S+)\]:\s*$/;
+    private readonly assemblerRegexp = /^"(?<fsPath>.+\.\S+)",(?<line>\d+)\s+(?<severity>Error|Warning)\[(?<code>\d+)\]:\s(?<details_start>.+)$/;
+    private readonly linkerRegexp = /^.*(?<severity>Error)\[(?<code>\S+)\]:\s(?<details_start>.+)$/;
+    private readonly messageRegexp = /^\s{9,10}(?<details_next>.+)|(?<details_end>])$/;
 
     public constructor() { super(QbsToolchain.Iar); }
 
     protected parseLine(line: string): void {
-        if (this.parseCompilerMessage(line))
-            return;
-        else if (this.parseAssemblerMessage(line))
-            return;
-        else if (this.parseLinkerMessage(line))
-            return;
+        for (; ;) {
+            switch (this.state) {
 
-        if (!this.parseDescription(line))
-            this.commitDiagnostic();
-    }
+                // Try to parse the message, assuming that it comes from a compiler at first.
+                case ParserState.Compiler: {
+                    if (this.diagnostic)
+                        return; // Wrong state.
+                    const matches = this.compilerRegexp.exec(line);
+                    if (matches) { // Yes, it is a starting compiler message.
+                        const [, fsPath, linestr, severity, code,] = matches;
+                        const lineNo = substractOne(linestr);
+                        const range = new vscode.Range(lineNo, 0, lineNo, 999);
+                        this.diagnostic = {
+                            source: this.toolchainType,
+                            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+                            message: '', // Should be available on the next lines.
+                            range,
+                            code
+                        };
+                        this.fsPath = fsPath;
+                        this.state = ParserState.Details; // Assume that next message be details.
+                        return;
+                    }
+                    // Maybe this message comes from an assembler.
+                    this.state = ParserState.Assembler;
+                }
+                    break;
 
-    private parseCompilerMessage(line: string): boolean {
-        if (!this.diagnostic) {
-            if (this.parseCompilerLocation(line))
-                return true;
-        }
-        return false;
-    }
+                // Try to parse the message, assuming that it comes from an assembler at second.
+                case ParserState.Assembler: {
+                    if (this.diagnostic)
+                        return; // Wrong state.
+                    const matches = this.assemblerRegexp.exec(line);
+                    if (matches) { // Yes, it is a starting assembler message.
+                        const [, fsPath, linestr, severity, code, message] = matches;
+                        const lineNo = substractOne(linestr);
+                        const range = new vscode.Range(lineNo, 0, lineNo, 999);
+                        this.diagnostic = {
+                            source: this.toolchainType,
+                            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+                            message, // Maybe whole details or at least the statrig part of details.
+                            range,
+                            code
+                        };
+                        this.fsPath = fsPath;
+                        this.state = ParserState.Details; // Assume that next message be details.
+                        return;
+                    }
+                    // Maybe this message comes from a linker.
+                    this.state = ParserState.Linker;
+                }
+                    break;
 
-    private parseAssemblerMessage(line: string): boolean {
-        const matches = this.assemblerRegexp.exec(line);
-        if (!matches)
-            return false;
+                // Try to parse the message, assuming that it comes from a linker at third.
+                case ParserState.Linker: {
+                    if (this.diagnostic)
+                        return; // Wrong state.
+                    const matches = this.linkerRegexp.exec(line);
+                    if (matches) { // Yes, it is a starting linker message.
+                        const [, severity, code, message] = matches;
+                        const range = new vscode.Range(0, 0, 0, 0);
+                        this.diagnostic = {
+                            source: this.toolchainType,
+                            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
+                            message, // Maybe whole details or at least the statrig part of details.
+                            range,
+                            code
+                        };
+                        // FIXME: How to use diagnostic without of a file path?
+                        // Related issue: https://github.com/microsoft/vscode/issues/112145
+                        this.fsPath = '';
+                        this.state = ParserState.Details; // Assume that next message be details.
+                        return;
+                    } else {
+                        // This message comes not from assembler/compiler/linker, it
+                        // is unknown message, skip it and do reset to the initial state.
+                        this.state = ParserState.Compiler;
+                        return;
+                    }
+                }
+                    break;
 
-        const [, fsPath, linestr, severity, code, message] = matches;
-        const lineNo = substractOne(linestr);
-        const range = new vscode.Range(lineNo, 0, lineNo, 999);
-        const diagnostic: vscode.Diagnostic = {
-            source: this.toolchainType,
-            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message,
-            range,
-            code
-        };
+                // Try to parse the multi-line details, comes after the starting
+                // assembler/compiler/linker message.
+                case ParserState.Details: {
+                    if (!this.diagnostic)
+                        return; // Wrong state.
+                    const matches = this.messageRegexp.exec(line);
+                    if (matches) { // Accumulate the multi-line messages.
+                        this.diagnostic.message += matches[1] || matches[2];
+                        return;
+                    } else { // Commit the diagnostic and go to parse the compiler message.
+                        this.insertDiagnostic(vscode.Uri.file(this.fsPath), this.diagnostic);
+                        // Reset diagnostic && file path.
+                        this.diagnostic = undefined;
+                        this.fsPath = '';
+                        // Maybe this message comes from a assembler/compiler/linker, go to
+                        // the initial state.
+                        this.state = ParserState.Compiler;
+                    }
+                }
+                    break;
 
-        this.insertDiagnostic(vscode.Uri.file(fsPath), diagnostic);
-        return false;
-    }
-
-    private parseLinkerMessage(line: string): boolean {
-        if (!this.diagnostic) {
-            if (this.parseLinkerLocation(line))
-                return true;
-        }
-        return false;
-    }
-
-    private parseCompilerLocation(line: string): boolean {
-        const matches = this.compilerRegexp.exec(line);
-        if (!matches)
-            return false;
-
-        const [, file, linestr, severity, code,] = matches;
-        const lineNo = substractOne(linestr);
-        const range = new vscode.Range(lineNo, 0, lineNo, 999);
-        const diagnostic: vscode.Diagnostic = {
-            source: this.toolchainType,
-            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message: '', // Will be available in the next line.
-            range,
-            code
-        };
-        this.diagnostic = diagnostic;
-        this.fsPath = file;
-        return true;
-    }
-
-    private parseLinkerLocation(line: string): boolean {
-        const matches = this.linkerRegexp.exec(line);
-        if (!matches)
-            return false;
-
-        const [, severity, code, message] = matches;
-        const range = new vscode.Range(0, 0, 0, 0);
-        const diagnostic: vscode.Diagnostic = {
-            source: this.toolchainType,
-            severity: QbsIarDiagnosticParser.encodeSeverity(severity),
-            message,
-            range,
-            code
-        };
-        this.diagnostic = diagnostic;
-        // FIXME: How to use diagnostic without of a file path?
-        // Related issue: https://github.com/microsoft/vscode/issues/112145
-        this.fsPath = '';
-        return true;
-    }
-
-    private parseDescription(line: string): boolean {
-        if (!this.diagnostic)
-            return false;
-        const matches = /^\s{9,10}(.+)|(])$/.exec(line);
-        if (!matches)
-            return false;
-        this.diagnostic.message += matches[1] || matches[2];
-        return true;
-    }
-
-    private commitDiagnostic(): void {
-        if (this.diagnostic) {
-            this.insertDiagnostic(vscode.Uri.file(this.fsPath), this.diagnostic);
-            this.diagnostic = undefined;
-            this.fsPath = '';
+            }
         }
     }
 
