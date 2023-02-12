@@ -32,7 +32,7 @@ for more information about variable expansion.
 | `qbs.qbsPath` | Specify location of the Qbs executable. | `qbs` (Causes Qbs to search the `PATH` environment variable.) | Yes. |
 | `qbs.saveBeforeBuild` | Saves open files before building (applicable for Resolve, Build, and ReBuild operations). | `true` | No. |
 | `qbs.settingsDirectory` | Specify location of the Qbs [settings directory](https://doc.qt.io/qbs/cli-config.html#op-op-op-op-settings-op-op-dir-op-lt-op-directory-op-gt-op). | `` (An empty value forces the use of the default path.) | Yes. |
-| `qbs.showDisabledProjectItems` | Shows the disabled project items (sub-projects, products, groups). | `false` | No. |
+| `qbs.showDisabledProjectItems` | Shows the disabled project items (sub-projects, products, groups). | `true` | No. |
 | `qbs.showEmptyProjectGroups` | Shows the empty project groups. | `true` | No. |
 
 ## Variable substitution
