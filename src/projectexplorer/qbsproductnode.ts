@@ -28,6 +28,7 @@ export class QbsProductNode extends QbsBaseNode {
     public constructor(
         resourcesPath: string,
         showDisabledNodes: boolean,
+        private readonly showEmptyGroups: boolean,
         productData: QbsProtocolProductData) {
         super(resourcesPath, showDisabledNodes);
 
@@ -85,7 +86,9 @@ export class QbsProductNode extends QbsBaseNode {
     private checkIsGroupVisible(groupData: QbsProtocolGroupData): boolean {
         if (!this.showDisabledNodes && !groupData.getIsEnabled())
             return false;
-        return !groupData.getIsEmpty();
+        if (!this.showEmptyGroups && groupData.getIsEmpty())
+            return false;
+        return true;
     }
 
     private getLabel(): string { return QbsBaseNode.createLabel(this.name, this.isEnabled); }

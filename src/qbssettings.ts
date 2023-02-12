@@ -34,6 +34,7 @@ export namespace QbsSettings {
         SaveBeforeBuild = 'saveBeforeBuild',
         SettingsDirectory = 'settingsDirectory',
         ShowDisabledProjectItems = 'showDisabledProjectItems',
+        ShowEmptyProjectGroups = 'showEmptyProjectGroups',
     }
 
     export function observeSetting(field: SettingKey, callback: () => void): vscode.Disposable {
@@ -95,6 +96,10 @@ export namespace QbsSettings {
 
     export function getShowDisabledProjectItems(): boolean {
         return getBoolean(SettingKey.ShowDisabledProjectItems, true);
+    }
+
+    export function getShowEmptyProjectGroups(): boolean {
+        return getBoolean(SettingKey.ShowEmptyProjectGroups, true);
     }
 
     export function getClearOutputBeforeOperation(): boolean {

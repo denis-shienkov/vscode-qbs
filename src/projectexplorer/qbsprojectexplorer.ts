@@ -33,7 +33,8 @@ class QbsProjectDataProvider implements vscode.TreeDataProvider<QbsBaseNode> {
         if (!showDisabledNodes && !this.projectData.getIsEnabled())
             return [];
 
-        return [new QbsProjectNode(this.resourcesPath, showDisabledNodes, this.projectData, true)];
+        const showEmptyGroups = QbsSettings.getShowEmptyProjectGroups();
+        return [new QbsProjectNode(this.resourcesPath, showDisabledNodes, showEmptyGroups, this.projectData, true)];
     }
 
     public refresh(projectData?: QbsProtocolProjectData) {
@@ -64,6 +65,8 @@ export class QbsProjectExplorer implements vscode.Disposable {
 
     private subscribeTreeUpdateEvents() {
         QbsSettings.observeSetting(QbsSettings.SettingKey.ShowDisabledProjectItems,
+            () => { this.provider.refresh(); });
+        QbsSettings.observeSetting(QbsSettings.SettingKey.ShowEmptyProjectGroups,
             () => { this.provider.refresh(); });
 
         QbsProjectManager.getInstance().onProjectOpen((async () => {

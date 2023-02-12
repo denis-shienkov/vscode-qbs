@@ -503,6 +503,12 @@
                     "default": true,
                     "description": "%qbs-tools.configuration.qbs.showDisabledProjectItems.description%",
                     "scope": "resource"
+                },
+                "qbs.showEmptyProjectGroups": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%qbs-tools.configuration.qbs.showEmptyProjectGroups.description%",
+                    "scope": "resource"
                 }
             }
         },

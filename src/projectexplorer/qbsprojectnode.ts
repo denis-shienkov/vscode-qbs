@@ -26,6 +26,7 @@ export class QbsProjectNode extends QbsBaseNode {
     public constructor(
         resourcesPath: string,
         showDisabledNodes: boolean,
+        private readonly showEmptyGroups: boolean,
         private readonly projectData: QbsProtocolProjectData,
         private readonly isRoot: boolean) {
         super(resourcesPath, showDisabledNodes);
@@ -72,9 +73,9 @@ export class QbsProjectNode extends QbsBaseNode {
             ...[new QbsLocationNode(
                 this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true)],
             ...this.products.map(productData => new QbsProductNode(
-                this.resourcesPath, this.showDisabledNodes, productData)),
+                this.resourcesPath, this.showDisabledNodes, this.showEmptyGroups, productData)),
             ...this.subprojects.map(projectData => new QbsProjectNode(
-                this.resourcesPath, this.showDisabledNodes, projectData, false))
+                this.resourcesPath, this.showDisabledNodes, this.showEmptyGroups, projectData, false))
         ];
         if (this.isRoot)
             childrenNodes.push(new QbsBuildSystemFilesNode(
