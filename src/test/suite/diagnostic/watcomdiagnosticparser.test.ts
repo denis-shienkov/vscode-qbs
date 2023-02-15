@@ -90,6 +90,90 @@ suite('Watcom Diagnostic Parser', () => {
         expect(parser.getDiagnostics().length).to.eq(0);
     });
 
+    test('Parsing linker warning', () => {
+        const parser = new QbsWatcomDiagnosticParser();
+        const lines = [
+            'Warning! W1008: cannot open clib3r.lib : No such file or directory'
+        ];
+        parser.parseLines(lines);
+
+        const collections = parser.getDiagnostics();
+        expect(collections.length).to.eq(1);
+        const collection = collections[0];
+        const uri = collection[0];
+        expect(uri.toString()).to.eq(vscode.Uri.file('').toString());
+        const diagnostics = collection[1];
+        expect(diagnostics.length).to.eq(1);
+        const diagnostic = diagnostics[0];
+        expect(diagnostic.source).to.eq(QbsToolchain.Watcom);
+        expect(diagnostic.severity).to.eq(vscode.DiagnosticSeverity.Warning);
+        expect(diagnostic.message).to.eq('cannot open clib3r.lib : No such file or directory');
+        expect(diagnostic.code).to.eq('W1008');
+        expect(diagnostic.range.start.line).to.eq(0);
+        expect(diagnostic.range.start.character).to.eq(0);
+        expect(diagnostic.range.end.line).to.eq(0);
+        expect(diagnostic.range.end.character).to.eq(0);
+
+        parser.clearDiagnistics();
+        expect(parser.getDiagnostics().length).to.eq(0);
+    });
+
+    test('Parsing linker error', () => {
+        const parser = new QbsWatcomDiagnosticParser();
+        const lines = [
+            'Error! E2028: __CHK is an undefined reference'
+        ];
+        parser.parseLines(lines);
+
+        const collections = parser.getDiagnostics();
+        expect(collections.length).to.eq(1);
+        const collection = collections[0];
+        const uri = collection[0];
+        expect(uri.toString()).to.eq(vscode.Uri.file('').toString());
+        const diagnostics = collection[1];
+        expect(diagnostics.length).to.eq(1);
+        const diagnostic = diagnostics[0];
+        expect(diagnostic.source).to.eq(QbsToolchain.Watcom);
+        expect(diagnostic.severity).to.eq(vscode.DiagnosticSeverity.Error);
+        expect(diagnostic.message).to.eq('__CHK is an undefined reference');
+        expect(diagnostic.code).to.eq('E2028');
+        expect(diagnostic.range.start.line).to.eq(0);
+        expect(diagnostic.range.start.character).to.eq(0);
+        expect(diagnostic.range.end.line).to.eq(0);
+        expect(diagnostic.range.end.character).to.eq(0);
+
+        parser.clearDiagnistics();
+        expect(parser.getDiagnostics().length).to.eq(0);
+    });
+
+    test('Parsing linker details', () => {
+        const parser = new QbsWatcomDiagnosticParser();
+        const lines = [
+            'file math387r.lib(ldcvt.c): undefined symbol memset_'
+        ];
+        parser.parseLines(lines);
+
+        const collections = parser.getDiagnostics();
+        expect(collections.length).to.eq(1);
+        const collection = collections[0];
+        const uri = collection[0];
+        expect(uri.toString()).to.eq(vscode.Uri.file('').toString());
+        const diagnostics = collection[1];
+        expect(diagnostics.length).to.eq(1);
+        const diagnostic = diagnostics[0];
+        expect(diagnostic.source).to.eq(QbsToolchain.Watcom);
+        expect(diagnostic.severity).to.eq(vscode.DiagnosticSeverity.Information);
+        expect(diagnostic.message).to.eq('file math387r.lib(ldcvt.c): undefined symbol memset_');
+        expect(diagnostic.code).to.eq(undefined);
+        expect(diagnostic.range.start.line).to.eq(0);
+        expect(diagnostic.range.start.character).to.eq(0);
+        expect(diagnostic.range.end.line).to.eq(0);
+        expect(diagnostic.range.end.character).to.eq(0);
+
+        parser.clearDiagnistics();
+        expect(parser.getDiagnostics().length).to.eq(0);
+    });
+
     test('Parsing two compiler errors', () => {
         const parser = new QbsWatcomDiagnosticParser();
         const lines = [

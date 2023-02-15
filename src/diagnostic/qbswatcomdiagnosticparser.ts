@@ -7,6 +7,7 @@ import { substractOne } from '../qbsutils';
 export class QbsWatcomDiagnosticParser extends QbsDiagnosticParser {
     private readonly compilerRegexp = /^(?<file>.+)\((?<line>\d+)\):\s(?<severity>Error|Warning|Note)!\s(?<code>\w{1}\d+):\s(?<details>.+)$/;
     private readonly linkerRegexp = /^(?<severity>Error|Warning|Note)!\s(?<code>\w{1}\d+):\s(?<details>.+)$/;
+    private readonly detailLinkerRegexp = /^(file\s.+)$/;
 
     public constructor() { super(QbsToolchain.Watcom); }
 
@@ -14,6 +15,8 @@ export class QbsWatcomDiagnosticParser extends QbsDiagnosticParser {
         if (this.parseCompilerMessage(line))
             return;
         else if (this.parseLinkerMessage(line))
+            return;
+        else if (this.parseDetailLinkerMessage(line))
             return;
     }
 
@@ -50,6 +53,24 @@ export class QbsWatcomDiagnosticParser extends QbsDiagnosticParser {
             message,
             range,
             code
+        };
+
+        this.insertDiagnostic(vscode.Uri.file(''), diagnostic);
+        return true;
+    }
+
+    private parseDetailLinkerMessage(line: string): boolean {
+        const matches = this.detailLinkerRegexp.exec(line);
+        if (!matches)
+            return false;
+
+        const [, message] = matches;
+        const range = new vscode.Range(0, 0, 0, 0);
+        const diagnostic: vscode.Diagnostic = {
+            source: this.toolchainType,
+            severity: vscode.DiagnosticSeverity.Information,
+            message,
+            range
         };
 
         this.insertDiagnostic(vscode.Uri.file(''), diagnostic);
