@@ -6,6 +6,7 @@
 - Improved parsing for SDCC toolchain messages as diagnostic problems.
 - Added the new setting `qbs.showEmptyProjectGroups` to show all empty
 project groups.
+- Implemented parsing for Watcom toolchain messages as diagnostic problems.
 
 ## 2.1.1
 

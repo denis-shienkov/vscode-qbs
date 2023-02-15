@@ -12,6 +12,7 @@ export enum QbsToolchain {
     MinGw = 'mingw',
     Msvc = 'msvc',
     Sdcc = 'sdcc',
+    Watcom = 'watcom',
 }
 
 // Known architectures.

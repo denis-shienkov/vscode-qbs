@@ -14,6 +14,7 @@ import { QbsIarDiagnosticParser } from './qbsiardiagnosticparser';
 import { QbsKeilDiagnosticParser } from './qbskeildiagnosticparser';
 import { QbsMsvcDiagnosticParser } from './qbsmsvcdiagnosticparser';
 import { QbsSdccDiagnosticParser } from './qbssdccdiagnosticparser';
+import { QbsWatcomDiagnosticParser } from './qbswatcomdiagnosticparser';
 
 // Qbs output parser (for Qbs warnings and errors).
 import { QbsQbsDiagnosticParser } from './qbsqbsdiagnosticparser';
@@ -105,6 +106,8 @@ export class QbsDiagnosticManager implements vscode.Disposable {
             this.toolchainParser = new QbsKeilDiagnosticParser();
         else if (toolchainType === QbsToolchain.Cosmic)
             this.toolchainParser = new QbsCosmicDiagnosticParser();
+        else if (toolchainType === QbsToolchain.Watcom)
+            this.toolchainParser = new QbsWatcomDiagnosticParser();
         else
             this.toolchainParser = undefined;
     }
