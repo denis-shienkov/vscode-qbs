@@ -2,10 +2,11 @@
 
 ## 2.1.2
 
-- Improved parsing for IAR EW toolchain messages as diagnostic problems.
-- Improved parsing for SDCC toolchain messages as diagnostic problems.
 - Added the new setting `qbs.showEmptyProjectGroups` to show all empty
 project groups.
+- Improved parsing for GCC toolchain messages as diagnostic problems.
+- Improved parsing for IAR EW toolchain messages as diagnostic problems.
+- Improved parsing for SDCC toolchain messages as diagnostic problems.
 - Implemented parsing for Watcom toolchain messages as diagnostic problems.
 
 ## 2.1.1
