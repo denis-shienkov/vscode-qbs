@@ -16,12 +16,13 @@ export enum QbsDiagnosticParserSeverity {
 export abstract class QbsDiagnosticParser {
     private readonly diagnostics = new Map<vscode.Uri, vscode.Diagnostic[]>();
 
-    public constructor(protected readonly toolchainType: string) { }
+    public constructor(protected toolchainType: string) { }
 
     public parseLines(lines: string[]): void {
         lines.forEach(line => this.parseLine(trimLine(line)));
         this.parseLine(''); // Trigger fake last empty line.
     }
+
     public clearDiagnistics(): void { this.diagnostics.clear(); }
 
     public getDiagnostics() {
@@ -35,6 +36,10 @@ export abstract class QbsDiagnosticParser {
         if (!this.diagnostics.has(uri))
             this.diagnostics.set(uri, []);
         this.diagnostics.get(uri)!.push(diagnostic);
+    }
+
+    protected setToolchainType(toolchainType: string): void {
+        this.toolchainType = toolchainType;
     }
 
     protected abstract parseLine(line: string): void;

@@ -15,6 +15,7 @@ import { QbsKeilDiagnosticParser } from './qbskeildiagnosticparser';
 import { QbsMsvcDiagnosticParser } from './qbsmsvcdiagnosticparser';
 import { QbsSdccDiagnosticParser } from './qbssdccdiagnosticparser';
 import { QbsWatcomDiagnosticParser } from './qbswatcomdiagnosticparser';
+import { QbsClangDiagnosticParser } from './qbsclangdiagnosticparser';
 
 // Qbs output parser (for Qbs warnings and errors).
 import { QbsQbsDiagnosticParser } from './qbsqbsdiagnosticparser';
@@ -94,6 +95,8 @@ export class QbsDiagnosticManager implements vscode.Disposable {
     private setupToolchainParser(toolchainType: string): void {
         if (toolchainType === QbsToolchain.Msvc)
             this.toolchainParser = new QbsMsvcDiagnosticParser();
+        else if (toolchainType === QbsToolchain.Clang)
+            this.toolchainParser = new QbsClangDiagnosticParser();
         else if (toolchainType === QbsToolchain.ClangCl)
             this.toolchainParser = new QbsClangClDiagnosticParser();
         else if (toolchainType === QbsToolchain.Gcc || toolchainType === QbsToolchain.MinGw)
