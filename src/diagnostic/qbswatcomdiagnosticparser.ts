@@ -68,7 +68,7 @@ export class QbsWatcomDiagnosticParser extends QbsDiagnosticParser {
         const range = new vscode.Range(0, 0, 0, 0);
         const diagnostic: vscode.Diagnostic = {
             source: this.toolchainType,
-            severity: vscode.DiagnosticSeverity.Information,
+            severity: vscode.DiagnosticSeverity.Error,
             message,
             range
         };

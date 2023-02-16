@@ -162,7 +162,7 @@ suite('Watcom Diagnostic Parser', () => {
         expect(diagnostics.length).to.eq(1);
         const diagnostic = diagnostics[0];
         expect(diagnostic.source).to.eq(QbsToolchain.Watcom);
-        expect(diagnostic.severity).to.eq(vscode.DiagnosticSeverity.Information);
+        expect(diagnostic.severity).to.eq(vscode.DiagnosticSeverity.Error);
         expect(diagnostic.message).to.eq('file math387r.lib(ldcvt.c): undefined symbol memset_');
         expect(diagnostic.code).to.eq(undefined);
         expect(diagnostic.range.start.line).to.eq(0);
