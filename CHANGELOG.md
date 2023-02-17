@@ -7,6 +7,7 @@ project groups.
 - Improved parsing for GCC toolchain messages as diagnostic problems.
 - Improved parsing for IAR EW toolchain messages as diagnostic problems.
 - Improved parsing for SDCC toolchain messages as diagnostic problems.
+- Improved parsing for Clang-Cl toolchain messages as diagnostic problems.
 - Implemented parsing for Watcom toolchain messages as diagnostic problems.
 - Implemented parsing for Clang toolchain messages as diagnostic problems.
 
