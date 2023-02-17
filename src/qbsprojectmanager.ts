@@ -207,7 +207,7 @@ export class QbsProjectManager implements vscode.Disposable {
 
         const env = await QbsBuildSystem.getInstance().fetchProductRunEnvironment(productName);
         const terminal = vscode.window.createTerminal({
-            name: 'QBS Run',
+            name: 'Qbs Run',
             env,
             cwd: product.getBuildDirectory()
         });
