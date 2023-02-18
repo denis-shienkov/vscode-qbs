@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-extension:
+  build-ubuntu:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -17,3 +17,15 @@ jobs:
         node-version: 19.x
     - run: npm install
     - run: npm run compile
+
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 19.x
+    - run: npm install
+    - run: xvfb-run -a npm run test
