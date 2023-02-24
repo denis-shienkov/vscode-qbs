@@ -1,5 +1,10 @@
 # What's New?
 
+## 2.1.3
+
+- Fixed that sets the default `debug` configuration name for Qbs
+projects which are open at first time.
+
 ## 2.1.2
 
 - Added the new setting `qbs.showEmptyProjectGroups` to show all empty
