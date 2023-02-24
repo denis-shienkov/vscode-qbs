@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { ensureFileCreated } from './qbsutils';
 import { QbsBuildConfigurationData } from './datatypes/qbsbuildconfigurationdata';
 import { QbsBuildConfigurationKey } from './datatypes/qbsbuildconfigurationkey';
+import { QbsBuildConfigurationName } from './datatypes/qbsbuildconfigurationname';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsSettings } from './qbssettings';
@@ -165,27 +166,27 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
     private static getDefaultConfigurations(): QbsBuildConfigurationData[] {
         return [
             {
-                'name': 'release',
+                'name': QbsBuildConfigurationName.Release,
                 'displayName': 'Release',
                 'description': 'Build with optimizations.',
                 'properties': {
-                    'qbs.defaultBuildVariant': 'release'
+                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Release
                 }
             },
             {
-                'name': 'debug',
+                'name': QbsBuildConfigurationName.Debug,
                 'displayName': 'Debug',
                 'description': 'Build with debug information.',
                 'properties': {
-                    'qbs.defaultBuildVariant': 'debug'
+                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Debug
                 }
             },
             {
-                'name': 'profiling',
+                'name': QbsBuildConfigurationName.Profiling,
                 'displayName': 'Profiling',
                 'description': 'Build with optimizations and debug information.',
                 'properties': {
-                    'qbs.defaultBuildVariant': 'profiling'
+                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Profiling
                 }
             }
         ];
