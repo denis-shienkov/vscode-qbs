@@ -48,13 +48,13 @@ export function ensureDirectoryExistence(fsPath: string) {
     fs.mkdirSync(directory);
 }
 
-export function ensureFileCreated(fsPath: string, callback?: (ws: fs.WriteStream) => boolean) {
+export function ensureFileCreated(fsPath: string, callback?: (fd: number) => boolean) {
     if (!fs.existsSync(fsPath)) {
         ensureDirectoryExistence(fsPath);
-        const ws = fs.createWriteStream(fsPath);
+        const fd = fs.openSync(fsPath, 'w');
         if (callback)
-            callback(ws);
-        ws.close();
+            callback(fd);
+        fs.close(fd);
     }
 }
 

@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 
 import { msToTime, trySaveAll } from './qbsutils';
 import { QbsBuildConfigurationManager } from './qbsbuildconfigurationmanager';
+import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsDiagnosticManager } from './diagnostic/qbsdiagnosticmanager';
 import { QbsOutputLogger } from './qbsoutputlogger';
@@ -783,16 +784,17 @@ export class QbsBuildSystem implements vscode.Disposable {
         const settingsDirectory = QbsBuildSystem.getSettingsDirectoryPathFromSettings();
         const fsPath = project.getFsPath();
         const profileName = project.getProfileName(); // An undefined value means the default profile.
-        const configurationName = project.getConfigurationName(); // An undefined value means the debug configuration.
+        const configurationName = project.getConfigurationName() || QbsBuildVariant.Debug; // An undefined value means the debug configuration.
 
         request.setSettingsDirectory(settingsDirectory);
         request.setProjectFilePath(fsPath);
-        request.setConfigurationName(project.getConfigurationName());
+        request.setConfigurationName(configurationName);
         request.setTopLevelProfile(project.getProfileName());
 
         // Find the current configuration by it's a name to get the overriden properties.
-        const configuration = QbsBuildConfigurationManager.getInstance().findConfiguration(project.getConfigurationName());
-        request.setOverriddenProperties(configuration ? configuration.properties : undefined);
+        const configuration = QbsBuildConfigurationManager.getInstance().findConfiguration(configurationName);
+        const properties = configuration?.properties;
+        request.setOverriddenProperties(properties);
         console.log('Create resolve request:\n'
             + '\tbuildRoot: ' + buildRoot + '\n'
             + '\tdryRun: ' + dryRun + '\n'
@@ -801,7 +803,8 @@ export class QbsBuildSystem implements vscode.Disposable {
             + '\tlogLevel: ' + logLevel + '\n'
             + '\tfsPath: ' + fsPath + '\n'
             + '\tprofileName: ' + profileName + '\n'
-            + '\tconfigurationName: ' + configurationName
+            + '\tconfigurationName: ' + configurationName + '\n'//,
+            + '\tproperties: ' + (properties ? JSON.stringify(properties) : '{}')
         );
         return request;
     }

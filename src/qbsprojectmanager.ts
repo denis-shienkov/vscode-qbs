@@ -7,9 +7,9 @@ import * as which from 'which';
 
 import { escapeShell } from './qbsutils';
 import { QbsBuildConfigurationManager } from './qbsbuildconfigurationmanager';
-import { QbsBuildConfigurationName } from './datatypes/qbsbuildconfigurationname';
 import { QbsBuildProfileManager } from './qbsbuildprofilemanager';
 import { QbsBuildSystem, QbsBuildSystemTimeout } from './qbsbuildsystem';
+import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsLaunchConfigurationConsole } from './datatypes/qbslaunchconfigurationdata';
 import { QbsLaunchConfigurationData } from './datatypes/qbslaunchconfigurationdata';
@@ -372,7 +372,7 @@ export class QbsProjectManager implements vscode.Disposable {
         const projects: any = (storage) ? storage[this.qbsStoredFsProjectsKey] : undefined;
         const project: any = (projects) ? projects[this.project?.getFsPath()] : undefined;
         this.project.setProfileName((project) ? project[this.qbsStoredBuildProfileNameKey] : undefined);
-        this.project.setConfigurationName((project) ? project[this.qbsStoredBuildConfigurationNameKey] : QbsBuildConfigurationName.Debug);
+        this.project.setConfigurationName((project) ? project[this.qbsStoredBuildConfigurationNameKey] : QbsBuildVariant.Debug);
         this.project.setBuildProductName((project) ? project[this.qbsStoredBuildProductNameKey] : undefined);
         this.project.setLaunchProductName((project) ? project[this.qbsStoredLaunchProductNameKey] : undefined);
         this.project.setDebuggerName((project) ? project[this.qbsStoredDebuggerNameKey] : undefined);

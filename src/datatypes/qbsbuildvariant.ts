@@ -1,4 +1,4 @@
-export enum QbsBuildConfigurationName {
+export enum QbsBuildVariant {
     Debug = 'debug',
     Profiling = 'profiling',
     Release = 'release',

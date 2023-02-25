@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { ensureFileCreated } from './qbsutils';
 import { QbsBuildConfigurationData } from './datatypes/qbsbuildconfigurationdata';
 import { QbsBuildConfigurationKey } from './datatypes/qbsbuildconfigurationkey';
-import { QbsBuildConfigurationName } from './datatypes/qbsbuildconfigurationname';
+import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsSettings } from './qbssettings';
@@ -41,7 +41,10 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
     public getConfigurations(): QbsBuildConfigurationData[] { return this.configurations; }
 
     public findConfiguration(configurationName?: string): QbsBuildConfigurationData | undefined {
-        return this.getConfigurations().find(configuration => configuration.name === configurationName);
+        let configuration = this.configurations.find(configuration => configuration.name === configurationName);
+        if (!configuration)
+            configuration = this.configurations.find(configuration => configuration.name === QbsBuildVariant.Debug);
+        return configuration;
     }
 
     public async start(): Promise<void> {
@@ -166,35 +169,36 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
     private static getDefaultConfigurations(): QbsBuildConfigurationData[] {
         return [
             {
-                'name': QbsBuildConfigurationName.Release,
+                'name': QbsBuildVariant.Release,
                 'displayName': 'Release',
                 'description': 'Build with optimizations.',
                 'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Release
+                    'qbs.defaultBuildVariant': QbsBuildVariant.Release
                 }
             },
             {
-                'name': QbsBuildConfigurationName.Debug,
+                'name': QbsBuildVariant.Debug,
                 'displayName': 'Debug',
                 'description': 'Build with debug information.',
                 'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Debug
+                    'qbs.defaultBuildVariant': QbsBuildVariant.Debug
                 }
             },
             {
-                'name': QbsBuildConfigurationName.Profiling,
+                'name': QbsBuildVariant.Profiling,
                 'displayName': 'Profiling',
                 'description': 'Build with optimizations and debug information.',
                 'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildConfigurationName.Profiling
+                    'qbs.defaultBuildVariant': QbsBuildVariant.Profiling
                 }
             }
         ];
     }
 
-    private static writeDefaultConfigurations(ws: fs.WriteStream): boolean {
-        ws.write(JSON.stringify(QbsBuildConfigurationManager.getDefaultConfigurations(), null, 4));
-        return true;
+    private static writeDefaultConfigurations(fd: number): boolean {
+        const data = JSON.stringify(QbsBuildConfigurationManager.getDefaultConfigurations(), null, 4);
+        const bytes = fs.writeSync(fd, data);
+        return bytes > 0;
     }
 
     private static getFullBuildConfigurationsFilePath(fsProjectPath: string): string | undefined {

@@ -178,9 +178,10 @@ export class QbsLaunchConfigurationManager implements vscode.Disposable {
         }
     }
 
-    private static writeDefaultConfigurations(ws: fs.WriteStream): boolean {
-        ws.write(JSON.stringify(QbsLaunchConfigurationManager.getDefaultConfigurations(), null, 4));
-        return true;
+    private static writeDefaultConfigurations(fd: number): boolean {
+        const data = JSON.stringify(QbsLaunchConfigurationManager.getDefaultConfigurations(), null, 4);
+        const bytes = fs.writeSync(fd, data);
+        return bytes > 0;
     }
 
     private static getFullLaunchConfigurationsFilePath(fsProjectPath: string): string | undefined {
