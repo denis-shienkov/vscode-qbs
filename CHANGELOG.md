@@ -4,6 +4,7 @@
 
 - Fixed that sets the default `debug` configuration name for Qbs
 projects which are open at first time.
+- Removed extra quotes in properties of detected build profiles.
 
 ## 2.1.2
 

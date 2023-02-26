@@ -163,14 +163,15 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
         lines.forEach(line => {
             if (!defaultProfileName) {
-                const matches = /^defaultProfile:\s\"(.+)\"$/.exec(line);
+                const matches = /^defaultProfile:\s\"(?<name>.+)\"$/.exec(line);
                 if (matches) {
                     defaultProfileName = matches[1];
                     return;
                 }
             }
 
-            const matches = /^profiles.(.+):\s(.+)$/.exec(line);
+            const matches = /^profiles.(?<path>.+):\s"(?<value>.+)"$/.exec(line)
+                || /^profiles.(?<path>.+):\s(?<value>.+)$/.exec(line);
             if (matches) {
                 // Builds the data map in a backwards order from the path parts array.
                 const createData = (parts: any): any => {
