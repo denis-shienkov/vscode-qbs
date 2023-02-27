@@ -4,6 +4,8 @@
 
 - Added some details for the build products in the build
 product selector (such as product type and so on).
+- Added displaying for the full target executable path in the
+run product selector.
 
 ## 2.1.3
 

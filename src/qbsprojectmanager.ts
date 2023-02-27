@@ -163,15 +163,6 @@ export class QbsProjectManager implements vscode.Disposable {
         await this.openProject(chosen.fsPath);
     }
 
-    private createProductQuickPickElement(productData: QbsProtocolProductData): QbsProductQuickPickItem {
-        const executable = productData.getTargetExecutable();
-        return {
-            label: productData.getFullDisplayName() || '',
-            description: QbsProjectManager.getLocalizedProductType(productData.getType()),
-            detail: executable ? basename(executable) : undefined
-        };
-    }
-
     private async selectBuildProduct(): Promise<void> {
         const items: QbsProductQuickPickItem[] = [
             ...[
@@ -183,7 +174,7 @@ export class QbsProjectManager implements vscode.Disposable {
             ],
             ...(this.getProject()?.getAllRecursiveProducts() || [])
                 .filter(productData => productData.getFullDisplayName())
-                .map(productData => this.createProductQuickPickElement(productData))
+                .map(productData => QbsProjectManager.createBuildProductQuickPickElement(productData))
         ];
 
         const chosen = await vscode.window.showQuickPick(items);
@@ -197,7 +188,7 @@ export class QbsProjectManager implements vscode.Disposable {
     private async selectRunProduct(): Promise<void> {
         const items: QbsProductQuickPickItem[] = (this.getProject()?.getAllRecursiveProducts() || [])
             .filter(productData => productData.getIsRunnable())
-            .map(productData => this.createProductQuickPickElement(productData));
+            .map(productData => QbsProjectManager.createRunProductQuickPickElement(productData));
 
         const chosen = await vscode.window.showQuickPick(items);
         if (!chosen) // Choose was canceled by the user.
@@ -439,5 +430,21 @@ export class QbsProjectManager implements vscode.Disposable {
         else if (type.includes(QbsProductType.StaticLibrary))
             return localize('qbs.product.type.staticlibrary', 'Static Library');
         return localize('qbs.product.type.custom', 'Custom');
+    }
+
+    private static createBuildProductQuickPickElement(productData: QbsProtocolProductData): QbsProductQuickPickItem {
+        const executable = productData.getTargetExecutable();
+        return {
+            label: productData.getFullDisplayName() || '',
+            description: QbsProjectManager.getLocalizedProductType(productData.getType()),
+            detail: executable ? basename(executable) : undefined
+        };
+    }
+
+    private static createRunProductQuickPickElement(productData: QbsProtocolProductData): QbsProductQuickPickItem {
+        return {
+            label: productData.getFullDisplayName() || '',
+            detail: productData.getTargetExecutable()
+        };
     }
 }
