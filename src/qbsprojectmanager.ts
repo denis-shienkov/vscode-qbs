@@ -16,6 +16,7 @@ import { QbsLaunchConfigurationData } from './datatypes/qbslaunchconfigurationda
 import { QbsLaunchConfigurationManager } from './qbslaunchconfigurationmanager';
 import { QbsLaunchConfigurationRequest } from './datatypes/qbslaunchconfigurationdata';
 import { QbsLaunchConfigurationType } from './datatypes/qbslaunchconfigurationdata';
+import { QbsProductType } from './datatypes/qbsproducttype';
 import { QbsProject } from './qbsproject';
 import { QbsProtocolProductData } from './protocol/qbsprotocolproductdata';
 import { QbsProtocolRunEnvironmentData } from './protocol/qbsprotocolrunenvironmentdata';
@@ -166,13 +167,20 @@ export class QbsProjectManager implements vscode.Disposable {
         const executable = productData.getTargetExecutable();
         return {
             label: productData.getFullDisplayName() || '',
-            description: executable ? basename(executable) : undefined
+            description: QbsProjectManager.getLocalizedProductType(productData.getType()),
+            detail: executable ? basename(executable) : undefined
         };
     }
 
     private async selectBuildProduct(): Promise<void> {
         const items: QbsProductQuickPickItem[] = [
-            ...[{ label: localize('qbs.select.build.product.placeholder', 'ALL'), all: true }],
+            ...[
+                {
+                    label: localize('qbs.select.build.all.label', 'ALL'),
+                    detail: localize('qbs.select.build.all.description', 'Build all available products'),
+                    all: true
+                }
+            ],
             ...(this.getProject()?.getAllRecursiveProducts() || [])
                 .filter(productData => productData.getFullDisplayName())
                 .map(productData => this.createProductQuickPickElement(productData))
@@ -395,7 +403,7 @@ export class QbsProjectManager implements vscode.Disposable {
         await this.context.workspaceState.update(this.qbsStorageKey, storage);
     }
 
-    async delaySaveProject(delay: number) {
+    private async delaySaveProject(delay: number) {
         if (this.timer)
             clearTimeout(this.timer);
         this.timer = setTimeout(async () => {
@@ -421,5 +429,15 @@ export class QbsProjectManager implements vscode.Disposable {
                 }
             });
         });
+    }
+
+    private static getLocalizedProductType(type: string[]): string {
+        if (type.includes(QbsProductType.Application))
+            return localize('qbs.product.type.application', 'Application');
+        else if (type.includes(QbsProductType.DynamicLibrary))
+            return localize('qbs.product.type.dynamiclibrary', 'Dynamic Library');
+        else if (type.includes(QbsProductType.StaticLibrary))
+            return localize('qbs.product.type.staticlibrary', 'Static Library');
+        return localize('qbs.product.type.custom', 'Custom');
     }
 }

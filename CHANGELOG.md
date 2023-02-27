@@ -1,5 +1,10 @@
 # What's New?
 
+## 2.1.4
+
+- Added some details for the build products in the build
+product selector (such as product type and so on).
+
 ## 2.1.3
 
 - Fixed that sets the default `debug` configuration name for Qbs

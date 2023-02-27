@@ -3,5 +3,10 @@
     "qbs.product.missed.error.message": "Продукт не найден, пересканируйте проект.",
     "qbs.product.name.missed.error.message": "Отсутствует имя продукта, выберите продукт для запуска.",
     "qbs.product.notexecutable.error.message": "Продукт не является выполняемым, пересканируйте проект.",
-    "qbs.select.build.product.placeholder": "ВСЕ"
+    "qbs.product.type.application": "Приложение",
+    "qbs.product.type.custom": "Особый",
+    "qbs.product.type.dynamiclibrary": "Динамическая библиотека",
+    "qbs.product.type.staticlibrary": "Статическая библиотека",
+    "qbs.select.build.all.description": "Сборка всех доступных продуктов",
+    "qbs.select.build.all.label": "ВСЕ"
 }
