@@ -6,6 +6,9 @@
 product selector (such as product type and so on).
 - Added displaying for the full target executable path in the
 run product selector.
+- [#73](https://github.com/denis-shienkov/vscode-qbs/issues/73)
+Right now are used the arguments from the `launch.json` file when
+launching the target program.
 
 ## 2.1.3
 

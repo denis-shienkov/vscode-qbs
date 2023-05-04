@@ -35,6 +35,7 @@ export class QbsLaunchConfigurationData {
     public getNiMode(): string | undefined { return this.data[QbsLaunchConfigurationKey.MiMode]; }
     public getProgram(): string | undefined { return this.data[QbsLaunchConfigurationKey.Program]; }
     public getType(): string | undefined { return this.data[QbsLaunchConfigurationKey.Type]; }
+    public getArgs(): string[] | undefined { return this.data[QbsLaunchConfigurationKey.Args]; }
 
     public setCwd(cwd?: string) {
         if (cwd)

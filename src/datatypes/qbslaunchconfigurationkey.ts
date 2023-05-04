@@ -1,5 +1,6 @@
 /** Helper enumeration for wrapping the data keys from the VSCode's `launch.json` file. */
 export enum QbsLaunchConfigurationKey {
+    Args = 'args',
     Configutations = 'configurations',
     Console = 'console',
     Cwd = 'cwd',

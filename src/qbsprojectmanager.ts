@@ -205,6 +205,10 @@ export class QbsProjectManager implements vscode.Disposable {
             return false;
         console.log('Running product: ' + productName + ', executable: ' + executable);
 
+        const configurationName = QbsProjectManager.getInstance().getProject()?.getDebuggerName();
+        const configuration = QbsLaunchConfigurationManager.getInstance().findConfiguration(configurationName);
+        const args = configuration?.getArgs();
+
         const env = await QbsBuildSystem.getInstance().fetchProductRunEnvironment(productName);
         const terminal = vscode.window.createTerminal({
             name: 'Qbs Run',
@@ -220,7 +224,10 @@ export class QbsProjectManager implements vscode.Disposable {
             }
         }
         const program = escapeShell(executable);
-        terminal.sendText(program);
+        terminal.sendText(program, false);
+        if (args && (args.length > 0))
+            args.forEach(arg => terminal.sendText(` ${escapeShell(arg)}`, false));
+        terminal.sendText('', true); // Finally send the newline to complete the command.
         terminal.show();
         return true;
     }
