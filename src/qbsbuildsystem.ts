@@ -9,6 +9,7 @@ import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsDiagnosticManager } from './diagnostic/qbsdiagnosticmanager';
 import { QbsOutputLogger } from './qbsoutputlogger';
+import { QbsProcessEnvironment } from './datatypes/qbsenvironment';
 import { QbsProductNode } from './projectexplorer/qbsproductnode';
 import { QbsProject } from './qbsproject';
 import { QbsProjectManager } from './qbsprojectmanager';
@@ -748,15 +749,13 @@ export class QbsBuildSystem implements vscode.Disposable {
         });
     }
 
-    public async fetchProductRunEnvironment(productName: string): Promise<any> {
-        return new Promise<any>(resolve => {
-            const disposable = this.session.onRunEnvironmentReceived(async (result) => {
+    public async fetchProductRunEnvironment(productName: string): Promise<QbsProcessEnvironment> {
+        return new Promise<QbsProcessEnvironment>(resolve => {
+            const disposable = this.session.onProcessEnvironmentReceived(async (result) => {
                 await disposable.dispose();
-                const environment = Object.entries(result.getData()).map(function ([k, v]) {
-                    return { name: k, value: v };
-                });
-                console.log('Received run environment for product: ' + productName + ' as ' + environment);
-                resolve(environment);
+                console.log('Received run environment for product: ' + productName + ' as ' + result);
+                resolve(result);
+
             });
             const request = new QbsProtocolGetRunEnvironmentRequest();
             request.setProduct(productName);

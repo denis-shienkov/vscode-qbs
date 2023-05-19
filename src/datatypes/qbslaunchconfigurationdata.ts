@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { QbsLaunchConfigurationKey } from './qbslaunchconfigurationkey';
-import { QbsProtocolRunEnvironmentData } from '../protocol/qbsprotocolrunenvironmentdata';
+import { QbsLaunchEnvironment } from '../datatypes/qbsenvironment';
 
 // See https://code.visualstudio.com/docs/editor/debugging.
 export enum QbsLaunchConfigurationRequest {
@@ -28,7 +28,7 @@ export class QbsLaunchConfigurationData {
     public getRequest(): string | undefined { return this.data[QbsLaunchConfigurationKey.Request]; }
     public getCwd(): string | undefined { return this.data[QbsLaunchConfigurationKey.Cwd]; }
     public getData(): vscode.DebugConfiguration { return this.data; }
-    public getEnvironment(): object | undefined { return this.data[QbsLaunchConfigurationKey.Environment]; }
+    public getEnvironment(): QbsLaunchEnvironment | undefined { return this.data[QbsLaunchConfigurationKey.Environment]; }
     public getConsole(): string | undefined { return this.data[QbsLaunchConfigurationKey.Console]; }
     public getMiDebuggerPath(): string | undefined { return this.data[QbsLaunchConfigurationKey.MiDebuggerPath]; }
     public getName(): string | undefined { return this.data[QbsLaunchConfigurationKey.Name]; }
@@ -42,10 +42,9 @@ export class QbsLaunchConfigurationData {
             this.data[QbsLaunchConfigurationKey.Cwd] = cwd;
     };
 
-    public setEnvironment(data: QbsProtocolRunEnvironmentData) {
-        const d = data.getData();
-        this.data[QbsLaunchConfigurationKey.Environment] = Object.entries(d)
-            .map(function ([k, v]) { return { name: k, value: v }; });
+    public setEnvironment(env?: QbsLaunchEnvironment) {
+        if (env)
+            this.data[QbsLaunchConfigurationKey.Environment] = env;
     }
 
     public setConsole(console?: string) {

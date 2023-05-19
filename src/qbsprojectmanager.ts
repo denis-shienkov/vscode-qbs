@@ -19,8 +19,11 @@ import { QbsLaunchConfigurationType } from './datatypes/qbslaunchconfigurationda
 import { QbsProductType } from './datatypes/qbsproducttype';
 import { QbsProject } from './qbsproject';
 import { QbsProtocolProductData } from './protocol/qbsprotocolproductdata';
-import { QbsProtocolRunEnvironmentData } from './protocol/qbsprotocolrunenvironmentdata';
 import { QbsSettings } from './qbssettings';
+
+import { QbsLaunchEnvironment } from './datatypes/qbsenvironment';
+import { QbsProcessEnvironment } from './datatypes/qbsenvironment';
+import { toProcessEnvironment, toLaunchEnvironment } from './datatypes/qbsenvironment';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -209,20 +212,31 @@ export class QbsProjectManager implements vscode.Disposable {
         const configuration = QbsLaunchConfigurationManager.getInstance().findConfiguration(configurationName);
         const args = configuration?.getArgs();
 
-        const env = await QbsBuildSystem.getInstance().fetchProductRunEnvironment(productName);
+        const collectProcessEnvironment = async (): Promise<QbsProcessEnvironment> => {
+            let env = toProcessEnvironment(configuration?.getEnvironment());
+            if (!env)
+                env = await QbsBuildSystem.getInstance().fetchProductRunEnvironment(productName);
+            return env;
+        };
+
+        const env = await collectProcessEnvironment();
+
         const terminal = vscode.window.createTerminal({
             name: 'Qbs Run',
             env,
             cwd: product.getBuildDirectory()
         });
 
-        if (process.platform === 'darwin') {
+
+        if (env && (process.platform === 'darwin')) {
             // Workaround for macOS system integrity protection.
             for (const specialEnv of ['DYLD_LIBRARY_PATH', 'DYLD_FRAMEWORK_PATH']) {
-                if (env[specialEnv])
-                    terminal.sendText(`export ${specialEnv}=${escapeShell(env[specialEnv])}`);
+                const value = env[specialEnv];
+                if (value)
+                    terminal.sendText(`export ${specialEnv}=${escapeShell(value)}`);
             }
         }
+
         const program = escapeShell(executable);
         terminal.sendText(program, false);
         if (args && (args.length > 0))
@@ -321,7 +335,7 @@ export class QbsProjectManager implements vscode.Disposable {
 
         if (!configuration.getEnvironment()) {
             const env = await QbsBuildSystem.getInstance().fetchProductRunEnvironment(productName);
-            configuration.setEnvironment(new QbsProtocolRunEnvironmentData(env));
+            configuration.setEnvironment(toLaunchEnvironment(env));
         }
 
         return await vscode.debug.startDebugging(undefined, configuration.getData());

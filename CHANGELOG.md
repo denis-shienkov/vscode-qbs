@@ -9,6 +9,9 @@ run product selector.
 - [#73](https://github.com/denis-shienkov/vscode-qbs/issues/73)
 Right now are used the arguments from the `launch.json` file when
 launching the target program.
+- [#72](https://github.com/denis-shienkov/vscode-qbs/issues/72)
+Fixes setting the environment for the application running
+or debugging.
 
 ## 2.1.3
 

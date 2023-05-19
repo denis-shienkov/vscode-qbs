@@ -4,11 +4,11 @@ import * as vscode from 'vscode';
 import * as which from 'which';
 
 import { QbsCommandKey } from './datatypes/qbscommandkey';
+import { QbsProcessEnvironment } from './datatypes/qbsenvironment';
 import { QbsProtocolDataKey } from './protocol/qbsprotocoldatakey';
 import { QbsProtocolEngine } from './protocol/qbsprotocolengine';
 import { QbsProtocolEngineState } from './protocol/qbsprotocolengine';
 import { QbsProtocolProjectData } from './protocol/qbsprotocolprojectdata';
-import { QbsProtocolRunEnvironmentData } from './protocol/qbsprotocolrunenvironmentdata';
 import { QbsSettings } from './qbssettings';
 
 // Protocol request.
@@ -52,8 +52,7 @@ export class QbsSession implements vscode.Disposable {
     private readonly projectCleaned: vscode.EventEmitter<QbsProtocolMessageResponse> = new vscode.EventEmitter<QbsProtocolMessageResponse>();
     private readonly projectInstalled: vscode.EventEmitter<QbsProtocolMessageResponse> = new vscode.EventEmitter<QbsProtocolMessageResponse>();
     private readonly projectResolved: vscode.EventEmitter<QbsSessionProjectData> = new vscode.EventEmitter<QbsSessionProjectData>();
-    private readonly runEnvironmentReceived: vscode.EventEmitter<QbsProtocolRunEnvironmentData> = new vscode.EventEmitter<QbsProtocolRunEnvironmentData>();
-    private readonly runEnvironmentResultReceived: vscode.EventEmitter<QbsProtocolMessageResponse> = new vscode.EventEmitter<QbsProtocolMessageResponse>();
+    private readonly processEnvironmentReceived: vscode.EventEmitter<QbsProcessEnvironment> = new vscode.EventEmitter<QbsProcessEnvironment>();
     private readonly taskMaxProgressChanged: vscode.EventEmitter<QbsProtocolTaskMaxProgressResponse> = new vscode.EventEmitter<QbsProtocolTaskMaxProgressResponse>();
     private readonly taskProgressUpdated: vscode.EventEmitter<QbsProtocolTaskProgressResponse> = new vscode.EventEmitter<QbsProtocolTaskProgressResponse>();
     private readonly taskStarted: vscode.EventEmitter<QbsProtocolTaskStartedResponse> = new vscode.EventEmitter<QbsProtocolTaskStartedResponse>();
@@ -70,8 +69,7 @@ export class QbsSession implements vscode.Disposable {
     public readonly onProjectCleaned: vscode.Event<QbsProtocolMessageResponse> = this.projectCleaned.event;
     public readonly onProjectInstalled: vscode.Event<QbsProtocolMessageResponse> = this.projectInstalled.event;
     public readonly onProjectResolved: vscode.Event<QbsSessionProjectData> = this.projectResolved.event;
-    public readonly onRunEnvironmentReceived: vscode.Event<QbsProtocolRunEnvironmentData> = this.runEnvironmentReceived.event;
-    public readonly onRunEnvironmentResultReceived: vscode.Event<QbsProtocolMessageResponse> = this.runEnvironmentResultReceived.event;
+    public readonly onProcessEnvironmentReceived: vscode.Event<QbsProcessEnvironment> = this.processEnvironmentReceived.event;
     public readonly onTaskMaxProgressChanged: vscode.Event<QbsProtocolTaskMaxProgressResponse> = this.taskMaxProgressChanged.event;
     public readonly onTaskProgressUpdated: vscode.Event<QbsProtocolTaskProgressResponse> = this.taskProgressUpdated.event;
     public readonly onTaskStarted: vscode.Event<QbsProtocolTaskStartedResponse> = this.taskStarted.event;
@@ -178,9 +176,9 @@ export class QbsSession implements vscode.Disposable {
             this.processResultReceived.fire(result);
         } else if (type === QbsProtocolDataKey.RunEnvironment) {
             const result = new QbsProtocolMessageResponse(response[QbsProtocolDataKey.Error]);
-            this.runEnvironmentResultReceived.fire(result);
-            const env = new QbsProtocolRunEnvironmentData(response[QbsProtocolDataKey.FullEnvironment]);
-            this.runEnvironmentReceived.fire(env);
+            this.errorMessageReceived.fire(result);
+            const env = response[QbsProtocolDataKey.FullEnvironment];
+            this.processEnvironmentReceived.fire(env);
         } else if (type === QbsProtocolDataKey.ProtocolError) {
             const result = new QbsProtocolMessageResponse(response[QbsProtocolDataKey.Error]);
             this.errorMessageReceived.fire(result);

@@ -78,7 +78,6 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         // Handle the command description/runenv messages from the Qbs session.
         disposables.push(session.onCommandDescriptionReceived(async (response) => this.logMessageResponse(response)));
-        disposables.push(session.onRunEnvironmentResultReceived(async (response) => this.logMessageResponse(response)));
 
         // Handle the log/warning/error messages from the Qbs session.
         disposables.push(session.onLogMessageReceived(async (response) => this.logMessageResponse(response)));
