@@ -88,7 +88,21 @@ command:
 $ qbs config --export <path/to/output/file> --settings-dir <path/to/settings/directory>
 ```
 
-**Note**: Exported profiles are taken from the Qbs settings directory.
+## Importing build profiles
+
+* To import the build profiles from a text file, run the
+**Qbs: Import Build Profiles** command from the command palette
+in VS Code.
+
+This command is an equivalent for the Qbs
+[import-profiles](https://doc.qt.io/qbs/cli-config.html#op-op-op-op-import-op-lt-op-file-op-gt-op)
+command:
+
+```bash
+$ qbs config --import <path/to/input/file> --settings-dir <path/to/settings/directory>
+```
+
+**Note**: Imported profiles are saved to the Qbs settings directory.
 
 ## Next steps
 

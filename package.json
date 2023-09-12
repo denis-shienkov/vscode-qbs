@@ -100,6 +100,11 @@
                 "category": "Qbs"
             },
             {
+                "command": "qbs.importBuildProfiles",
+                "title": "%qbs-tools.command.qbs.importBuildProfiles.title%",
+                "category": "Qbs"
+            },
+            {
                 "command": "qbs.installProduct",
                 "title": "%qbs-tools.command.qbs.installProduct.title%",
                 "category": "Qbs"

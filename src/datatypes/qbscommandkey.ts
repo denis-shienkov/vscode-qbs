@@ -12,6 +12,7 @@ export enum QbsCommandKey {
     GetProductBuildDirectory = 'qbs.getProductBuildDirectory',
     GetProductExecutablePath = 'qbs.getProductExecutablePath',
     GetProductRunEnvironment = 'qbs.getProductRunEnvironment',
+    ImportBuildProfiles = 'qbs.importBuildProfiles',
     InstallProduct = 'qbs.installProduct',
     LoadProject = 'qbs.loadProject',
     OpenTextDocument = 'vscode.open',

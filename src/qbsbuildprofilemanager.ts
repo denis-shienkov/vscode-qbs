@@ -48,6 +48,9 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ExportBuildProfiles, async () => {
             await this.exportProfilesWithDialog();
         }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ImportBuildProfiles, async () => {
+            await this.importProfilesWithDialog();
+        }));
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.SelectBuildProfile, async () => {
             await this.selectProfile();
         }));
@@ -136,6 +139,42 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         });
     }
 
+    private async importProfilesWithDialog(): Promise<void> {
+        const options: vscode.OpenDialogOptions = {
+            title: localize('qbs.buildprofilemanager.import.title', 'Choose file to import the build profiles'),
+            openLabel: localize('qbs.buildprofilemanager.import.caption', 'Import'),
+            canSelectMany: false,
+        };
+        return new Promise<void>(async (resolve) => {
+            return await vscode.window.showOpenDialog(options).then((uri) => {
+                const fsPaths = uri?.map(uri => uri.fsPath);
+                if (fsPaths) {
+                    const fsPath = fsPaths[0];
+                    return this.importProfiles(fsPath).then((result) => {
+                        if (result.success) {
+                            this.fillProfiles().then((result) => {
+                                if (result.success) {
+                                    return vscode.window.showInformationMessage(
+                                        localize('qbs.buildprofilemanager.import.success',
+                                            'Build profiles successfully imported from file: {0}', fsPath));
+                                }
+                                return vscode.window.showErrorMessage(
+                                    localize('qbs.buildprofilemanager.import.failed',
+                                        'Build profiles importing from file: {0} failed: {1}'), fsPath, result.message);
+                            });
+                        } else {
+                            vscode.window.showErrorMessage(
+                                localize('qbs.buildprofilemanager.import.failed',
+                                    'Build profiles importing from file: {0} failed: {1}'), fsPath, result.message);
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
     private async scanProfiles(): Promise<QbsResult<void, string>> {
         QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.scan.log.started',
             'Starting build profiles scanning...'));
@@ -153,6 +192,18 @@ export class QbsBuildProfileManager implements vscode.Disposable {
     private async exportProfiles(fsPath: string): Promise<QbsResult<void, string>> {
         return new Promise(async (resolve) => {
             const shell = this.getExportToolchainsShell(fsPath);
+            const process = cp.exec(shell, (error) => {
+                resolve(error ? QbsResult.Error(error.message) : QbsResult.Ok(undefined));
+            });
+            process.stdout?.on('data', (data) => {
+                // Do nothing.
+            });
+        });
+    }
+
+    private async importProfiles(fsPath: string): Promise<QbsResult<void, string>> {
+        return new Promise(async (resolve) => {
+            const shell = this.getImportToolchainsShell(fsPath);
             const process = cp.exec(shell, (error) => {
                 resolve(error ? QbsResult.Error(error.message) : QbsResult.Ok(undefined));
             });
@@ -291,6 +342,10 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
     private getExportToolchainsShell(fsPath: string): string {
         return `"${QbsSettings.getQbsPath()}" config --export ${fsPath} ${this.getSetitngsShell()}`;
+    }
+
+    private getImportToolchainsShell(fsPath: string): string {
+        return `"${QbsSettings.getQbsPath()}" config --import ${fsPath} ${this.getSetitngsShell()}`;
     }
 
     private getSetitngsShell(): string {

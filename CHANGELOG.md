@@ -4,6 +4,8 @@
 
  - Added new **Qbs: Export Build Profiles** command to
 export build profiles to a file.
+ - Added new **Qbs: Import Build Profiles** command to
+import build profiles from a file.
 
 ## 2.1.4
 
