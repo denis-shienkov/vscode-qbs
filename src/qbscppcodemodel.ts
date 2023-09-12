@@ -60,7 +60,7 @@ export class QbsCppCodeModel implements cpt.CustomConfigurationProvider {
             }));
         if (token?.isCancellationRequested) {
             console.log('Cpptools timed out waiting for intellisense configurations. Requesting a refresh.');
-            this.toolsApi?.didChangeCustomConfiguration(this);
+            //this.toolsApi?.didChangeCustomConfiguration(this);
             return [];
         } else {
             console.log('Return ' + configurations.length + ' Cpptools configurations.');
