@@ -9,7 +9,7 @@ Each build profile includes:
 - A toolchain configuration.
 
 Qbs has the functionality both for manually creating the
-necessary build profiles, and the functionality for 
+necessary build profiles, and the functionality for
 automatically detecting the toolchains installed in the
 system.
 
@@ -73,6 +73,22 @@ $ qbs setup-toolchains C:\mingw530_32\bin\g++.exe mingw
 Also, it is possible to create the profile that allows to build the Qt
 projects, using the [setup-qt](https://doc.qt.io/qbs/cli-setup-qt.html)
 command.
+
+## Exporting build profiles
+
+* To export the build profiles into a text file, run the
+**Qbs: Export Build Profiles** command from the command palette
+in VS Code.
+
+This command is an equivalent for the Qbs
+[export-profiles](https://doc.qt.io/qbs/cli-config.html#op-op-op-op-keyword-export-keyword-op-lt-op-file-op-gt-op)
+command:
+
+```bash
+$ qbs config --export <path/to/output/file> --settings-dir <path/to/settings/directory>
+```
+
+**Note**: Exported profiles are taken from the Qbs settings directory.
 
 ## Next steps
 

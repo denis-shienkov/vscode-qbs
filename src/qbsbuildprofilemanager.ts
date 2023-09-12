@@ -45,6 +45,9 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ScanBuildProfiles, async () => {
             await this.scanProfilesWithProgress();
         }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ExportBuildProfiles, async () => {
+            await this.exportProfilesWithDialog();
+        }));
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.SelectBuildProfile, async () => {
             await this.selectProfile();
         }));
@@ -107,6 +110,32 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         });
     }
 
+    private async exportProfilesWithDialog(): Promise<void> {
+        const options: vscode.OpenDialogOptions = {
+            title: localize('qbs.buildprofilemanager.export.title', 'Choose file to export the build profiles'),
+            openLabel: localize('qbs.buildprofilemanager.export.caption', 'Export'),
+            canSelectMany: false,
+        };
+        return new Promise<void>(async (resolve) => {
+            return await vscode.window.showSaveDialog(options).then((uri) => {
+                const fsPath = uri?.fsPath;
+                if (fsPath) {
+                    return this.exportProfiles(fsPath).then((result) => {
+                        if (result.success)
+                            return vscode.window.showInformationMessage(
+                                localize('qbs.buildprofilemanager.export.success',
+                                    'Build profiles successfully exported to file: `{0}`', fsPath));
+                        return vscode.window.showErrorMessage(
+                            localize('qbs.buildprofilemanager.export.failed',
+                                'Build profiles exporting to file: {0} failed: {1}'), fsPath, result.message);
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
     private async scanProfiles(): Promise<QbsResult<void, string>> {
         QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.scan.log.started',
             'Starting build profiles scanning...'));
@@ -118,6 +147,18 @@ export class QbsBuildProfileManager implements vscode.Disposable {
             QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.scan.log.finished',
                 'Build profiles scanning finished.'));
             return result;
+        });
+    }
+
+    private async exportProfiles(fsPath: string): Promise<QbsResult<void, string>> {
+        return new Promise(async (resolve) => {
+            const shell = this.getExportToolchainsShell(fsPath);
+            const process = cp.exec(shell, (error) => {
+                resolve(error ? QbsResult.Error(error.message) : QbsResult.Ok(undefined));
+            });
+            process.stdout?.on('data', (data) => {
+                // Do nothing.
+            });
         });
     }
 
@@ -246,6 +287,10 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
     private getListToolchainsShell(): string {
         return `"${QbsSettings.getQbsPath()}" config --list ${this.getSetitngsShell()}`;
+    }
+
+    private getExportToolchainsShell(fsPath: string): string {
+        return `"${QbsSettings.getQbsPath()}" config --export ${fsPath} ${this.getSetitngsShell()}`;
     }
 
     private getSetitngsShell(): string {

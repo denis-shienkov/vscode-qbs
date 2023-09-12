@@ -6,6 +6,7 @@
     "qbs-tools.command.qbs.debugProduct.title": "Отладить",
     "qbs-tools.command.qbs.editBuildConfigurations.title": "Редактировать конфигурацию сборки",
     "qbs-tools.command.qbs.editLaunchConfigurations.title": "Редактировать конфигурацию запуска",
+    "qbs-tools.command.qbs.exportBuildProfiles.title": "Экспортировать профили сборки",
     "qbs-tools.command.qbs.installProduct.title": "Установить",
     "qbs-tools.command.qbs.loadProject.title": "Загрузить проект",
     "qbs-tools.command.qbs.rebuildProduct.title": "Пересобрать",

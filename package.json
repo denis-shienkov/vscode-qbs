@@ -95,6 +95,11 @@
                 "category": "Qbs"
             },
             {
+                "command": "qbs.exportBuildProfiles",
+                "title": "%qbs-tools.command.qbs.exportBuildProfiles.title%",
+                "category": "Qbs"
+            },
+            {
                 "command": "qbs.installProduct",
                 "title": "%qbs-tools.command.qbs.installProduct.title%",
                 "category": "Qbs"

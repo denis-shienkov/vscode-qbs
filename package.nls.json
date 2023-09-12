@@ -6,6 +6,7 @@
     "qbs-tools.command.qbs.debugProduct.title": "Debug",
     "qbs-tools.command.qbs.editBuildConfigurations.title": "Edit Build Configurations",
     "qbs-tools.command.qbs.editLaunchConfigurations.title": "Edit Launch Configurations",
+    "qbs-tools.command.qbs.exportBuildProfiles.title": "Export Build Profiles",
     "qbs-tools.command.qbs.installProduct.title": "Install",
     "qbs-tools.command.qbs.loadProject.title": "Load Project",
     "qbs-tools.command.qbs.rebuildProduct.title": "Rebuild",

@@ -8,6 +8,7 @@ export enum QbsCommandKey {
     DebugProduct = 'qbs.debugProduct',
     EditBuildConfigurations = 'qbs.editBuildConfigurations',
     EditLaunchConfigurations = 'qbs.editLaunchConfigurations',
+    ExportBuildProfiles = 'qbs.exportBuildProfiles',
     GetProductBuildDirectory = 'qbs.getProductBuildDirectory',
     GetProductExecutablePath = 'qbs.getProductExecutablePath',
     GetProductRunEnvironment = 'qbs.getProductRunEnvironment',

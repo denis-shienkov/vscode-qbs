@@ -1,5 +1,10 @@
 # What's New?
 
+## 2.1.5
+
+ - Added new **Qbs: Export Build Profiles** command to
+export build profiles to a file.
+
 ## 2.1.4
 
 - Added some details for the build products in the build
