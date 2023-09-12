@@ -127,7 +127,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                         if (result.success)
                             return vscode.window.showInformationMessage(
                                 localize('qbs.buildprofilemanager.export.success',
-                                    'Build profiles successfully exported to file: `{0}`', fsPath));
+                                    'Build profiles successfully exported to file: {0}', fsPath));
                         return vscode.window.showErrorMessage(
                             localize('qbs.buildprofilemanager.export.failed',
                                 'Build profiles exporting to file: {0} failed: {1}'), fsPath, result.message);
