@@ -6,6 +6,9 @@
 export build profiles to a file.
  - Added new **Qbs: Import Build Profiles** command to
 import build profiles from a file.
+ - Changed format of the `qbs-configurations.json` file
+that allows to specify an additional common build properties
+for any build configuration.
 
 ## 2.1.4
 

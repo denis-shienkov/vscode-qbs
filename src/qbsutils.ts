@@ -58,6 +58,16 @@ export function ensureFileCreated(fsPath: string, callback?: (fd: number) => boo
     }
 }
 
+export function ensureFileUpdated(fsPath: string, data?: any, callback?: (fd: number, data: any) => boolean) {
+    if (data && callback) {
+        if (!fs.existsSync(fsPath))
+            ensureDirectoryExistence(fsPath);
+        const fd = fs.openSync(fsPath, 'w');
+        callback(fd, data);
+        fs.close(fd);
+    }
+}
+
 export function msToTime(msecs: number): string {
     function addZ(n: number): string {
         return (n < 10 ? '0' : '') + n;

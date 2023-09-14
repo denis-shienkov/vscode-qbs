@@ -4,8 +4,8 @@ import * as jsonc from 'jsonc-parser';
 import * as nls from 'vscode-nls';
 import * as vscode from 'vscode';
 
-import { ensureFileCreated } from './qbsutils';
-import { QbsBuildConfigurationData } from './datatypes/qbsbuildconfigurationdata';
+import { ensureFileCreated, ensureFileUpdated } from './qbsutils';
+import { QbsSpecificBuildConfigurationData, QbsAllBuildConfigurationData } from './datatypes/qbsbuildconfigurationdata';
 import { QbsBuildConfigurationKey } from './datatypes/qbsbuildconfigurationkey';
 import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
@@ -13,18 +13,19 @@ import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsSettings } from './qbssettings';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
+const currentConfigurationVersion = '1';
 
 export class QbsBuildConfigurationManager implements vscode.Disposable {
     private static instance: QbsBuildConfigurationManager;
-    private configurations: QbsBuildConfigurationData[] = [];
+    private configuration: QbsAllBuildConfigurationData = QbsBuildConfigurationManager.getDefaultConfiguration();
     private updated: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
-    private configurationSelected: vscode.EventEmitter<QbsBuildConfigurationData>
-        = new vscode.EventEmitter<QbsBuildConfigurationData>();
+    private configurationSelected: vscode.EventEmitter<QbsSpecificBuildConfigurationData>
+        = new vscode.EventEmitter<QbsSpecificBuildConfigurationData>();
     private fsBuildConfigurationsWatcher?: chokidar.FSWatcher
     private disposable?: vscode.Disposable;
 
     readonly onUpdated: vscode.Event<void> = this.updated.event;
-    readonly onConfigurationSelected: vscode.Event<QbsBuildConfigurationData>
+    readonly onConfigurationSelected: vscode.Event<QbsSpecificBuildConfigurationData>
         = this.configurationSelected.event;
 
     public static getInstance(): QbsBuildConfigurationManager {
@@ -38,13 +39,19 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
 
     public dispose(): void { this.stop(); }
 
-    public getConfigurations(): QbsBuildConfigurationData[] { return this.configurations; }
+    public getConfiguration(): QbsAllBuildConfigurationData | undefined { return this.configuration; }
 
-    public findConfiguration(configurationName?: string): QbsBuildConfigurationData | undefined {
-        let configuration = this.configurations.find(configuration => configuration.name === configurationName);
-        if (!configuration)
-            configuration = this.configurations.find(configuration => configuration.name === QbsBuildVariant.Debug);
-        return configuration;
+    public findSpecificConfiguration(configurationName?: string): QbsSpecificBuildConfigurationData | undefined {
+        const configurations = this.configuration[QbsBuildConfigurationKey.Configurations];
+        let specific = configurations.find(configuration => configuration.name === configurationName);
+        if (!specific)
+            specific = configurations.find(specific => specific.name === QbsBuildVariant.Debug);
+        return specific;
+    }
+
+    public findCommonProperties(): { [key: string]: string } | undefined {
+        const properties = this.configuration[QbsBuildConfigurationKey.Properties];
+        return properties;
     }
 
     public async start(): Promise<void> {
@@ -94,56 +101,61 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
         const fsPath = QbsBuildConfigurationManager.ensureConfigurationsCreated();
         if (!fsPath)
             return;
-        return new Promise<QbsBuildConfigurationData[]>((resolve) => {
+        return new Promise<QbsAllBuildConfigurationData>((resolve) => {
             console.log('Start reading build configurations from: ' + fsPath);
             fs.readFile(fsPath, (error, data) => {
                 if (error) {
-                    resolve([]);
+                    console.log('Unable to read build configurations from: ' + fsPath);
+                    resolve(QbsBuildConfigurationManager.getDefaultConfiguration());
                 } else {
-                    const result = (jsonc.parse(data.toString()))
-                        .filter((entry: any) => entry[QbsBuildConfigurationKey.Name])
-                        .map((entry: any) => {
-                            const name = entry[QbsBuildConfigurationKey.Name];
-                            const display = entry[QbsBuildConfigurationKey.DisplayName];
-                            const descr = entry[QbsBuildConfigurationKey.Description];
-                            const props = entry[QbsBuildConfigurationKey.Properties];
-                            return new QbsBuildConfigurationData(name, display, descr, props);
-                        });
-                    resolve(result);
+                    const extractConfiguration = (): QbsAllBuildConfigurationData => {
+                        const content = jsonc.parse(data.toString());
+                        const version = content[QbsBuildConfigurationKey.Version];
+                        if (!version)
+                            return QbsBuildConfigurationManager.migrateBuildConfigurationFromVersion0(fsPath, content);
+                        switch (version) {
+                            case currentConfigurationVersion:
+                                return QbsBuildConfigurationManager.migrateBuildConfigurationFromVersion1(fsPath, content);
+                            default:
+                                return QbsBuildConfigurationManager.migrateBuildConfigurationFromVersionUnknown(fsPath, content);
+                        }
+                    };
+                    const configuration = extractConfiguration();
+                    resolve(configuration);
                 }
             });
-        }).then(async (configurations) => {
-            this.configurations = configurations;
-            console.log('Reading build configurations completed, found: ' + configurations.length + ' configurations');
+        }).then(async (configuration) => {
+            this.configuration = configuration;
+            console.log('Reading build configurations completed, found: ' + configuration.configurations.length + ' configurations');
             this.updated.fire();
         });
     }
 
     private async selectConfiguration(): Promise<void> {
-        interface QbsConfigurationQuickPickItem extends vscode.QuickPickItem {
-            configuration: QbsBuildConfigurationData | undefined;
+        interface QbsSpecificConfigurationQuickPickItem extends vscode.QuickPickItem {
+            specific: QbsSpecificBuildConfigurationData | undefined;
         }
-        const items: QbsConfigurationQuickPickItem[] = [
+        const items: QbsSpecificConfigurationQuickPickItem[] = [
             ...[{
                 label: localize('qbs.buildconfigurationmanager.scan.select.label',
                     '[Scan build configurations]'),
                 description: localize('qbs.buildconfigurationmanager.scan.select.description',
                     'Scan available build configurations'),
-                configuration: undefined
+                specific: undefined
             }],
-            ...this.configurations.map((configuration) => {
-                const label = configuration.displayName || configuration.name;
-                return { label, description: configuration.description, configuration };
+            ...(this.configuration.configurations).map((specific) => {
+                const label = specific.displayName || specific.name;
+                return { label, description: specific.description, specific };
             })
         ];
 
         const chosen = await vscode.window.showQuickPick(items);
         if (!chosen) // Choose was canceled by the user.
             return;
-        else if (!chosen.configuration) // Scan configurations item was choosed by the user.
+        else if (!chosen.specific) // Scan configurations item was choosed by the user.
             await this.scanConfigurations();
         else // Configuration was choosed by the user.
-            this.configurationSelected.fire(chosen.configuration);
+            this.configurationSelected.fire(chosen.specific);
     }
 
     private static async editConfigurations(): Promise<void> {
@@ -153,6 +165,46 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
             return;
         const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(fsPath));
         await vscode.window.showTextDocument(doc);
+    }
+
+    private static migrateBuildConfigurationFromVersionUnknown(fsPath: string, content: any): QbsAllBuildConfigurationData {
+        console.log('Migrate build configuration from version: unknown to current version: ' + currentConfigurationVersion);
+        // Update file with default configurations.
+        const data = QbsBuildConfigurationManager.getDefaultConfiguration();
+        ensureFileUpdated(fsPath, data, QbsBuildConfigurationManager.writeConfigurations);
+        return data;
+    }
+
+    private static migrateBuildConfigurationFromVersion0(fsPath: string, content: any): QbsAllBuildConfigurationData {
+        console.log('Migrate build configuration from version: 0 to current version: ' + currentConfigurationVersion);
+        const configurations = content
+            .filter((entry: any) => entry[QbsBuildConfigurationKey.Name])
+            .map((entry: any) => {
+                const name = entry[QbsBuildConfigurationKey.Name];
+                const display = entry[QbsBuildConfigurationKey.DisplayName];
+                const descr = entry[QbsBuildConfigurationKey.Description];
+                const props = entry[QbsBuildConfigurationKey.Properties];
+                return new QbsSpecificBuildConfigurationData(name, display, descr, props);
+            });
+        const data = new QbsAllBuildConfigurationData(currentConfigurationVersion, configurations);
+        ensureFileUpdated(fsPath, data, QbsBuildConfigurationManager.writeConfigurations);
+        return data;
+    }
+
+    private static migrateBuildConfigurationFromVersion1(fsPath: string, content: any): QbsAllBuildConfigurationData {
+        console.log('Migrate build configuration from version: 1 to current version: ' + currentConfigurationVersion);
+        const configurations = content[QbsBuildConfigurationKey.Configurations]
+            .filter((entry: any) => entry[QbsBuildConfigurationKey.Name])
+            .map((entry: any) => {
+                const name = entry[QbsBuildConfigurationKey.Name];
+                const display = entry[QbsBuildConfigurationKey.DisplayName];
+                const descr = entry[QbsBuildConfigurationKey.Description];
+                const props = entry[QbsBuildConfigurationKey.Properties];
+                return new QbsSpecificBuildConfigurationData(name, display, descr, props);
+            });
+        const properties = content[QbsBuildConfigurationKey.Properties];
+        const data = new QbsAllBuildConfigurationData(currentConfigurationVersion, configurations, properties);
+        return data;
     }
 
     private static ensureConfigurationsCreated(): string | undefined {
@@ -166,39 +218,46 @@ export class QbsBuildConfigurationManager implements vscode.Disposable {
         return fsPath;
     }
 
-    private static getDefaultConfigurations(): QbsBuildConfigurationData[] {
-        return [
-            {
-                'name': QbsBuildVariant.Release,
-                'displayName': 'Release',
-                'description': 'Build with optimizations.',
-                'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildVariant.Release
+    private static getDefaultConfiguration(): QbsAllBuildConfigurationData {
+        return {
+            'version': '1',
+            'configurations': [
+                {
+                    'name': QbsBuildVariant.Release,
+                    'displayName': 'Release',
+                    'description': 'Build with optimizations.',
+                    'properties': {
+                        'qbs.defaultBuildVariant': QbsBuildVariant.Release
+                    }
+                },
+                {
+                    'name': QbsBuildVariant.Debug,
+                    'displayName': 'Debug',
+                    'description': 'Build with debug information.',
+                    'properties': {
+                        'qbs.defaultBuildVariant': QbsBuildVariant.Debug
+                    }
+                },
+                {
+                    'name': QbsBuildVariant.Profiling,
+                    'displayName': 'Profiling',
+                    'description': 'Build with optimizations and debug information.',
+                    'properties': {
+                        'qbs.defaultBuildVariant': QbsBuildVariant.Profiling
+                    }
                 }
-            },
-            {
-                'name': QbsBuildVariant.Debug,
-                'displayName': 'Debug',
-                'description': 'Build with debug information.',
-                'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildVariant.Debug
-                }
-            },
-            {
-                'name': QbsBuildVariant.Profiling,
-                'displayName': 'Profiling',
-                'description': 'Build with optimizations and debug information.',
-                'properties': {
-                    'qbs.defaultBuildVariant': QbsBuildVariant.Profiling
-                }
-            }
-        ];
+            ]
+        }
+    }
+
+    private static writeConfigurations(fd: number, data: QbsAllBuildConfigurationData): boolean {
+        const content = JSON.stringify(data, null, 4);
+        const bytes = fs.writeSync(fd, content);
+        return (bytes > 0);
     }
 
     private static writeDefaultConfigurations(fd: number): boolean {
-        const data = JSON.stringify(QbsBuildConfigurationManager.getDefaultConfigurations(), null, 4);
-        const bytes = fs.writeSync(fd, data);
-        return bytes > 0;
+        return QbsBuildConfigurationManager.writeConfigurations(fd, QbsBuildConfigurationManager.getDefaultConfiguration());
     }
 
     private static getFullBuildConfigurationsFilePath(fsProjectPath: string): string | undefined {

@@ -44,57 +44,120 @@ The default contents of this configuration file looks
 like this:
 
 ```json
-[
-    {
-        "name": "release",
-        "displayName": "Release",
-        "description": "Build with optimizations.",
-        "properties": {
-            "qbs.buildVariant": "release"
+{
+    "version": "1",
+    "configurations": [
+        {
+            "name": "release",
+            "displayName": "Release",
+            "description": "Build with optimizations.",
+            "properties": {
+                "qbs.buildVariant": "release"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "Build with debug information.",
+            "properties": {
+                "qbs.buildVariant": "debug"
+            }
+        },
+        {
+            "name": "profiling",
+            "displayName": "Profiling",
+            "description": "Build with optimizations and debug information.",
+            "properties": {
+                "qbs.buildVariant": "profiling"
+            }
         }
-    },
-    {
-        "name": "debug",
-        "displayName": "Debug",
-        "description": "Build with debug information.",
-        "properties": {
-            "qbs.buildVariant": "debug"
-        }
-    },
-    {
-        "name": "profiling",
-        "displayName": "Profiling",
-        "description": "Build with optimizations and debug information.",
-        "properties": {
-            "qbs.buildVariant": "profiling"
-        }
+    ],
+    "properties": {
+        "foo": "foo-value",
+        "bar": "bar-value",
     }
-]
+}
 ```
 
 The user can edit, remove, or add the other configurations.
 
 ## Specify overriden properties
 
-It is possible to specify a list of custom properties passed
+It is possible to specify a list of specific properties passed
 to the Qbs at resolve step for each build configuration
 separatelly using the `properties` item.
 
 For example, the possible configuration might look like this:
 
 ```json
-[
-    {
-        "name": "my-cool-config",
-        "displayName": "My Cool Config",
-        "description": "Enable something and override something.",
-        "properties": {
-            "projects.someProject.projectProperty": false,
-            "products.someProduct.productProperty": false,
-            "modules.cpp.treatWarningsAsErrors": true,
-            "products.someProduct.cpp.treatWarningsAsErrors": true,
-            "projects.someProject.listProp: ["a", "b", "c"]
-        }
+{
+    "name": "my-cool-config",
+    "displayName": "My Cool Config",
+    "description": "Enable something and override something.",
+    "properties": {
+        "projects.someProject.projectProperty": false,
+        "products.someProduct.productProperty": false,
+        "modules.cpp.treatWarningsAsErrors": true,
+        "products.someProduct.cpp.treatWarningsAsErrors": true,
+        "projects.someProject.listProp: ["a", "b", "c"]
     }
-]
+}
 ```
+
+## Specify common properties
+
+It is possible to specify a list of common properties passed
+to the Qbs at resolve step for each build configuration.
+
+```json
+{
+    "properties": {
+        "foo": "foo-value",
+        "bar": "bar-value"
+    }
+}
+```
+
+E.g. this makes sense if some of overriden properties from
+build configuration are same (e.g. have duplicates):
+
+```json
+{
+    "configurations": [
+        {
+            "name": "release",
+            "properties": {
+                "my-prop": "my-value"
+            }
+        },
+        {
+            "name": "debug",
+            "properties": {
+                "my-prop": "my-value"
+            }
+        }
+    ]
+}
+```
+
+then it can be re-written with:
+
+```json
+{
+    "configurations": [
+        {
+            "name": "release",
+        },
+        {
+            "name": "debug",
+        }
+    ],
+    "properties": {
+        "my-prop": "my-value"
+    }
+}
+```
+
+**Note**: If a common property matches with a specific property,
+then the specific property value passed to the resolve step
+(i.e. overrides a common property).

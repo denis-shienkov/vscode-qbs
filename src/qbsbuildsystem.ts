@@ -791,8 +791,10 @@ export class QbsBuildSystem implements vscode.Disposable {
         request.setTopLevelProfile(project.getProfileName());
 
         // Find the current configuration by it's a name to get the overriden properties.
-        const configuration = QbsBuildConfigurationManager.getInstance().findConfiguration(configurationName);
-        const properties = configuration?.properties;
+        const specificProperties = QbsBuildConfigurationManager.getInstance().findSpecificConfiguration(configurationName)?.properties;
+        const commonProperties = QbsBuildConfigurationManager.getInstance().findCommonProperties();
+        // Common properties should be overriden by specific properties, so, order makes sense!
+        const properties = Object.assign({}, commonProperties, specificProperties);
         request.setOverriddenProperties(properties);
         console.log('Create resolve request:\n'
             + '\tbuildRoot: ' + buildRoot + '\n'

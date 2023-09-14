@@ -149,7 +149,7 @@ class SelectBuildConfigurationButton extends Button {
 
     private update(): void {
         const value = QbsProjectManager.getInstance().getProject()?.getConfigurationName();
-        const configuration = QbsBuildConfigurationManager.getInstance().findConfiguration(value);
+        const configuration = QbsBuildConfigurationManager.getInstance().findSpecificConfiguration(value);
         const friendlyName = configuration?.displayName || configuration?.name;
         this.setText(friendlyName);
     }
