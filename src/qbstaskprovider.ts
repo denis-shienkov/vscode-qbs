@@ -128,7 +128,7 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         console.log('Start build task');
         return new Promise<boolean>(async (resolve) => {
-            const success = vscode.commands.executeCommand(QbsCommandKey.BuildProduct, this.definition?.products);
+            const success = vscode.commands.executeCommand<boolean>(QbsCommandKey.BuildProduct, this.definition?.products);
             resolve(success);
         }).then((result) => {
             console.log('Complete build task with result: ' + result);
@@ -147,7 +147,7 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         console.log('Start clean task');
         return new Promise<boolean>(async (resolve) => {
-            const success = vscode.commands.executeCommand(QbsCommandKey.CleanProduct, this.definition?.products);
+            const success = vscode.commands.executeCommand<boolean>(QbsCommandKey.CleanProduct, this.definition?.products);
             resolve(success);
         }).then((result) => {
             console.log('Complete clean task with result: ' + result);
@@ -166,7 +166,7 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         console.log('Start install task');
         return new Promise<boolean>(async (resolve) => {
-            const success = vscode.commands.executeCommand(QbsCommandKey.InstallProduct, this.definition?.products);
+            const success = vscode.commands.executeCommand<boolean>(QbsCommandKey.InstallProduct, this.definition?.products);
             resolve(success);
         }).then((result) => {
             console.log('Complete install task with result: ' + result);
@@ -188,7 +188,7 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         console.log('Start rebuild task');
         return new Promise<boolean>(async (resolve) => {
-            const success = vscode.commands.executeCommand(QbsCommandKey.RebuildProduct, this.definition?.products);
+            const success = vscode.commands.executeCommand<boolean>(QbsCommandKey.RebuildProduct, this.definition?.products);
             resolve(success);
         }).then((result) => {
             console.log('Complete rebuild task with result: ' + result);
@@ -207,7 +207,7 @@ class QbsTaskTerminal implements vscode.Pseudoterminal {
 
         console.log('Start resolve task');
         return new Promise<boolean>(async (resolve) => {
-            const success = vscode.commands.executeCommand(QbsCommandKey.ResolveProject, this.definition?.products);
+            const success = vscode.commands.executeCommand<boolean>(QbsCommandKey.ResolveProject, this.definition?.products);
             resolve(success);
         }).then((result) => {
             console.log('Complete resolve task with result: ' + result);
