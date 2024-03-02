@@ -1,5 +1,11 @@
 # What's New?
 
+## 2.1.6
+
+- [#79](https://github.com/denis-shienkov/vscode-qbs/issues/79)
+Fixed that, artifacts with a long paths are displayed as a view
+with the hierarchical subfolders in the project tree.
+
 ## 2.1.5
 
  - Added new **Qbs: Export Build Profiles** command to

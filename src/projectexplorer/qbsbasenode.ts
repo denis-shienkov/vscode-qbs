@@ -13,6 +13,7 @@ export enum QbsBaseNodeContext {
     RootProject = 'root-project-node',
     SourceArtifact = 'source-artifact-node',
     SubProject = 'sub-project-node',
+    Folder = 'folder-node',
 }
 
 export enum QbsBaseNodeTheme {

@@ -1,13 +1,15 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { QbsBaseNode } from './qbsbasenode';
+import { QbsFolderData } from './qbsfolderdata';
+import { QbsFolderNode } from './qbsfoldernode';
 import { QbsLocationNode } from './qbslocationnode';
 import { QbsProtocolGroupData } from '../protocol/qbsprotocolgroupdata';
-import { QbsProtocolSourceArtifactData } from '../protocol/qbsprotocolsourceartifactdata';
-import { QbsSourceArtifactNode } from './qbssourceartifactnode';
 import { QbsProtocolLocationData } from '../protocol/qbsprotocollocationdata';
+import { QbsSourceArtifactNode } from './qbssourceartifactnode';
 
-enum QbsPGroupNodeIcon {
+enum QbsGroupNodeIcon {
     Group = 'files',
 }
 
@@ -15,9 +17,7 @@ enum QbsPGroupNodeIcon {
 export class QbsGroupNode extends QbsBaseNode {
     private readonly name: string
     private readonly location: QbsProtocolLocationData
-    private readonly fsPath: string
-    private readonly sources: QbsProtocolSourceArtifactData[];
-    private readonly wildcards: QbsProtocolSourceArtifactData[];
+    private readonly folder: QbsFolderData
     private readonly isEnabled: boolean
 
     public constructor(
@@ -39,17 +39,17 @@ export class QbsGroupNode extends QbsBaseNode {
         const fsPath = location.getFilePath();
         if (!fsPath)
             throw new Error('Unable to create group node because the file path is undefined');
-        this.fsPath = fsPath;
+        const fsParent = path.dirname(fsPath);
 
-        this.sources = groupData.getSourceArtifacts();
-        this.wildcards = groupData.getSourceWildcardArtifacts();
+        const allSources = [...groupData.getSourceArtifacts(), ...groupData.getSourceWildcardArtifacts()];
+        this.folder = new QbsFolderData(allSources, fsParent);
         this.isEnabled = groupData.getIsEnabled() || false;
     }
 
     public getTreeItem(): vscode.TreeItem {
         const item = new vscode.TreeItem(this.getLabel(), vscode.TreeItemCollapsibleState.Collapsed);
         item.id = this.uuid;
-        item.iconPath = new vscode.ThemeIcon(QbsPGroupNodeIcon.Group);
+        item.iconPath = new vscode.ThemeIcon(QbsGroupNodeIcon.Group);
         return item;
     }
 
@@ -57,9 +57,9 @@ export class QbsGroupNode extends QbsBaseNode {
         return [
             ...[new QbsLocationNode(
                 this.resourcesPath, this.showDisabledNodes, this.location, this.isEnabled, true)],
-            ...this.sources.map(artifactData => new QbsSourceArtifactNode(
-                this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled)),
-            ...this.wildcards.map(artifactData => new QbsSourceArtifactNode(
+            ...this.folder.getFolders().map(folderData => new QbsFolderNode(
+                this.resourcesPath, this.showDisabledNodes, folderData, this.isEnabled)),
+            ...this.folder.getSources().map(artifactData => new QbsSourceArtifactNode(
                 this.resourcesPath, this.showDisabledNodes, artifactData, this.isEnabled))
         ];
     }
