@@ -1,5 +1,12 @@
 # What's New?
 
+## 2.1.7
+
+- Added new **Qbs: Update Build Profiles** command which just
+reads the available Qbs profiles and fills the profile selector.
+Also this command runs once instead of **Qbs: Scan Build Profiles**
+when the extension loading to avoid the Qbs profiles re-detection.
+
 ## 2.1.6
 
 - [#79](https://github.com/denis-shienkov/vscode-qbs/issues/79)

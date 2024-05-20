@@ -27,6 +27,7 @@
     "qbs-tools.command.qbs.selectRunProduct.title": "Выбрать продукт для запуска",
     "qbs-tools.command.qbs.startSession.title": "Запустить сессию",
     "qbs-tools.command.qbs.stopSession.title": "Остановить сессию",
+    "qbs-tools.command.qbs.updateBuildProfiles.title": "Обновить профили сборки",
     "qbs-tools.configuration.qbs.autoResolve.description": "Сканировать проект автоматически при внесении изменений в файлы сборки.",
     "qbs-tools.configuration.qbs.buildBeforeRun.description": "Собирать продукт перед его запуском.",
     "qbs-tools.configuration.qbs.buildConfigurationsFilePath.description": "Полный путь к файлу qbs-configurations.json, содержащему конфигурации сборки.",

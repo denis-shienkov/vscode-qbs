@@ -2,7 +2,7 @@
     "name": "qbs-tools",
     "displayName": "Qbs",
     "description": "Qbs tools support for Visual Studio Code",
-    "version": "2.1.6",
+    "version": "2.1.7",
     "publisher": "qbs-community",
     "author": {
         "name": "Denis Shienkov"
@@ -202,6 +202,11 @@
                 "command": "qbs.stopSession",
                 "title": "%qbs-tools.command.qbs.stopSession.title%",
                 "category": "Qbs"
+            },
+            {
+                "command": "qbs.updateBuildProfiles",
+                "title": "%qbs-tools.command.qbs.updateBuildProfiles.title%",
+                "category": "Qbs"
             }
         ],
         "taskDefinitions": [
@@ -328,6 +333,10 @@
                 },
                 {
                     "command": "qbs.stopSession",
+                    "when": "qbs:extension-activated"
+                },
+                {
+                    "command": "qbs.updateBuildProfiles",
                     "when": "qbs:extension-activated"
                 }
             ],

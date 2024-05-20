@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsOutputLogger } from './qbsoutputlogger';
 import { QbsProtocolProfileData } from './protocol/qbsprotocolprofiledata';
-import { QbsProtocolQbsModuleData } from './protocol/qbsprotocolqbsmoduledata';
 import { QbsResult } from './qbsresult';
 import { QbsSettings } from './qbssettings';
 import { trimLine } from './qbsutils';
@@ -43,7 +42,10 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
     private registerCommandsHandlers(context: vscode.ExtensionContext): void {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ScanBuildProfiles, async () => {
-            await this.scanProfilesWithProgress();
+            await this.scanProfilesWithProgress(); // Scan with re-detection.
+        }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.UpdateBuildProfiles, async () => {
+            await this.updateProfilesWithProgress(); // Scan without re-detection.
         }));
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.ExportBuildProfiles, async () => {
             await this.exportProfilesWithDialog();
@@ -87,7 +89,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         if (!chosen) // Choose was canceled by the user.
             return;
         else if (!chosen.profile && !chosen.isDefault) // Scan profiles item was choosed by the user.
-            await this.scanProfilesWithProgress();
+            await this.scanProfilesWithProgress(); // Scan with re-detection
         else // Profile was choosed by the user (or default or selected).
             this.profileSelected.fire(chosen.profile);
     }
@@ -108,6 +110,27 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                                 'Failed with an error: {0}', result.message)
                     });
                     setTimeout(() => { resolve(); }, 3000);
+                });
+            });
+        });
+    }
+
+    private async updateProfilesWithProgress(): Promise<void> {
+        return await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: localize('qbs.buildprofilemanager.update.progress.title', 'Updating build profiles')
+        }, async (progress) => {
+            return new Promise<void>(async (resolve) => {
+                return await this.updateProfiles().then((result) => {
+                    progress.report({
+                        increment: 100,
+                        message: (result.success)
+                            ? localize('qbs.buildprofilemanager.update.progress.completed.message',
+                                'Successfully completed')
+                            : localize('qbs.buildprofilemanager.update.progress.failed.message',
+                                'Failed with an error: {0}', result.message)
+                    });
+                    setTimeout(() => { resolve(); }, 1000);
                 });
             });
         });
@@ -185,6 +208,16 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         }).then((result) => {
             QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.scan.log.finished',
                 'Build profiles scanning finished.'));
+            return result;
+        });
+    }
+
+    private async updateProfiles(): Promise<QbsResult<void, string>> {
+        QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.update.log.started',
+            'Starting build profiles updating...'));
+        return this.fillProfiles().then((result) => {
+            QbsOutputLogger.getInstance().logOutput(localize('qbs.buildprofilemanager.update.log.finished',
+                'Build profiles updating finished.'));
             return result;
         });
     }

@@ -74,6 +74,14 @@ Also, it is possible to create the profile that allows to build the Qt
 projects, using the [setup-qt](https://doc.qt.io/qbs/cli-setup-qt.html)
 command.
 
+## Updating build profiles
+
+If the Qbs already configured with build profiles, then use the
+**Qbs: Update Build Profiles** command to read that profiles from
+the Qbs configuration into the extension to fill the profile selector.
+
+**Note**: This command runs automatically when the extension loading.
+
 ## Exporting build profiles
 
 * To export the build profiles into a text file, run the

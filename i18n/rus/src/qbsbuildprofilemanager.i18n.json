@@ -18,5 +18,10 @@
     "qbs.buildprofilemanager.scan.select.description": "Сканировать доступные профили сборки",
     "qbs.buildprofilemanager.scan.select.label": "[Сканировать профили сборки]",
     "qbs.buildprofilemanager.select.description1": "Архитектура \"{0}\", тип \"{1}\"",
-    "qbs.buildprofilemanager.select.description2": "Базовый профиль \"{0}\""
+    "qbs.buildprofilemanager.select.description2": "Базовый профиль \"{0}\"",
+    "qbs.buildprofilemanager.update.log.finished": "Обновление профилей сборки завершено",
+    "qbs.buildprofilemanager.update.log.started": "Запуск обновления профилей сборки...",
+    "qbs.buildprofilemanager.update.progress.completed.message": "Успешно завершено",
+    "qbs.buildprofilemanager.update.progress.failed.message": "Завершено с ошибкой: {0}",
+    "qbs.buildprofilemanager.update.progress.title": "Обновление профилей сборки"
 }
