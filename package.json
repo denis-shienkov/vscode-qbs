@@ -40,11 +40,16 @@
                 "extensions": [
                     ".qbs"
                 ],
+                "aliases": [
+                    "QBS",
+                    "Qbs",
+                    "qbs"
+                ],
                 "icon": {
                     "light": "res/cube.svg",
                     "dark": "res/cube.svg"
                 },
-                "configuration": "./qbs-language-configuration.json"
+                "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
