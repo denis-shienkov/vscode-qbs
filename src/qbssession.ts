@@ -21,6 +21,8 @@ import { QbsProtocolTaskMaxProgressResponse } from './protocol/qbsprotocoltaskma
 import { QbsProtocolTaskProgressResponse } from './protocol/qbsprotocoltaskprogressresponse';
 import { QbsProtocolTaskStartedResponse } from './protocol/qbsprotocoltaskstartedresponse';
 
+import { QbsLanguageClient } from './qbslanguageclient';
+
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export enum QbsSessionState {
@@ -40,6 +42,7 @@ export class QbsSessionProjectData {
 export class QbsSession implements vscode.Disposable {
     private engine: QbsProtocolEngine = new QbsProtocolEngine();
     private state: QbsSessionState = QbsSessionState.Stopped;
+    private languageClient?: QbsLanguageClient;
 
     private readonly stateChanged: vscode.EventEmitter<QbsSessionState> = new vscode.EventEmitter<QbsSessionState>();
 
@@ -135,6 +138,8 @@ export class QbsSession implements vscode.Disposable {
         if (type === QbsProtocolDataKey.Hello) {
             const result = new QbsProtocolHelloResponse(response)
             this.helloReceived.fire(result);
+            if (result.lspSocket)
+                this.startupLanguageClient(result.lspSocket, result.apiLevel);
         } else if (type === QbsProtocolDataKey.ProjectResolved) {
             const data = new QbsProtocolProjectData(response[QbsProtocolDataKey.ProjectData]);
             const msg = new QbsProtocolMessageResponse(response[QbsProtocolDataKey.Error]);
@@ -192,6 +197,12 @@ export class QbsSession implements vscode.Disposable {
         this.stateChanged.fire(this.state);
     }
 
+    private startupLanguageClient(pipeName: string, apiLevel: number) {
+        if (apiLevel <= 4)
+            return; // LSP supports by Qbs from the Qbs API Level version 4 and greather!
+        this.languageClient = new QbsLanguageClient(pipeName);
+    }
+
     private static convert(status: QbsProtocolEngineState): QbsSessionState {
         switch (status) {
             case QbsProtocolEngineState.Started:
@@ -217,7 +228,7 @@ export class QbsSession implements vscode.Disposable {
             return false;
         } else if (!fs.existsSync(qbsPath)) {
             await vscode.window.showErrorMessage(localize('qbs.executable.not-found.error.message',
-                `Qbs executable not found.`));
+                'Qbs executable not found.'));
             return false;
         }
         return true;

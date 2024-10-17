@@ -6,7 +6,8 @@
 reads the available Qbs profiles and fills the profile selector.
 Also this command runs once instead of **Qbs: Scan Build Profiles**
 when the extension loading to avoid the Qbs profiles re-detection.
-- Improve hihgliting for the Qbs language syntax in editor.
+- Improved hihgliting for the Qbs language syntax in editor.
+- Added support for LSP server provided by Qbs session.
 
 ## 2.1.6
 

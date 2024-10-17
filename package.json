@@ -587,6 +587,7 @@
         "jsonc-parser": "^3.0.0",
         "uuid": "^9.0.0",
         "vscode-cpptools": "^6.1.0",
+        "vscode-languageclient": "^9.0.1",
         "vscode-nls": "^5.0.0",
         "which": "~2.0.2"
     },

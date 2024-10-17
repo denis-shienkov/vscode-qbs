@@ -45,6 +45,7 @@ export enum QbsProtocolDataKey {
     Location = 'location',
     LogData = 'log-data',
     LogLevel = 'log-level',
+    LspSocket = 'lsp-socket',
     MaxJobCount = 'max-job-count',
     MaxProgress = 'max-progress',
     Message = 'message',
