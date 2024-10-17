@@ -6,6 +6,7 @@
 reads the available Qbs profiles and fills the profile selector.
 Also this command runs once instead of **Qbs: Scan Build Profiles**
 when the extension loading to avoid the Qbs profiles re-detection.
+- Improve hihgliting for the Qbs language syntax in editor.
 
 ## 2.1.6
 
