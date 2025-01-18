@@ -1,5 +1,11 @@
 # What's New?
 
+## 2.1.8
+
+- [#82](https://github.com/denis-shienkov/vscode-qbs/issues/82)
+Used forward slashes for separators in a file paths, which requires
+since Qbs v2.5.0.
+
 ## 2.1.7
 
 - Added new **Qbs: Update Build Profiles** command which just
