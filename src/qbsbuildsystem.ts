@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as nls from 'vscode-nls';
 import * as vscode from 'vscode';
 
-import { msToTime, trySaveAll } from './qbsutils';
+import { msToTime, trySaveAll, fixFsPathSeparators } from './qbsutils';
 import { QbsBuildConfigurationManager } from './qbsbuildconfigurationmanager';
 import { QbsBuildVariant } from './datatypes/qbsbuildvariant';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
@@ -981,7 +981,7 @@ export class QbsBuildSystem implements vscode.Disposable {
         fsPath = QbsSettings.substituteProjectName(fsPath, projectName);
         fsPath = QbsSettings.substituteBuildProfileName(fsPath, profileName);
         fsPath = QbsSettings.substituteBuildConfigurationName(fsPath, configurationName);
-        return fsPath;
+        return fixFsPathSeparators(fsPath);
     }
 
     private static getBuildRootDirectoryPathFromSettings(): string | undefined {
