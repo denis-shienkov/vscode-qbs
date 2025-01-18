@@ -44,8 +44,8 @@ export class QbsBuildSystemFilesNode extends QbsBaseNode {
         const item = new vscode.TreeItem(this.getLabel());
         item.id = this.uuid;
         item.iconPath = {
-            light: path.join(this.resourcesPath, 'light', QbsBuildSystemFilesNodeIcon.Qbs),
-            dark: path.join(this.resourcesPath, 'dark', QbsBuildSystemFilesNodeIcon.Qbs),
+            light: vscode.Uri.file(path.join(this.resourcesPath, 'light', QbsBuildSystemFilesNodeIcon.Qbs)),
+            dark: vscode.Uri.file(path.join(this.resourcesPath, 'dark', QbsBuildSystemFilesNodeIcon.Qbs)),
         };
         return item;
     }
