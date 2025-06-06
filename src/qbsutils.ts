@@ -6,6 +6,8 @@ import * as vscode from 'vscode';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
+const vscodeVariables = require('vscode-variables');
+
 export function getHash(input: BinaryLike) {
     const hash = createHash('sha1');
     hash.update(input);
@@ -23,6 +25,14 @@ export function escapeShell(shell: string): string {
         return `"${shell}"`;
     }
     return shell;
+}
+
+export function resolveVariables(s: string, recursive: boolean = true): string {
+    return vscodeVariables(s, recursive);
+}
+
+export function workspaceFolder(): string {
+    return vscodeVariables('${workspaceFolder}', true);
 }
 
 export function trimLine(line: string): string { return line.replace(/[\n\r]/g, ''); }

@@ -10,6 +10,7 @@ import { QbsProtocolEngine } from './protocol/qbsprotocolengine';
 import { QbsProtocolEngineState } from './protocol/qbsprotocolengine';
 import { QbsProtocolProjectData } from './protocol/qbsprotocolprojectdata';
 import { QbsSettings } from './qbssettings';
+import { resolveVariables } from './qbsutils';
 
 // Protocol request.
 import { QbsProtocolRequest } from './protocol/qbsprotocolrequest';
@@ -117,7 +118,7 @@ export class QbsSession implements vscode.Disposable {
 
     private registerCommandsHandlers(context: vscode.ExtensionContext): void {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.StartSession, async () => {
-            await this.startSession(QbsSettings.getQbsPath());
+            await this.startSession(resolveVariables(QbsSettings.getQbsPath()));
         }));
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.StopSession, async () => {
             await this.stopSession();

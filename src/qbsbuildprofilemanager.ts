@@ -1,13 +1,14 @@
 import * as cp from 'child_process';
 import * as nls from 'vscode-nls';
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsOutputLogger } from './qbsoutputlogger';
 import { QbsProtocolProfileData } from './protocol/qbsprotocolprofiledata';
 import { QbsResult } from './qbsresult';
 import { QbsSettings } from './qbssettings';
-import { trimLine } from './qbsutils';
+import { trimLine, fixFsPathSeparators, resolveVariables, workspaceFolder } from './qbsutils';
 
 const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
@@ -366,23 +367,30 @@ export class QbsBuildProfileManager implements vscode.Disposable {
     }
 
     private getDetectToolchainsShell(): string {
-        return `"${QbsSettings.getQbsPath()}" setup-toolchains --detect ${this.getSetitngsShell()}`;
+        return `"${this.getQbsPath()}" setup-toolchains --detect ${this.getSettingsShell()}`;
     }
 
     private getListToolchainsShell(): string {
-        return `"${QbsSettings.getQbsPath()}" config --list ${this.getSetitngsShell()}`;
+        return `"${this.getQbsPath()}" config --list ${this.getSettingsShell()}`;
     }
 
     private getExportToolchainsShell(fsPath: string): string {
-        return `"${QbsSettings.getQbsPath()}" config --export ${fsPath} ${this.getSetitngsShell()}`;
+        return `"${this.getQbsPath()}" config --export ${fsPath} ${this.getSettingsShell()}`;
     }
 
     private getImportToolchainsShell(fsPath: string): string {
-        return `"${QbsSettings.getQbsPath()}" config --import ${fsPath} ${this.getSetitngsShell()}`;
+        return `"${this.getQbsPath()}" config --import ${fsPath} ${this.getSettingsShell()}`;
     }
 
-    private getSetitngsShell(): string {
-        const directory = QbsSettings.getSettingsDirectory();
+    private getQbsPath() : string { return resolveVariables(QbsSettings.getQbsPath()); }
+
+    private getSettingsShell(): string {
+        var directory = QbsSettings.getSettingsDirectory();
+        if (directory) {
+            directory = resolveVariables(directory);
+            directory = fixFsPathSeparators(directory)
+            directory = path.resolve(workspaceFolder(), directory);
+        }
         return directory ? ` --settings-dir "${directory}"` : '';
     }
 

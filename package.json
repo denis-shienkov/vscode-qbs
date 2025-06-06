@@ -589,6 +589,7 @@
         "vscode-cpptools": "^6.1.0",
         "vscode-languageclient": "^9.0.1",
         "vscode-nls": "^5.0.0",
+        "vscode-variables": "^1.0.1",
         "which": "~2.0.2"
     },
     "overrides": {
