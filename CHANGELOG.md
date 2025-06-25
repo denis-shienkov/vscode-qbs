@@ -1,5 +1,11 @@
 # What's New?
 
+## next
+
+- [#84] (https://github.com/denis-shienkov/vscode-qbs/pull/84)
+Added support for resolving VS Code variables and relative paths
+in Qbs plugin paths
+
 ## 2.1.8
 
 - [#82](https://github.com/denis-shienkov/vscode-qbs/issues/82)
