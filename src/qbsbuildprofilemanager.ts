@@ -72,6 +72,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         interface QbsProfileQuickPickItem extends vscode.QuickPickItem {
             profile?: QbsProtocolProfileData;
             isDefault?: boolean;
+            isToggleFilter?: boolean;
         }
 
         // Load profile filters if not already loaded
@@ -79,38 +80,68 @@ export class QbsBuildProfileManager implements vscode.Disposable {
             this.profileFilters = await this.readProfileFilters();
         }
 
-        // Get filtered profiles
-        const filteredProfiles = this.getFilteredProfiles();
+        let showFilteredOnly = true; // Always start with filtered profiles
 
-        const items: QbsProfileQuickPickItem[] = [
-            ...[
-                {
-                    label: localize('qbs.buildprofilemanager.scan.select.label', '[Scan build profiles]'),
-                    description: localize('qbs.buildprofilemanager.scan.select.description', 'Scan available build profiles'),
-                    profile: undefined
-                },
-                {
-                    label: localize('qbs.buildprofilemanager.default.select.label', 'Default'),
-                    description: localize('qbs.buildprofilemanager.default.select.description',
-                        'Default profile "{0}"', this.defaultProfileName),
+        const showProfilePicker = async (): Promise<void> => {
+            // Get profiles based on current filter state
+            const profilesToShow = showFilteredOnly ? this.getFilteredProfiles() : this.profiles;
+            const hasFiltering = this.profileFilters && this.profileFilters.profiles && this.profileFilters.profiles.length > 0;
+            const isFiltered = hasFiltering && profilesToShow.length < this.profiles.length;
+
+            const items: QbsProfileQuickPickItem[] = [
+                ...[
+                    {
+                        label: localize('qbs.buildprofilemanager.scan.select.label', '[Scan build profiles]'),
+                        description: localize('qbs.buildprofilemanager.scan.select.description', 'Scan available build profiles'),
+                        profile: undefined
+                    },
+                    {
+                        label: localize('qbs.buildprofilemanager.default.select.label', 'Default'),
+                        description: localize('qbs.buildprofilemanager.default.select.description',
+                            'Default profile "{0}"', this.defaultProfileName),
+                        profile: undefined,
+                        isDefault: true
+                    }
+                ],
+                // Add filter toggle item if filtering is available and some profiles are filtered out
+                ...(hasFiltering && isFiltered ? [{
+                    label: localize('qbs.buildprofilemanager.showall.select.label', '[Show All Profiles]'),
+                    description: localize('qbs.buildprofilemanager.showall.select.description', 'Show all available profiles without filtering'),
                     profile: undefined,
-                    isDefault: true
-                }
-            ],
-            ...filteredProfiles.map((profile) => {
-                const label = profile.getName();
-                const description = this.getProfileDescription(profile);
-                return { label, description, profile };
-            })
-        ];
+                    isToggleFilter: true
+                }] : []),
+                // Add filter toggle item if showing all profiles and filtering is available
+                ...(hasFiltering && !showFilteredOnly ? [{
+                    label: localize('qbs.buildprofilemanager.filter.select.label', '[Filter Profiles]'),
+                    description: localize('qbs.buildprofilemanager.filter.select.description', 'Show only filtered profiles from qbs-profiles.json'),
+                    profile: undefined,
+                    isToggleFilter: true
+                }] : []),
+                ...profilesToShow.map((profile) => {
+                    const label = profile.getName();
+                    const description = this.getProfileDescription(profile);
+                    return { label, description, profile };
+                })
+            ];
 
-        const chosen = await vscode.window.showQuickPick(items);
-        if (!chosen) // Choose was canceled by the user.
-            return;
-        else if (!chosen.profile && !chosen.isDefault) // Scan profiles item was choosed by the user.
-            await this.scanProfilesWithProgress(); // Scan with re-detection
-        else // Profile was choosed by the user (or default or selected).
-            this.profileSelected.fire(chosen.profile);
+            const chosen = await vscode.window.showQuickPick(items);
+            if (!chosen) {
+                // Choose was canceled by the user.
+                return;
+            } else if (chosen.isToggleFilter) {
+                // Toggle filter state and show picker again
+                showFilteredOnly = !showFilteredOnly;
+                await showProfilePicker();
+            } else if (!chosen.profile && !chosen.isDefault) {
+                // Scan profiles item was chosen by the user.
+                await this.scanProfilesWithProgress(); // Scan with re-detection
+            } else {
+                // Profile was chosen by the user (or default or selected).
+                this.profileSelected.fire(chosen.profile);
+            }
+        };
+
+        await showProfilePicker();
     }
 
     private async scanProfilesWithProgress(): Promise<void> {
