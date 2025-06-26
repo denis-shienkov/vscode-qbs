@@ -5,6 +5,7 @@ import * as path from 'path';
 
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsOutputLogger } from './qbsoutputlogger';
+import { QbsProjectManager } from './qbsprojectmanager';
 import { QbsProtocolProfileData } from './protocol/qbsprotocolprofiledata';
 import { QbsResult } from './qbsresult';
 import { QbsSettings } from './qbssettings';
@@ -416,5 +417,39 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
         }
         return '';
+    }
+
+    /**
+     * Gets the full path to the qbs-profiles.json file based on the project path.
+     * Similar to QbsBuildConfigurationManager.getFullBuildConfigurationsFilePath().
+     * @param fsProjectPath The file system path to the project
+     * @returns The full path to the qbs-profiles.json file, or undefined if not available
+     */
+    private static getFullBuildProfilesFilePath(fsProjectPath: string): string | undefined {
+        const sourceRoot = QbsSettings.getSourceRootDirectory(fsProjectPath);
+        if (!sourceRoot) {
+            vscode.window.showWarningMessage(localize('qbs.buildprofilemanager.noworkspace.message',
+                'Unable get the build profiles file because no any workspace folder is open.'));
+            return;
+        }
+        const result = QbsSettings.getBuildProfilesFilePath();
+        if (!result) {
+            vscode.window.showWarningMessage(localize('qbs.buildprofilemanager.nofspath.message',
+                'Unable to get the build profiles file because its path is not set in Qbs extension settings.'));
+            return;
+        }
+        return QbsSettings.substituteSourceRoot(result, sourceRoot);
+    }
+
+    /**
+     * Returns the full path to the qbs-profiles.json file.
+     * Similar to QbsBuildConfigurationManager.getFullBuildConfigurationsFilePath() but for profiles.
+     * @returns The path to the qbs-profiles.json file, or undefined if not available.
+     */
+    public getProfilesFilePath(): string | undefined {
+        const fsProjectPath = QbsProjectManager.getInstance().getProject()?.getFsPath();
+        if (!fsProjectPath)
+            return;
+        return QbsBuildProfileManager.getFullBuildProfilesFilePath(fsProjectPath);
     }
 }
