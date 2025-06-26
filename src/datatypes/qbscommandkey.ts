@@ -36,4 +36,6 @@ export enum QbsCommandKey {
     StartupCppCodeModel = 'qbs.startupCppCodeModel',
     StopSession = 'qbs.stopSession',
     UpdateBuildProfiles = 'qbs.updateBuildProfiles',
+    CreateBuildProfilesFilter = 'qbs.createBuildProfilesFilter',
+    EditBuildProfilesFilter = 'qbs.editBuildProfilesFilter',
 }

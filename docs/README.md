@@ -12,6 +12,7 @@ with Qbs-based projects.
 * [Debug a project](qbs-how-to.md#debug-a-project)
 * [Edit a build configurations](qbs-how-to.md#edit-a-build-configurations)
 * [Edit a launch configurations](qbs-how-to.md#edit-a-launch-configurations)
+* [Add a build profiles filter](qbs-how-to.md#add-a-build-profiles-filter)
 * [Set up include paths for C++ IntelliSense](qbs-how-to.md#set-up-include-paths-for-c-intellisense)
 
 [Build profiles](qbs-build-profiles.md)

@@ -18,6 +18,7 @@ for more information about variable expansion.
 | `qbs.autoResolve` | Starts the automatic resolution of the project when changes are made to the build files. | `true` | No. |
 | `qbs.buildBeforeRun` | Always build the target product before it launches. | `true` | No. |
 | `qbs.buildDirectory` | Specify location of the Qbs [build directory](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-build-op-op-directory-op-op-op-op-d-op-lt-op-directory-op-gt-op). | `${sourceDirectory}/build/${profileName}_${configurationName}` | Yes. |
+| `qbs.buildProfilesFilePath` | Specify location of the profiles filter `qbs-profiles.json`file. | `${sourceDirectory}/.vscode/qbs-profiles.json` | Yes. |
 | `qbs.cleanInstallRoot` | Removes the [installation](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-clean-op-op-install-op-op-root) base directory before installing. | `false` | No. |
 | `qbs.clearOutputBeforeOperation` | Clears the output console before starting the operation (applicable for Resolve, Clean, Build, and ReBuild operations). | `false` | No. |
 | `qbs.commandEchoMode` | Specifies how Qbs should display the command lines at building using the [command echo mode](https://doc.qt.io/qbs/cli-build.html#op-op-op-op-command-op-op-echo-op-op-mode-op-lt-op-mode-op-gt-op). | `summary` | No. |

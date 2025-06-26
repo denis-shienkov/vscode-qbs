@@ -212,6 +212,16 @@
                 "command": "qbs.updateBuildProfiles",
                 "title": "%qbs-tools.command.qbs.updateBuildProfiles.title%",
                 "category": "Qbs"
+            },
+            {
+                "command": "qbs.createBuildProfilesFilter",
+                "title": "%qbs-tools.command.qbs.createBuildProfilesFilter.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.editBuildProfilesFilter",
+                "title": "%qbs-tools.command.qbs.editBuildProfilesFilter.title%",
+                "category": "Qbs"
             }
         ],
         "taskDefinitions": [
@@ -420,6 +430,12 @@
                     "type": "string",
                     "default": "${sourceDirectory}/.vscode/qbs-configurations.json",
                     "description": "%qbs-tools.configuration.qbs.buildConfigurationsFilePath.description%",
+                    "scope": "resource"
+                },
+                "qbs.buildProfilesFilePath": {
+                    "type": "string",
+                    "default": "${sourceDirectory}/.vscode/qbs-profiles.json",
+                    "description": "%qbs-tools.configuration.qbs.buildProfilesFilePath.description%",
                     "scope": "resource"
                 },
                 "qbs.buildDirectory": {

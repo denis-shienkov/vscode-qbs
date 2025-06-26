@@ -19,6 +19,7 @@ export namespace QbsSettings {
         AutoResolve = 'autoResolve',
         BuildBeforeRun = 'buildBeforeRun',
         BuildConfigurationsFilePath = 'buildConfigurationsFilePath',
+        BuildProfilesFilePath = 'buildProfilesFilePath',
         BuildDirectory = 'buildDirectory',
         CleanInstallRoot = 'cleanInstallRoot',
         ClearOutputBeforeOperation = 'clearOutputBeforeOperation',
@@ -63,6 +64,11 @@ export namespace QbsSettings {
     /** Returns the path to the `qbs-configurations.json` file from the extension settings. */
     export function getBuildConfigurationsFilePath(): string {
         return getString(SettingKey.BuildConfigurationsFilePath, qbsDefaultBuildConfigurationsFilePath);
+    }
+
+    /** Returns the path to the `qbs-profiles.json` file from the extension settings. */
+    export function getBuildProfilesFilePath(): string {
+        return getString(SettingKey.BuildProfilesFilePath, qbsDefaultBuildProfilesFilePath);
     }
 
     /** Returns the value of the Qbs `keep-going` property from the extension settings. */
@@ -148,6 +154,7 @@ export namespace QbsSettings {
     const qbsDefaultBuildDirectoryPath = `${QbsSubstitutionPattern.SourceDirectory}/build/${QbsSubstitutionPattern.ProfileName}_${QbsSubstitutionPattern.ConfigurationName}`;
     const qbsDefaultLaunchFilePath = `${QbsSubstitutionPattern.SourceDirectory}/.vscode/launch.json`;
     const qbsDefaultBuildConfigurationsFilePath = `${QbsSubstitutionPattern.SourceDirectory}/.vscode/qbs-configurations.json`;
+    const qbsDefaultBuildProfilesFilePath = `${QbsSubstitutionPattern.SourceDirectory}/.vscode/qbs-profiles.json`;
 
     function getSettings(): vscode.WorkspaceConfiguration {
         return vscode.workspace.getConfiguration(qbsSettingsSection);
