@@ -29,5 +29,14 @@
     "qbs.buildprofilemanager.update.log.started": "Запуск обновления профилей сборки...",
     "qbs.buildprofilemanager.update.progress.completed.message": "Успешно завершено",
     "qbs.buildprofilemanager.update.progress.failed.message": "Завершено с ошибкой: {0}",
-    "qbs.buildprofilemanager.update.progress.title": "Обновление профилей сборки"
+    "qbs.buildprofilemanager.update.progress.title": "Обновление профилей сборки",
+    "qbs.buildprofilemanager.createfilter.exists.message": "Файл \"{0}\" уже существует. Хотите перезаписать его?",
+    "qbs.buildprofilemanager.createfilter.overwrite": "Перезаписать",
+    "qbs.buildprofilemanager.createfilter.cancel": "Отмена",
+    "qbs.buildprofilemanager.createfilter.success.message": "Создан файл фильтра профилей сборки \"{0}\" с {1} профилями.",
+    "qbs.buildprofilemanager.createfilter.error.message": "Не удалось создать файл фильтра профилей сборки: {0}",
+    "qbs.buildprofilemanager.editfilter.notfound.message": "Файл фильтра профилей сборки \"{0}\" не существует. Хотите создать его?",
+    "qbs.buildprofilemanager.editfilter.create": "Создать файл",
+    "qbs.buildprofilemanager.editfilter.cancel": "Отмена",
+    "qbs.buildprofilemanager.editfilter.error.message": "Не удалось открыть файл фильтра профилей сборки: {0}"
 }

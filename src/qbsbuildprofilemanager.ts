@@ -66,6 +66,12 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.SelectBuildProfile, async () => {
             await this.selectProfile();
         }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.CreateBuildProfilesFilter, async () => {
+            await this.createBuildProfilesFilter();
+        }));
+        context.subscriptions.push(vscode.commands.registerCommand(QbsCommandKey.EditBuildProfilesFilter, async () => {
+            await this.editBuildProfilesFilter();
+        }));
     }
 
     private async selectProfile(): Promise<void> {
@@ -564,5 +570,106 @@ export class QbsBuildProfileManager implements vscode.Disposable {
      */
     public async refreshProfileFilters(): Promise<void> {
         this.profileFilters = await this.readProfileFilters();
+    }
+
+    /**
+     * Creates a new qbs-profiles.json file with all currently known profiles and opens it for editing.
+     * This command allows users to easily set up a profile filter by starting with all available profiles.
+     */
+    public async createBuildProfilesFilter(): Promise<void> {
+        try {
+            const filePath = this.getProfilesFilePath();
+            if (!filePath) {
+                return; // Error already shown by getProfilesFilePath()
+            }
+
+            // Check if file already exists
+            if (fs.existsSync(filePath)) {
+                const overwrite = await vscode.window.showWarningMessage(
+                    localize('qbs.buildprofilemanager.createfilter.exists.message',
+                        'The file "{0}" already exists. Do you want to overwrite it?', filePath),
+                    { modal: true },
+                    localize('qbs.buildprofilemanager.createfilter.overwrite', 'Overwrite'),
+                    localize('qbs.buildprofilemanager.createfilter.cancel', 'Cancel')
+                );
+                
+                if (overwrite !== localize('qbs.buildprofilemanager.createfilter.overwrite', 'Overwrite')) {
+                    return; // User cancelled
+                }
+            }
+
+            // Create the filter data with all current profiles in the expected JSON format
+            const filterData = {
+                [QbsBuildProfileFilterKey.Version]: "1.0",
+                [QbsBuildProfileFilterKey.Profiles]: this.profiles.map(profile => ({
+                    [QbsBuildProfileFilterKey.Name]: profile.getName()
+                }))
+            };
+
+            // Ensure the directory exists
+            const dirPath = path.dirname(filePath);
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath, { recursive: true });
+            }
+
+            // Write the JSON file with proper formatting
+            const jsonContent = JSON.stringify(filterData, null, 2);
+            fs.writeFileSync(filePath, jsonContent, 'utf8');
+
+            // Open the file in the editor
+            const document = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(document);
+
+            vscode.window.showInformationMessage(
+                localize('qbs.buildprofilemanager.createfilter.success.message',
+                    'Created build profiles filter file "{0}" with {1} profiles.', 
+                    path.basename(filePath), this.profiles.length)
+            );
+
+        } catch (error) {
+            const message = localize('qbs.buildprofilemanager.createfilter.error.message',
+                'Failed to create build profiles filter file: {0}', error instanceof Error ? error.message : String(error));
+            QbsOutputLogger.getInstance().logOutput(message);
+            vscode.window.showErrorMessage(message);
+        }
+    }
+
+    /**
+     * Opens the existing qbs-profiles.json file for editing.
+     * If the file doesn't exist, offers to create it first.
+     */
+    public async editBuildProfilesFilter(): Promise<void> {
+        try {
+            const filePath = this.getProfilesFilePath();
+            if (!filePath) {
+                return; // Error already shown by getProfilesFilePath()
+            }
+
+            // Check if file exists
+            if (!fs.existsSync(filePath)) {
+                const create = await vscode.window.showInformationMessage(
+                    localize('qbs.buildprofilemanager.editfilter.notfound.message',
+                        'The build profiles filter file "{0}" does not exist. Would you like to create it?', filePath),
+                    localize('qbs.buildprofilemanager.editfilter.create', 'Create File'),
+                    localize('qbs.buildprofilemanager.editfilter.cancel', 'Cancel')
+                );
+                
+                if (create === localize('qbs.buildprofilemanager.editfilter.create', 'Create File')) {
+                    // Create the file first
+                    await this.createBuildProfilesFilter();
+                }
+                return;
+            }
+
+            // Open the existing file in the editor
+            const document = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(document);
+
+        } catch (error) {
+            const message = localize('qbs.buildprofilemanager.editfilter.error.message',
+                'Failed to open build profiles filter file: {0}', error instanceof Error ? error.message : String(error));
+            QbsOutputLogger.getInstance().logOutput(message);
+            vscode.window.showErrorMessage(message);
+        }
     }
 }

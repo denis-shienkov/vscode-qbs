@@ -212,6 +212,16 @@
                 "command": "qbs.updateBuildProfiles",
                 "title": "%qbs-tools.command.qbs.updateBuildProfiles.title%",
                 "category": "Qbs"
+            },
+            {
+                "command": "qbs.createBuildProfilesFilter",
+                "title": "%qbs-tools.command.qbs.createBuildProfilesFilter.title%",
+                "category": "Qbs"
+            },
+            {
+                "command": "qbs.editBuildProfilesFilter",
+                "title": "%qbs-tools.command.qbs.editBuildProfilesFilter.title%",
+                "category": "Qbs"
             }
         ],
         "taskDefinitions": [
