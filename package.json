@@ -422,6 +422,12 @@
                     "description": "%qbs-tools.configuration.qbs.buildConfigurationsFilePath.description%",
                     "scope": "resource"
                 },
+                "qbs.buildProfilesFilePath": {
+                    "type": "string",
+                    "default": "${sourceDirectory}/.vscode/qbs-profiles.json",
+                    "description": "%qbs-tools.configuration.qbs.buildProfilesFilePath.description%",
+                    "scope": "resource"
+                },
                 "qbs.buildDirectory": {
                     "type": "string",
                     "default": "${sourceDirectory}/build/${profileName}_${configurationName}",
