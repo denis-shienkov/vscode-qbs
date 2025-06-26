@@ -1,8 +1,12 @@
 import * as cp from 'child_process';
+import * as fs from 'fs';
+import * as jsonc from 'jsonc-parser';
 import * as nls from 'vscode-nls';
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { QbsAllBuildProfileFilterData, QbsSpecificBuildProfileFilterData } from './datatypes/qbsbuildprofilefilterdata';
+import { QbsBuildProfileFilterKey } from './datatypes/qbsbuildprofilefilterkey';
 import { QbsCommandKey } from './datatypes/qbscommandkey';
 import { QbsOutputLogger } from './qbsoutputlogger';
 import { QbsProjectManager } from './qbsprojectmanager';
@@ -16,6 +20,7 @@ const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 export class QbsBuildProfileManager implements vscode.Disposable {
     private static instance: QbsBuildProfileManager;
     private profiles: QbsProtocolProfileData[] = [];
+    private profileFilters: QbsAllBuildProfileFilterData | undefined;
     private defaultProfileName: string = '';
     private updated: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     private profileSelected: vscode.EventEmitter<QbsProtocolProfileData | undefined>
@@ -31,6 +36,9 @@ export class QbsBuildProfileManager implements vscode.Disposable {
 
         // Register the commands related to the profile manager.
         this.registerCommandsHandlers(context);
+        
+        // Initialize profile filters asynchronously
+        this.refreshProfileFilters();
     }
 
     public dispose(): void { }
@@ -65,6 +73,15 @@ export class QbsBuildProfileManager implements vscode.Disposable {
             profile?: QbsProtocolProfileData;
             isDefault?: boolean;
         }
+
+        // Load profile filters if not already loaded
+        if (this.profileFilters === undefined) {
+            this.profileFilters = await this.readProfileFilters();
+        }
+
+        // Get filtered profiles
+        const filteredProfiles = this.getFilteredProfiles();
+
         const items: QbsProfileQuickPickItem[] = [
             ...[
                 {
@@ -80,7 +97,7 @@ export class QbsBuildProfileManager implements vscode.Disposable {
                     isDefault: true
                 }
             ],
-            ...this.profiles.map((profile) => {
+            ...filteredProfiles.map((profile) => {
                 const label = profile.getName();
                 const description = this.getProfileDescription(profile);
                 return { label, description, profile };
@@ -367,6 +384,63 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         this.profiles = profiles;
     }
 
+    /**
+     * Reads the qbs-profiles.json file and returns the profile filters.
+     * @returns Promise that resolves to the profile filter data or undefined if file doesn't exist or can't be read
+     */
+    private async readProfileFilters(): Promise<QbsAllBuildProfileFilterData | undefined> {
+        const filePath = this.getProfilesFilePath();
+        if (!filePath) {
+            return undefined;
+        }
+
+        return new Promise<QbsAllBuildProfileFilterData | undefined>((resolve) => {
+            fs.readFile(filePath, (error, data) => {
+                if (error) {
+                    // File doesn't exist or can't be read - this is not an error, just no filtering
+                    resolve(undefined);
+                } else {
+                    try {
+                        const content = jsonc.parse(data.toString());
+                        const version = content[QbsBuildProfileFilterKey.Version] || '1';
+                        const profilesArray = content[QbsBuildProfileFilterKey.Profiles] || [];
+                        
+                        const profiles = profilesArray
+                            .filter((entry: any) => entry[QbsBuildProfileFilterKey.Name])
+                            .map((entry: any) => {
+                                const name = entry[QbsBuildProfileFilterKey.Name];
+                                return new QbsSpecificBuildProfileFilterData(name);
+                            });
+                        
+                        resolve(new QbsAllBuildProfileFilterData(version, profiles));
+                    } catch (parseError) {
+                        console.log('Error parsing qbs-profiles.json:', parseError);
+                        resolve(undefined);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Filters the available profiles based on the profile filters from qbs-profiles.json.
+     * @returns Array of filtered profiles
+     */
+    private getFilteredProfiles(): QbsProtocolProfileData[] {
+        // If no profile filters are loaded, return all profiles
+        if (!this.profileFilters || !this.profileFilters.profiles || this.profileFilters.profiles.length === 0) {
+            return this.profiles;
+        }
+
+        // Create a set of allowed profile names for efficient lookup
+        const allowedProfileNames = new Set(
+            this.profileFilters.profiles.map(filter => filter.name)
+        );
+
+        // Return only profiles that are in the allowed list
+        return this.profiles.filter(profile => allowedProfileNames.has(profile.getName()));
+    }
+
     private getDetectToolchainsShell(): string {
         return `"${this.getQbsPath()}" setup-toolchains --detect ${this.getSettingsShell()}`;
     }
@@ -451,5 +525,13 @@ export class QbsBuildProfileManager implements vscode.Disposable {
         if (!fsProjectPath)
             return;
         return QbsBuildProfileManager.getFullBuildProfilesFilePath(fsProjectPath);
+    }
+
+    /**
+     * Refreshes the profile filters by re-reading the qbs-profiles.json file.
+     * This should be called when the file might have changed.
+     */
+    public async refreshProfileFilters(): Promise<void> {
+        this.profileFilters = await this.readProfileFilters();
     }
 }
