@@ -10,6 +10,8 @@
     "qbs.buildprofilemanager.import.failed": "Импортирование профилей сборки из файла: {0} завершилось с ошибкой: {1}",
     "qbs.buildprofilemanager.import.success": "Профили сборки успешно импортированы из файла: {0}",
     "qbs.buildprofilemanager.import.title": "Выберите файл для импорта профилей сборки",
+    "qbs.buildprofilemanager.nofspath.message": "Невозможно получить файл профилей сборки т.к. путь к нему не установлен в настройках расширения Qbs.",
+    "qbs.buildprofilemanager.noworkspace.message": "Невозможно получить файл профилей сборки т.к. нет ни одной открытой папки в рабочей области.",
     "qbs.buildprofilemanager.scan.log.finished": "Сканирование профилей сборки завершено",
     "qbs.buildprofilemanager.scan.log.started": "Запуск сканирования профилей сборки...",
     "qbs.buildprofilemanager.scan.progress.completed.message": "Успешно завершено",
