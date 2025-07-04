@@ -71,6 +71,13 @@ command, which will create the `launch.json` file.
 * Add desired launch configurations to this `launch.json`
 file, and save it.
 
+## Add a build profiles filter
+
+* From the command palette in VS Code, run the **Qbs: Edit Build Profiles Filter**
+command, which will create the `qbs-profiles.json` file.
+* Refine the list to contain desired build profiles which 
+should be listed in the **Qbs: Select Build Profile** command.
+
 ## Set up include paths for C++ IntelliSense
 
 Qbs currently supports Microsoft's `ms-vscode.cpptools`

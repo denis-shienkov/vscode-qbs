@@ -112,6 +112,21 @@ $ qbs config --import <path/to/input/file> --settings-dir <path/to/settings/dire
 
 **Note**: Imported profiles are saved to the Qbs settings directory.
 
+## Adding a filter on build profiles
+
+Depending on the number of compilers and Qt versions you have installed,
+the list of build profiles in command **Qbs: Selected Build Profile**
+may be very long. Also, a project may want to limit the allowed profiles
+to specific compilers and Qt versions. The settings file
+`qbs-profiles.json` may contain a list of profile names. The picker
+in the selection command will only show those profiles which are
+also in the settings file.
+
+* To create or edit the settings file use **Qbs:: Edit Build Profiles Filter**.
+
+* The picker in the selection command contains items to apply or ignore the
+filter.
+
 ## Next steps
 
 - Explore the [Qbs documentation](README.md)
